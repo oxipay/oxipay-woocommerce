@@ -164,12 +164,14 @@ function woocommerce_xpay_init() {
         function generate_signature( $query, $api_key ) {
         	//step 1: order by key_name ascending
         	$encoded_query = '';
-        	foreach (ksort($query) as $key => $value) {
+        	ksort($query);
+        	foreach ($query as $key => $value) {
 	        	//step 2: concat all keys in form "{key}{value}"
         		$encoded_query .= $key . $value;
         	}
         	//step 3: use HMAC-SHA256 function on step 4 using API key as entropy      	
-            return hash_hmac( "sha256", $encoded_query, $api_key );
+            $hash = hash_hmac( "sha256", $encoded_query, $api_key );
+            return str_replace('-', '', $hash);
         }
 
 		function post_and_get_response( $request ) {
