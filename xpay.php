@@ -114,6 +114,19 @@ function woocommerce_xpay_init() {
          * Returns the test gateway URL if enabled in the admin panel, otherwise, returns the
          * default XPay payment gateway URL
          */
+        function get_gateway_url( $order ) {
+            if ($this->settings[test_mode] == "yes") {
+                $this->view_transaction_url = TEST_URL;
+            } else {
+                $this->view_transaction_url = XPAY_URL;
+            }
+            return parent::get_transaction_url( $order );
+        }
+
+        /**
+         * Returns the test gateway URL if enabled in the admin panel, otherwise, returns the
+         * default XPay payment gateway URL
+         */
         function process_payment( $order_id ) {
             global $woocommerce;
             $order = new WC_Order( $order_id );
@@ -169,7 +182,7 @@ function woocommerce_xpay_init() {
 	        	//step 2: concat all keys in form "{key}{value}"
         		$encoded_query .= $key . $value;
         	}
-        	//step 3: use HMAC-SHA256 function on step 4 using API key as entropy      	
+        	//step 3: use HMAC-SHA256 function on step 4 using API key as entropy
             $hash = hash_hmac( "sha256", $encoded_query, $api_key );
             return str_replace('-', '', $hash);
         }
