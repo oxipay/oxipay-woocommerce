@@ -162,13 +162,16 @@ function woocommerce_xpay_init() {
             );
 		}
 
-        function generate_signature( $transaction, $api_key ) {
-            $encoded_transaction = json_encode( $transaction );
-            $stripped_transaction = str_replace(array('"',':',','),'', $encoded_transaction);
-            $transaction_type = gettype($transaction);
-            $transaction_type = gettype($encoded_transaction);
-            $hash = hash_hmac( "sha256", utf8_encode( $transaction ), utf8_encode( $api_key ) );
-            return $hash;
+		//refer: http://ad-d-dev02:8080/browse/XPAY-293
+        function generate_signature( $query, $api_key ) {
+        	//step 1: order by key_name ascending
+        	$encoded_query = '';
+        	foreach (ksort($query) as $key => $value) {
+	        	//step 2: concat all keys in form "{key}{value}"
+        		$encoded_query .= $key . $value;
+        	}
+        	//step 3: use HMAC-SHA256 function on step 4 using API key as entropy      	
+            return hash_hmac( "sha256", $encoded_query, $api_key );
         }
 
 		function post_and_get_response( $request ) {
