@@ -33,7 +33,7 @@ function woocommerce_xpay_init() {
 
             // Description displayed underneath heading
 			$this->method_descripton	= __( XPAY_DISPLAYNAME . ' is a payment gateway from FlexiGroup. ' .
-                                            'The plugin works by sending payment details to XPay for processing.', 'woocommerce' );
+                                            'The plugin works by sending payment details to ' . XPAY_DISPLAYNAME . ' for processing.', 'woocommerce' );
 
 			$this->init_form_fields();
 			$this->init_settings();
@@ -117,8 +117,6 @@ function woocommerce_xpay_init() {
         function process_payment( $order_id ) {
             global $woocommerce;
             $order = new WC_Order( $order_id );
-
-
 
             $transaction_details = array (
                 'reference'     =>  '',
