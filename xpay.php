@@ -148,14 +148,24 @@ function woocommerce_xpay_init() {
                 'first_name'    =>  $order->billing_first_name,
                 'last_name' 	=>  $order->billing_last_name,
                 'email'         =>  $order->billing_email,
-                'counry'        =>  $order->billing_country,
-                'city' 	        =>  $order->billing_city,
-                'address_1' 	=>  $order->billing_address_1,
-                'address_2' 	=>  $order->billing_address_2,
-                'state' 	    =>  $order->billing_state,
-                'postcode' 		=>  $order->billing_postcode,
-                'platform'		=>	PLATFORM_NAME
+                'phone_mobile'	=>  $order->billing_phone,
+                //AU only at this stage
+                //'counry'        =>  $order->billing_country, 
+                //billing detail
+                'billing_city' 	        =>  $order->billing_city,
+                'billing_address_1' 	=>  $order->billing_address_1,
+                'billing_address_2' 	=>  $order->billing_address_2,
+                'billing_state' 	    =>  $order->billing_state,
+                'billing_postcode' 		=>  $order->billing_postcode,
+                //shipping detail
 
+ 				'shipping_city' 	    =>  $order->postal_city,
+                'shipping_address_1' 	=>  $order->postal_address_1,
+                'shipping_address_2' 	=>  $order->postal_address_2,
+                'shipping_state' 	    =>  $order->postal_state,
+                'shipping_postcode' 	=>  $order->postal_postcode,
+                'platform'		=>	PLATFORM_NAME // required for backend            	
+            	
             );
             
            
