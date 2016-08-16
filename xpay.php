@@ -175,7 +175,7 @@ function woocommerce_xpay_init() {
             // 'platform'   =>  PLATFORM_NAME
 
             // Send request and get response from server
-            $response = $this->post_and_get_response($transaction_details);
+            //$response = $this->post_and_get_response($transaction_details);
 
         	if($response[result] == 'success') {
     		 	$order->reduce_order_stock();
