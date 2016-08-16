@@ -11,6 +11,9 @@
  * @since 0.9.0
  */
 
+// this checks that the woocommerce plugin is alive and well.
+if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) return;
+
 add_action('plugins_loaded', 'woocommerce_xpay_init', 0);
 
 function woocommerce_xpay_init() {
@@ -119,14 +122,14 @@ function woocommerce_xpay_init() {
             $order = new WC_Order( $order_id );
 
             $transaction_details = array (
-                'reference'     =>  '',
+                'order_key'     =>  '', //no idea what this is :) possibly a merchant identifier
                 'account_id'    =>  $this->settings[account_id],
-                'amount' 	    =>  $order->order_total,
-                'currency'      =>  $order->order_currency,
+                'total' 	    =>  $order->order_total,
+                //'currency'      =>  $order->order_currency,
                 'url_callback'  =>  '',
                 'url_complete'  =>  '',
-                'shop_country'  =>  'AU',
-                'shop_name'     =>  $this->settings[shop_name],
+                //'shop_country'  =>  'AU',
+                //'shop_name'     =>  $this->settings[shop_name],
                 'test'          =>  $this->test_enabled(),
                 'first_name'    =>  $order->billing_first_name,
                 'last_name' 	=>  $order->billing_last_name,
@@ -137,15 +140,11 @@ function woocommerce_xpay_init() {
                 'address_2' 	=>  $order->billing_address_2,
                 'state' 	    =>  $order->billing_state,
                 'postcode' 		=>  $order->billing_postcode,
+                'platform'		=>	PLATFORM_NAME
 
             );
-
-            // TODO If ACK then reduce stock and empty cart, else ...
-            if (1 == 1) {
-                $order->reduce_order_stock();
-                $woocommerce->cart->empty_cart();
-            }
-
+            
+           
 
             // 'phone'      =>  $order->billing_phone,
             // 'api_key'    =>  $this->settings[api_key],
@@ -154,9 +153,18 @@ function woocommerce_xpay_init() {
             // Send request and get response from server
             $response = $this->post_and_get_response($transaction_details);
 
+        	if($response[result] == 'success') {
+    		 	$order->reduce_order_stock();
+            	$woocommerce->cart->empty_cart();	
+    			$order->payment_complete();
+        	} else {
+        		wc_add_notice( __('Payment error:', 'woothemes') . $error_message, 'error' );
+				return;
+        	}
+
             return array(
-                    'result' 	=> 'success',
-                    'redirect'	=> 'https://www.google.com/'
+                    'result' 	=> $response['result'],
+                    'redirect'	=> $this->get_return_url( $order )
             );
 		}
 
@@ -178,12 +186,7 @@ function woocommerce_xpay_init() {
 			global $woocommerce;
 
 			// Genereate URL encoded query string
-			$post = http_build_query( $request, '', '&' );
             $signature = $this->generate_signature($request, $this->settings[api_key]);
-            $post2 = http_build_query();
-
-            $encoded_request = json_encode($request);
-
             // Send request to server
             $options = array(
                 'http' => array(
@@ -194,6 +197,7 @@ function woocommerce_xpay_init() {
                 );
 
             $url = $this->get_gateway_url();
+            //is there a cleaner way to POST in PHP?
             $context = stream_context_create( $options );
             $result = file_get_contents( $url, false, $context );
 
