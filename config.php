@@ -6,6 +6,7 @@ DEFINE ('CWD', basename( __DIR__ ));
 
 $config = array(
 	'XPAY_DISPLAYNAME' => 'OxiPay',
+	'WAIT_URL' => 'waiting.php'
 );
 
 switch (ENVIRONMENT) {

@@ -115,18 +115,16 @@ function woocommerce_xpay_init() {
             $order = new WC_Order( $order_id );
 
             $transaction_details = array (
-                'order_key'     =>  '', //this is a merchant identifier
-                'account_id'    =>  $this->settings[account_id],
-                'total' 	    =>  $order->order_total,
-                'url_callback'  =>  CWD . '/callback2.php', //server->server callback
-                'url_complete'  =>  get_return_url( $order ), //server->client callback - TODO: determine if this std. thankyou is OK
-                'test'          =>  $config['TEST'],
-                'first_name'    =>  $order->billing_first_name,
-                'last_name' 	=>  $order->billing_last_name,
-                'email'         =>  $order->billing_email,
-                'phone_mobile'	=>  $order->billing_phone,
-                //AU only at this stage
-                //'counry'        =>  $order->billing_country, 
+                'order_key'     		=>  '', //this is a merchant identifier
+                'account_id'    		=>  $this->settings[account_id],
+                'total' 	    		=>  $order->order_total,
+                'url_callback'  		=>  CWD . '/callback2.php', //server->server callback
+                'url_complete'  		=>  get_return_url( $order ), //server->client callback - TODO: determine if this std. thankyou is OK
+                'test'          		=>  $config['TEST'],
+                'first_name'    		=>  $order->billing_first_name,
+                'last_name' 			=>  $order->billing_last_name,
+                'email'         		=>  $order->billing_email,
+                'phone_mobile'			=>  $order->billing_phone,
                 //billing detail
                 'billing_city' 	        =>  $order->billing_city,
                 'billing_address_1' 	=>  $order->billing_address_1,
@@ -134,32 +132,22 @@ function woocommerce_xpay_init() {
                 'billing_state' 	    =>  $order->billing_state,
                 'billing_postcode' 		=>  $order->billing_postcode,
                 //shipping detail
-
  				'shipping_city' 	    =>  $order->postal_city,
                 'shipping_address_1' 	=>  $order->postal_address_1,
                 'shipping_address_2' 	=>  $order->postal_address_2,
                 'shipping_state' 	    =>  $order->postal_state,
                 'shipping_postcode' 	=>  $order->postal_postcode,
-                'platform'		=>	PLATFORM_NAME // required for backend            
+                'platform'				=>	PLATFORM_NAME // required for backend            
             );
           	
           	$signature = generate_signature($transaction_details, $this->form_fields['api_key']);
           	$transaction_details['signature'] = $signature;
 
-    //     	if($response[result] == 'success') {
-    // 		 	$order->reduce_order_stock();
-    //         	$woocommerce->cart->empty_cart();	
-    // 			$order->payment_complete();
-    //     	} else {
-    //     		wc_add_notice( __('Payment error:', 'woothemes') . $error_message, 'error' );
-				// return;
-    //     	}
-
             $order->update_status('on-hold', __("Awaiting {$config['XPAY_DISPLAYNAME']} payment", 'woothemes'));
 
             return array(
                     'result' 	=> 'Success', 
-                    'redirect'	=> $config['XPAY_URL']
+                    'redirect'	=> $config['WAIT_URL']
             );
 		}
 
@@ -177,49 +165,14 @@ function woocommerce_xpay_init() {
             return str_replace('-', '', $hash);
         }
 
-		function post_and_get_response( $request ) {
-			global $woocommerce;
-
-			// Genereate URL encoded query string
-            $signature = $this->generate_signature($request, $this->settings[api_key]);
-            // Send request to server
-            $options = array(
-                'http' => array(
-                    'method'    => 'POST',
-                    'content'   => json_encode( $request ),
-                    'header'    => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"
-                    )
-                );
-
-            $url = $this->get_gateway_url();
-            //is there a cleaner way to POST in PHP?
-            $context = stream_context_create( $options );
-            $result = file_get_contents( $url, false, $context );
-
-            // If needed to decode, use below
-            // $response = json_decode( $result );
-
-
-
-			// Convert the resonse from the server to an array
-			$vars = explode( '&', $data['body'] );
-			foreach ( $vars as $key => $val ) {
-				$var = explode( '=', $val );
-				$data[ $var[0] ] = $var[1];
-			}
-
-			// Return the array
-			return $data;
-		}
-
 		function admin_options() { ?>
-		 <h2><?php _e($config['XPAY_DISPLAYNAME'],'woocommerce'); ?></h2>
-		 <p><?php _e( $config['XPAY_DISPLAYNAME'] . ' is a payment gateway from FlexiGroup. The plugin works by sending payment details to ' . 
-                      $config['XPAY_DISPLAYNAME'] . ' for processing.', 'woocommerce' ); ?></p>
-		 <table class="form-table">
-		 <?php $this->generate_settings_html(); ?>
-		 </table> <?php
-		 }
+			<h2><?php _e($config['XPAY_DISPLAYNAME'],'woocommerce'); ?></h2>
+			<p><?php _e( $config['XPAY_DISPLAYNAME'] . ' is a payment gateway from FlexiGroup. The plugin works by sending payment details to ' . 
+			          $config['XPAY_DISPLAYNAME'] . ' for processing.', 'woocommerce' ); ?></p>
+			<table class="form-table">
+			<?php $this->generate_settings_html(); ?>
+			</table> <?php
+		}
 	}
 }
 
