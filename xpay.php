@@ -24,6 +24,7 @@ function woocommerce_xpay_init() {
   DEFINE ('TEST_URL', 'http://www.google.com/');
   DEFINE ('XPAY_DISPLAYNAME', 'XPay');
   DEFINE ('PLATFORM_NAME', 'WooCommerce');
+  DEFINE ('TEST', true);
 
 	class XPay_Gateway extends WC_Payment_Gateway {
 		function __construct() {
@@ -143,7 +144,7 @@ function woocommerce_xpay_init() {
                 'url_complete'  =>  '',
                 //'shop_country'  =>  'AU',
                 //'shop_name'     =>  $this->settings[shop_name],
-                'test'          =>  $this->test_enabled(),
+                'test'          =>  TEST,
                 'first_name'    =>  $order->billing_first_name,
                 'last_name' 	=>  $order->billing_last_name,
                 'email'         =>  $order->billing_email,
