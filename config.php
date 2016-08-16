@@ -5,8 +5,8 @@ DEFINE ('PLUGIN_DIR', plugins_url( basename( plugin_dir_path( __FILE__ ) ), base
 DEFINE ('CWD', basename( __DIR__ ));
 
 $config = array(
-	'XPAY_DISPLAYNAME' => 'OxiPay',
-	'WAIT_URL' => 'waiting.php'
+	"XPAY_DISPLAYNAME" => "OxiPay",
+	"WAIT_URL" => "waiting.php"
 );
 
 switch (ENVIRONMENT) {
@@ -15,12 +15,11 @@ switch (ENVIRONMENT) {
 		$config['XPAY_URL'] = 'http://localhost:60343/Checkout?platform=WooCommerce';
 		$config['TEST'] = true;
 		return $config;
-		break;
-	case 'PRODUCTION'
+    case 'PRODUCTION':
 		$config['XPAY_URL'] = 'http://xpozsecure.certegyezipay.com.au/Checkout?platform=WooCommerce';
 		$config['TEST'] = false;
 		return $config;
-		break;
 	default:
 		break;
 }
+?>

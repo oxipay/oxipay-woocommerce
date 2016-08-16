@@ -13,7 +13,7 @@
 
 // this checks that the woocommerce plugin is alive and well.
 if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) return;
-$config = include('./config.php');
+include_once( 'config.php' );
 
 add_action('plugins_loaded', 'woocommerce_xpay_init', 0);
 
@@ -90,7 +90,7 @@ function woocommerce_xpay_init() {
 				'business_details' => array(
 					'title' 		=> __( 'Merchant Details', 'woocommerce' ),
 					'type' 			=> 'title',
-					'description' 	=> __( 'Enter your business details to process payments via ' . $config['$config['XPAY_DISPLAYNAME']'], 'woocommerce' ),
+					'description' 	=> __( 'Enter your business details to process payments via ' . $config['XPAY_DISPLAYNAME'], 'woocommerce' ),
 					'default' 		=> __( $config['XPAY_DISPLAYNAME'] . ' Payment', 'woocommerce' ),
 				),
                 'account_id'   =>array(
@@ -106,7 +106,7 @@ function woocommerce_xpay_init() {
 			);
 		}
 
-        /** 
+        /**
          * Returns the test gateway URL if enabled in the admin panel, otherwise, returns the
          * default XPay payment gateway URL
          */
@@ -137,16 +137,16 @@ function woocommerce_xpay_init() {
                 'shipping_address_2' 	=>  $order->postal_address_2,
                 'shipping_state' 	    =>  $order->postal_state,
                 'shipping_postcode' 	=>  $order->postal_postcode,
-                'platform'				=>	PLATFORM_NAME // required for backend            
+                'platform'				=>	PLATFORM_NAME // required for backend
             );
-          	
+
           	$signature = generate_signature($transaction_details, $this->form_fields['api_key']);
           	$transaction_details['signature'] = $signature;
 
             $order->update_status('on-hold', __("Awaiting {$config['XPAY_DISPLAYNAME']} payment", 'woothemes'));
 
             return array(
-                    'result' 	=> 'Success', 
+                    'result' 	=> 'Success',
                     'redirect'	=> $config['WAIT_URL']
             );
 		}
