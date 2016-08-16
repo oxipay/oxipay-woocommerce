@@ -1,0 +1,4 @@
+- callback.php - handles successful or failed payment on the server
+- callback2.php - not used as yet - may replace the standard thankyou page from Woocommerce
+- config.php - sets up configuration bsaed on environment constant
+- xpay.php - the Woocommerce plugin

@@ -13,31 +13,23 @@
 
 // this checks that the woocommerce plugin is alive and well.
 if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) return;
+$config = include('./config.php');
 
 add_action('plugins_loaded', 'woocommerce_xpay_init', 0);
 
 function woocommerce_xpay_init() {
-
-
-  DEFINE ('PLUGIN_DIR', plugins_url( basename( plugin_dir_path( __FILE__ ) ), basename( __FILE__ ) ) . '/' );
-  DEFINE ('XPAY_URL', 'http://localhost/CCP.XPay.Secure/checkout/Index?platform=WooCommerce');
-  DEFINE ('TEST_URL', 'http://www.google.com/');
-  DEFINE ('XPAY_DISPLAYNAME', 'XPay');
-  DEFINE ('PLATFORM_NAME', 'WooCommerce');
-  DEFINE ('TEST', true);
-
 	class XPay_Gateway extends WC_Payment_Gateway {
 		function __construct() {
 			$this->id 					= 'xpay';
 			$this->has_fields 			= false;
-			$this->order_button_text 	= __( 'Proceed to ' . XPAY_DISPLAYNAME, 'woocommerce' );
+			$this->order_button_text 	= __( 'Proceed to ' . $config['XPAY_DISPLAYNAME'], 'woocommerce' );
 
             // Tab Title on the WooCommerce Checkout page
-			$this->method_title       	= __( XPAY_DISPLAYNAME, 'woocommerce' );
+			$this->method_title       	= __( $config['XPAY_DISPLAYNAME'], 'woocommerce' );
 
             // Description displayed underneath heading
-			$this->method_descripton	= __( XPAY_DISPLAYNAME . ' is a payment gateway from FlexiGroup. ' .
-                                            'The plugin works by sending payment details to ' . XPAY_DISPLAYNAME . ' for processing.', 'woocommerce' );
+			$this->method_descripton	= __( $config['XPAY_DISPLAYNAME'] . ' is a payment gateway from FlexiGroup. ' .
+                                            'The plugin works by sending payment details to ' . $config['XPAY_DISPLAYNAME'] . ' for processing.', 'woocommerce' );
 
 			$this->init_form_fields();
 			$this->init_settings();
@@ -56,7 +48,7 @@ function woocommerce_xpay_init() {
 				'enabled' => array(
 					'title' 		=> __( 'Enable', 'woocommerce' ),
 					'type' 			=> 'checkbox',
-					'label' 		=> __( 'Enable the ' . XPAY_DISPLAYNAME . ' Payment Gateway', 'woocommerce' ),
+					'label' 		=> __( 'Enable the ' . $config['XPAY_DISPLAYNAME'] . ' Payment Gateway', 'woocommerce' ),
 					'default' 		=> 'yes'
 				),
                 'test_mode' => array(
@@ -69,26 +61,26 @@ function woocommerce_xpay_init() {
 					'title' 		=> __( 'Title', 'woocommerce' ),
 					'type' 			=> 'text',
 					'description' 	=> __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
-					'default' 		=> __( XPAY_DISPLAYNAME , 'woocommerce' ),
+					'default' 		=> __( $config['XPAY_DISPLAYNAME'] , 'woocommerce' ),
 					'desc_tip'      => true,
 				),
 				'description' => array(
 					'title' 		=> __( 'Description', 'woocommerce' ),
 					'type' 			=> 'text',
 					'description' 	=> __( 'This controls the description which the user sees during checkout.', 'woocommerce' ),
-					'default' 		=> __( 'Pay using ' . XPAY_DISPLAYNAME . ' with an interest-free installment payment plan', 'woocommerce' ),
+					'default' 		=> __( 'Pay using ' . $config['XPAY_DISPLAYNAME'] . ' with an interest-free installment payment plan', 'woocommerce' ),
 					'desc_tip'      => true,
 				),
 				'gateway_details' => array(
-					'title' 		=> __( XPAY_DISPLAYNAME . ' Settings', 'woocommerce' ),
+					'title' 		=> __( $config['XPAY_DISPLAYNAME'] . ' Settings', 'woocommerce' ),
 					'type' 			=> 'title',
-					'description' 	=> __( 'Enter the gateway settings to process payments via the ' . XPAY_DISPLAYNAME . ' payment gateway.', 'woocommerce' ),
-					'default' 		=> __( XPAY_DISPLAYNAME . ' Payment', 'woocommerce' ),
+					'description' 	=> __( 'Enter the gateway settings to process payments via the ' . $config['XPAY_DISPLAYNAME'] . ' payment gateway.', 'woocommerce' ),
+					'default' 		=> __( $config['XPAY_DISPLAYNAME'] . ' Payment', 'woocommerce' ),
 				),
 				'gateway_url' => array(
-					'title' 		=> __( XPAY_DISPLAYNAME . ' Gateway URL', 'woocommerce' ),
+					'title' 		=> __( $config['XPAY_DISPLAYNAME'] . ' Gateway URL', 'woocommerce' ),
 					'type' 			=> 'text',
-					'default' 		=> __( XPAY_URL, 'woocommerce' ),
+					'default' 		=> __( $config['XPAY_URL'], 'woocommerce' ),
 				),
                 'api_key'   =>array(
                     'title'     => __( 'API Key', 'woocommerce' ),
@@ -98,8 +90,8 @@ function woocommerce_xpay_init() {
 				'business_details' => array(
 					'title' 		=> __( 'Merchant Details', 'woocommerce' ),
 					'type' 			=> 'title',
-					'description' 	=> __( 'Enter your business details to process payments via ' . XPAY_DISPLAYNAME, 'woocommerce' ),
-					'default' 		=> __( XPAY_DISPLAYNAME . ' Payment', 'woocommerce' ),
+					'description' 	=> __( 'Enter your business details to process payments via ' . $config['$config['XPAY_DISPLAYNAME']'], 'woocommerce' ),
+					'default' 		=> __( $config['XPAY_DISPLAYNAME'] . ' Payment', 'woocommerce' ),
 				),
                 'account_id'   =>array(
                     'title'     => __( 'Merchant ID', 'woocommerce' ),
@@ -114,20 +106,7 @@ function woocommerce_xpay_init() {
 			);
 		}
 
-        /**
-         * Returns the test gateway URL if enabled in the admin panel, otherwise, returns the
-         * default XPay payment gateway URL
-         */
-        function get_gateway_url( $order ) {
-            if ($this->settings[test_mode] == "yes") {
-                $this->view_transaction_url = TEST_URL;
-            } else {
-                $this->view_transaction_url = XPAY_URL;
-            }
-            return parent::get_transaction_url( $order );
-        }
-
-        /**
+        /** 
          * Returns the test gateway URL if enabled in the admin panel, otherwise, returns the
          * default XPay payment gateway URL
          */
@@ -136,15 +115,12 @@ function woocommerce_xpay_init() {
             $order = new WC_Order( $order_id );
 
             $transaction_details = array (
-                'order_key'     =>  '', //no idea what this is :) possibly a merchant identifier
+                'order_key'     =>  '', //this is a merchant identifier
                 'account_id'    =>  $this->settings[account_id],
                 'total' 	    =>  $order->order_total,
-                //'currency'      =>  $order->order_currency,
-                'url_callback'  =>  '',
-                'url_complete'  =>  '',
-                //'shop_country'  =>  'AU',
-                //'shop_name'     =>  $this->settings[shop_name],
-                'test'          =>  TEST,
+                'url_callback'  =>  CWD . '/callback2.php', //server->server callback
+                'url_complete'  =>  get_return_url( $order ), //server->client callback - TODO: determine if this std. thankyou is OK
+                'test'          =>  $config['TEST'],
                 'first_name'    =>  $order->billing_first_name,
                 'last_name' 	=>  $order->billing_last_name,
                 'email'         =>  $order->billing_email,
@@ -164,31 +140,26 @@ function woocommerce_xpay_init() {
                 'shipping_address_2' 	=>  $order->postal_address_2,
                 'shipping_state' 	    =>  $order->postal_state,
                 'shipping_postcode' 	=>  $order->postal_postcode,
-                'platform'		=>	PLATFORM_NAME // required for backend            	
-            	
+                'platform'		=>	PLATFORM_NAME // required for backend            
             );
-            
-           
+          	
+          	$signature = generate_signature($transaction_details, $this->form_fields['api_key']);
+          	$transaction_details['signature'] = $signature;
 
-            // 'phone'      =>  $order->billing_phone,
-            // 'api_key'    =>  $this->settings[api_key],
-            // 'platform'   =>  PLATFORM_NAME
+    //     	if($response[result] == 'success') {
+    // 		 	$order->reduce_order_stock();
+    //         	$woocommerce->cart->empty_cart();	
+    // 			$order->payment_complete();
+    //     	} else {
+    //     		wc_add_notice( __('Payment error:', 'woothemes') . $error_message, 'error' );
+				// return;
+    //     	}
 
-            // Send request and get response from server
-            //$response = $this->post_and_get_response($transaction_details);
-
-        	if($response[result] == 'success') {
-    		 	$order->reduce_order_stock();
-            	$woocommerce->cart->empty_cart();	
-    			$order->payment_complete();
-        	} else {
-        		wc_add_notice( __('Payment error:', 'woothemes') . $error_message, 'error' );
-				return;
-        	}
+            $order->update_status('on-hold', __("Awaiting {$config['XPAY_DISPLAYNAME']} payment", 'woothemes'));
 
             return array(
-                    'result' 	=> $response['result'],
-                    'redirect'	=> $this->get_return_url( $order )
+                    'result' 	=> 'Success', 
+                    'redirect'	=> $config['XPAY_URL']
             );
 		}
 
@@ -242,9 +213,9 @@ function woocommerce_xpay_init() {
 		}
 
 		function admin_options() { ?>
-		 <h2><?php _e(XPAY_DISPLAYNAME,'woocommerce'); ?></h2>
-		 <p><?php _e( XPAY_DISPLAYNAME . ' is a payment gateway from FlexiGroup. The plugin works by sending payment details to ' . 
-                      XPAY_DISPLAYNAME . ' for processing.', 'woocommerce' ); ?></p>
+		 <h2><?php _e($config['XPAY_DISPLAYNAME'],'woocommerce'); ?></h2>
+		 <p><?php _e( $config['XPAY_DISPLAYNAME'] . ' is a payment gateway from FlexiGroup. The plugin works by sending payment details to ' . 
+                      $config['XPAY_DISPLAYNAME'] . ' for processing.', 'woocommerce' ); ?></p>
 		 <table class="form-table">
 		 <?php $this->generate_settings_html(); ?>
 		 </table> <?php
