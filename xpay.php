@@ -119,8 +119,8 @@ function woocommerce_xpay_init() {
                 'account_id'    		=>  $this->settings[account_id],
                 'total' 	    		=>  $order->order_total,
                 'url_callback'  		=>  CWD . '/callback2.php', //server->server callback
-                'url_complete'  		=>  get_return_url( $order ), //server->client callback - TODO: determine if this std. thankyou is OK
-                'test'          		=>  $config['TEST'],
+                //'url_complete'  		=>  get_return_url( $order ), //server->client callback - TODO: determine if this std. thankyou is OK
+                'test'          		=>  $this->settings[test_mode],
                 'first_name'    		=>  $order->billing_first_name,
                 'last_name' 			=>  $order->billing_last_name,
                 'email'         		=>  $order->billing_email,
@@ -140,14 +140,14 @@ function woocommerce_xpay_init() {
                 'platform'				=>	PLATFORM_NAME // required for backend
             );
 
-          	$signature = generate_signature($transaction_details, $this->form_fields['api_key']);
-          	$transaction_details['signature'] = $signature;
+          	//$signature = generate_signature($transaction_details, $this->form_fields['api_key']);
+          	//$transaction_details['signature'] = $signature;
 
-            $order->update_status('on-hold', __("Awaiting {$config['XPAY_DISPLAYNAME']} payment", 'woothemes'));
-
+            //$order->update_status('on-hold', __("Awaiting {$config['XPAY_DISPLAYNAME']} payment", 'woothemes'));
+            $qs = http_build_query($transaction_details);
             return array(
-                    'result' 	=> 'Success',
-                    'redirect'	=> $config['WAIT_URL']
+                    'result' 	=>  'success',
+                    'redirect'	=>  plugins_url("processing.php?$qs", __FILE__ )
             );
 		}
 
