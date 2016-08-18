@@ -1,10 +1,9 @@
 <?php
 
 include_once( 'config.php' );
+include_once( 'xpay.php' );
 
-add_filter( 'woocommerce_thankyou_order_id',array($this,'finalised_payment'));
-
-function finalised_payment($order_id, $processing_status) {
+function payment_finalisation($order_id, $processing_status) {
     $order = wc_get_order( $order_id );
     $status = $order->get_status();
 
@@ -19,13 +18,16 @@ function finalised_payment($order_id, $processing_status) {
     switch ($processing_status) {
 
         case 'APPROVED':
+            $order->add_order_note( __( 'Payment approved using ' . $config['XPAY_DISPLAYNAME'] . '. Your Order ID is '. $order->id, 'woocommerce' ) );
             $order->payment_complete($response->id);
             woocommerce_empty_cart();
 
         case 'PENDING':
+            $order->add_order_note( __( 'Payment pending using ' . $config['XPAY_DISPLAYNAME'] . '. Your Order ID is '. $order->id, 'woocommerce' ) );
             $order->update_status('on-hold');
 
         case 'DECLINED':
+            $order->add_order_note( __( 'Payment declined using ' . $config['XPAY_DISPLAYNAME'] . '. Your Order ID is '. $order->id, 'woocommerce' ) );
             $order->update_status('failed');
     }
 

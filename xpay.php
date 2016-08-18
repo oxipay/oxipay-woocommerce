@@ -14,6 +14,7 @@
 // this checks that the woocommerce plugin is alive and well.
 if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) return;
 include_once( 'config.php' );
+include_once( 'callback.php' );
 
 add_action('plugins_loaded', 'woocommerce_xpay_init', 0);
 
@@ -40,6 +41,7 @@ function woocommerce_xpay_init() {
 			$this->icon = PLUGIN_DIR . 'images/xpay.png';
 
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
+			add_filter( 'woocommerce_thankyou_order_id',array($this,'payment_finalisation'));
 		}
 
 		function init_form_fields() {
