@@ -143,7 +143,7 @@ function woocommerce_xpay_init() {
           	//$signature = generate_signature($transaction_details, $this->form_fields['api_key']);
           	//$transaction_details['signature'] = $signature;
 
-            //$order->update_status('on-hold', __("Awaiting {$config['XPAY_DISPLAYNAME']} payment", 'woothemes'));
+            $order->update_status('on-hold', __("Awaiting {$config['XPAY_DISPLAYNAME']} payment", 'woothemes'));
             $qs = http_build_query($transaction_details);
             return array(
                     'result' 	=>  'success',
