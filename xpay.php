@@ -85,9 +85,10 @@ function woocommerce_xpay_init() {
 					'default' 		=> __( $config['XPAY_URL'], 'woocommerce' ),
 				),
                 'api_key'   =>array(
+                    'id'        => 'merchant_api_key',
                     'title'     => __( 'API Key', 'woocommerce' ),
 					'type' 	    => 'text',
-                    'default'   => ''
+                    'default'   => '1234-5678-9101'
                 ),
 				'business_details' => array(
 					'title' 		=> __( 'Merchant Details', 'woocommerce' ),
@@ -142,7 +143,7 @@ function woocommerce_xpay_init() {
                 'platform'				=>	PLATFORM_NAME // required for backend
             );
 
-          	$signature = generate_signature($transaction_details, $this->form_fields['api_key']);
+            $signature = generate_signature($transaction_details, $this->settings[api_key]);
           	$transaction_details['signature'] = $signature;
 
             $order->update_status('on-hold', __("Awaiting {$config['XPAY_DISPLAYNAME']} payment", 'woothemes'));
