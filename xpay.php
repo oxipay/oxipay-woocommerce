@@ -121,7 +121,7 @@ function woocommerce_xpay_init() {
                 'account_id'    		=>  $this->settings[account_id],
                 'total' 	    		=>  $order->order_total,
                 'url_callback'  		=>  CWD . '/callback2.php', //server->server callback
-                //'url_complete'  		=>  get_return_url( $order ), //server->client callback - TODO: determine if this std. thankyou is OK
+                'url_complete'  		=>  get_return_url( $order ), //server->client callback - TODO: determine if this std. thankyou is OK
                 'test'          		=>  $this->settings[test_mode],
                 'first_name'    		=>  $order->billing_first_name,
                 'last_name' 			=>  $order->billing_last_name,
