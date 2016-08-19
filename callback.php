@@ -8,8 +8,8 @@ function payment_finalisation($order_id, $xpay_response) {
     $status = $order->get_status();
 
     $response = wp_remote_get($config['XPAY_URL']);                         // Retrieve raw respnose from HTTP request
-    $xpay_response = json_decode( wp_remote_retrieve_body($response) );     // Get body from raw response; convert from json to array
-    $status = xpay_response["result"];                                      // Only interested in the value of result (string)
+    $xpay_response = json_decode( wp_remote_retrieve_body($response) );     // Get body of raw response; convert from json to array
+    $status = xpay_response."result";                                       // Only interested in the value of result (string)
 
     // Get the status of the order from XPay and handle accordingly
     switch ($xpay_response) {

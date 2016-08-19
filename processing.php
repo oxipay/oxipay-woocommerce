@@ -9,15 +9,15 @@
    
         <div id="spinner"></div>
 
-        <!--<form method="post" action="">-->
+        <!-- PHP code to post to payment gateway -->
         <?php
             $full_url = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
             $url = "http://localhost/CCP.XPay.Secure/checkout?platform=WooCommerce";
 
-
             $parts = parse_url($full_url, PHP_URL_QUERY);
             parse_str($parts, $params);
 
+            // Display processing page for 2 seconds before posting to payment gateway
             sleep(2);
 
             $post_options = array(
@@ -34,9 +34,8 @@
 
 
         ?>
-        <!--</form>-->
 
-        <!-- Submitting the form and spinner animation -->
+        <!-- spinner animation -->
         <script type="text/javascript" src="spin.min.js"></script>
 
         <script>
