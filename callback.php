@@ -3,7 +3,7 @@
 include_once( 'config.php' );
 include_once( 'xpay.php' );
 
-function payment_finalisation($order_id) {
+function payment_finalisation($order_id, $processing_status) {
     $order = wc_get_order( $order_id );
     $status = $order->get_status();
 
