@@ -17,25 +17,29 @@
 
             $parts = parse_url($full_url, PHP_URL_QUERY);
             parse_str($parts, $params);
-            $form_start = "<form id='xpay_payload' method='post' action='$url'>";
-            $form_end = "</form>";
-            
+
             sleep(2);
 
-            echo $form_start;
-            foreach($params as $key => $value) {
-                echo "<input id='$key' name='$key' value='$value' type='hidden'/>";
-            }
-            echo $form_end;
+            $post_options = array(
+                'http' => array(
+                    'method'    =>  'POST',
+                    'content'   =>  json_encode($params),
+                    'header'    =>  "Content-Type: application/json\r\n" .
+                                    "Accept: application/json\r\n"
+                )
+            );
+
+            $context    = stream_context_create( $post_options );
+            $response   = file_get_contents($url, false, $context);
+
 
         ?>
         <!--</form>-->
 
-        <!-- Submitting form and spinner animation -->
+        <!-- Submitting the form and spinner animation -->
         <script type="text/javascript" src="spin.min.js"></script>
-        <script>
-            document.forms["xpay_payload"].submit();
 
+        <script>
             var opts = {
                 lines: 13 // The number of lines to draw
                 , length: 28 // The length of each line
