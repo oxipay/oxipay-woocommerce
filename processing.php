@@ -11,8 +11,10 @@
 
         <!-- PHP code to post to payment gateway -->
         <?php
+            include_once( 'config.php' );
+
             $full_url = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-            $url = "http://localhost/CCP.XPay.Secure/checkout?platform=WooCommerce";
+            $url = $config['XPAY_DISPLAYNAME'];
 
             $parts = parse_url($full_url, PHP_URL_QUERY);
             parse_str($parts, $params);
