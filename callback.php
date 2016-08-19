@@ -10,9 +10,9 @@ function payment_finalisation($order_id, $processing_status) {
     $response = wp_remote_get($config['XPAY_URL'] . $order_id . '.json');
     $body = json_decode( wp_remote_retrieve_body($response) );
 
-    $processing_status = 
+    $processing_status = ;
 
-    Get the status of the order from XPay and handle accordingly
+    //Get the status of the order from XPay and handle accordingly
     switch ($processing_status) {
 
         case 'APPROVED':
@@ -32,4 +32,6 @@ function payment_finalisation($order_id, $processing_status) {
     return $order_id;
 
 }
+
+
 ?>
