@@ -1,5 +1,4 @@
 <!-- MIT Licensing -->
-<script type="text/javascript" src="spin.min.js"></script>
 
 <html>
     <head>
@@ -33,6 +32,7 @@
         <!--</form>-->
 
         <!-- Submitting form and spinner animation -->
+        <script type="text/javascript" src="spin.min.js"></script>
         <script>
             document.forms["xpay_payload"].submit();
 
