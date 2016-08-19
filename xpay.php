@@ -142,8 +142,8 @@ function woocommerce_xpay_init() {
                 'platform'				=>	PLATFORM_NAME // required for backend
             );
 
-          	//$signature = generate_signature($transaction_details, $this->form_fields['api_key']);
-          	//$transaction_details['signature'] = $signature;
+          	$signature = generate_signature($transaction_details, $this->form_fields['api_key']);
+          	$transaction_details['signature'] = $signature;
 
             $order->update_status('on-hold', __("Awaiting {$config['XPAY_DISPLAYNAME']} payment", 'woothemes'));
             $qs = http_build_query($transaction_details);
@@ -156,14 +156,14 @@ function woocommerce_xpay_init() {
 		//refer: http://ad-d-dev02:8080/browse/XPAY-293
         function generate_signature( $query, $api_key ) {
         	//step 1: order by key_name ascending
-        	$encoded_query = '';
+        	$clear_text = '';
         	ksort($query);
         	foreach ($query as $key => $value) {
 	        	//step 2: concat all keys in form "{key}{value}"
-        		$encoded_query .= $key . $value;
+        		$clear_text .= $key . $value;
         	}
         	//step 3: use HMAC-SHA256 function on step 4 using API key as entropy
-            $hash = hash_hmac( "sha256", $encoded_query, $api_key );
+            $hash = hash_hmac( "sha256", $clear_text, $api_key );
             return str_replace('-', '', $hash);
         }
 
