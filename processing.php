@@ -14,7 +14,9 @@
             include_once( 'config.php' );
 
             $full_url = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-            $url = $config['XPAY_DISPLAYNAME'];
+            $url = 'http://localhost:60343/Checkout?platform=WooCommerce';
+
+            echo $full_url;
 
             $parts = parse_url($full_url, PHP_URL_QUERY);
             parse_str($parts, $params);
@@ -22,6 +24,12 @@
             // Display processing page for 2 seconds before posting to payment gateway
             sleep(2);
 
+/*
+            $response = wp_remote_post( $url, array(
+                'body'  => $params
+                )
+            );
+            */
             $post_options = array(
                 'http' => array(
                     'method'    =>  'POST',
@@ -31,10 +39,18 @@
                 )
             );
 
+
             $context    = stream_context_create( $post_options );
             $response   = file_get_contents($url, false, $context);
 
-
+            /*
+            $curl_handle=curl_init();
+            curl_setopt($curl_handle, CURLOPT_URL,'http://localhost/Checkout?platform=WooCommerce');
+            curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT, 2);
+            curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, FALSE);
+            $query = curl_exec($curl_handle);
+            curl_close($curl_handle);
+            */
         ?>
 
         <!-- spinner animation -->

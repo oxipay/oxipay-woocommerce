@@ -16,6 +16,8 @@ if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins',
 include_once( 'config.php' );
 include_once( 'callback.php' );
 
+require_once(ABSPATH.'wp-settings.php');
+
 add_action('plugins_loaded', 'woocommerce_xpay_init', 0);
 
 function woocommerce_xpay_init() {
@@ -38,7 +40,7 @@ function woocommerce_xpay_init() {
 			$this->title          = $this->get_option( 'title' );
 			$this->description    = $this->get_option( 'description' );
 
-			$this->icon = PLUGIN_DIR . 'images/xpay.png';
+			//$this->icon = PLUGIN_DIR . 'images/xpay.png';
 
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 			add_filter( 'woocommerce_thankyou_order_id',array($this,'payment_finalisation'));
@@ -88,7 +90,7 @@ function woocommerce_xpay_init() {
                     'id'        => 'merchant_api_key',
                     'title'     => __( 'API Key', 'woocommerce' ),
 					'type' 	    => 'text',
-                    'default'   => '1234-5678-9101'
+                    'default'   => ''
                 ),
 				'business_details' => array(
 					'title' 		=> __( 'Merchant Details', 'woocommerce' ),
@@ -118,11 +120,16 @@ function woocommerce_xpay_init() {
             $order = new WC_Order( $order_id );
 
             $transaction_details = array (
-                'order_key'     		=>  '', //this is a merchant identifier
+                'order_key'     		=>  $this->settings[account_id],        //this is a merchant identifier
                 'account_id'    		=>  $this->settings[account_id],
                 'total' 	    		=>  $order->order_total,
-                'url_callback'  		=>  CWD . '/callback2.php', //server->server callback
-                //'url_complete'  		=>  get_return_url( $order ), //server->client callback - TODO: determine if this std. thankyou is OK
+                'url_callback'  		=>  "http://$_SERVER[HTTP_HOST]" .
+                                            '/wordpress/wp-content/plugins/oxipay-wordpress/' .
+                                            '/callback.php',                    //server->server callback
+                'url_complete'  		=>  $this->get_return_url( $order ),    //server->client callback - TODO: determine if this std. thankyou is OK
+                'url_cancel'            =>  $woocommerce->cart->get_cart_url(), // redirect back to the shopping cart
+                'currency'              =>  get_woocommerce_currency(),
+                'shop_name'             =>  $this->settings[shop_name],
                 'test'          		=>  $this->settings[test_mode],
                 'first_name'    		=>  $order->billing_first_name,
                 'last_name' 			=>  $order->billing_last_name,
@@ -143,8 +150,8 @@ function woocommerce_xpay_init() {
                 'platform'				=>	PLATFORM_NAME // required for backend
             );
 
-            $signature = generate_signature($transaction_details, $this->settings[api_key]);
-          	$transaction_details['signature'] = $signature;
+          	$signature = $this->generate_signature($transaction_details, $this->form_fields['api_key']);
+            $transaction_details['x_signature'] = $signature;
 
             $order->update_status('on-hold', __("Awaiting {$config['XPAY_DISPLAYNAME']} payment", 'woothemes'));
             $qs = http_build_query($transaction_details);
@@ -163,9 +170,26 @@ function woocommerce_xpay_init() {
 	        	//step 2: concat all keys in form "{key}{value}"
         		$clear_text .= $key . $value;
         	}
+            $this->debug_to_console('$clear_text' , $clear_text);
+            $this->debug_to_console('---------------');
         	//step 3: use HMAC-SHA256 function on step 4 using API key as entropy
-            $hash = hash_hmac( "sha256", $clear_text, $api_key );
+            //append &, requirement with woocommerce v3, refer: http://stackoverflow.com/questions/31976059/woocommerce-api-v3-authentication-issue
+            $key = $api_key . '&';
+            $hash = base64_encode( hash_hmac( "sha256", $clear_text, $api_key, true ));
+            $this->debug_to_console('hash' , $hash);
             return str_replace('-', '', $hash);
+        }
+
+        // Function to output echo statements to teh browser console.
+        function debug_to_console( $data ) {
+
+
+            if ( is_array( $data ) )
+                $output = "<script>console.log( 'Debug Objects: " . implode( ',', $data) . "' );</script>";
+            else
+                $output = "<script>console.log( 'Debug Objects: " . $data . "' );</script>";
+
+            echo $data;
         }
 
 		function admin_options() { ?>

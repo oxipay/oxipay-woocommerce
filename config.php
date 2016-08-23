@@ -1,9 +1,11 @@
 <?php
 DEFINE ('ENVIRONMENT', 'DEVELOPMENT');
 DEFINE ('PLATFORM_NAME', 'WooCommerce');
-DEFINE ('PLUGIN_DIR', plugins_url( basename( plugin_dir_path( __FILE__ ) ), basename( __FILE__ ) ) . '/' );
+//DEFINE ('PLUGIN_DIR', plugins_url( basename( plugin_dir_path( __FILE__ ) ), basename( __FILE__ ) ) . '/' );
 DEFINE ('CWD', basename( __DIR__ ));
-DEFINE ('WEBROOT', "http://localhost:52724/");
+DEFINE ('WEBROOT', "http://localhost:60343/");
+define('ABSPATH', dirname(__FILE__).'/');
+
 
 $config = array(
 	"XPAY_DISPLAYNAME" => "OxiPay",
