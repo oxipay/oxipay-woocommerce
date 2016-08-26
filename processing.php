@@ -5,7 +5,7 @@
         <title>Processing Payment</title>
     </head>
     <body>
-        <h2>We are currently processing your payment</h2>
+        <h2>Please wait, we are processing your purchase...</h2>
    
         <div id="spinner"></div>
 
@@ -16,45 +16,19 @@
             $full_url = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
             $url = 'http://localhost:60343/Checkout?platform=WooCommerce';
 
-            echo $full_url;
-
             $parts = parse_url($full_url, PHP_URL_QUERY);
             parse_str($parts, $params);
 
-            // Display processing page for 2 seconds before posting to payment gateway
-            sleep(2);
+            $jparams = json_encode($params);
+            echo $jparams;
 
-/*
-            $response = wp_remote_post( $url, array(
-                'body'  => $params
-                )
-            );
-            */
-            $post_options = array(
-                'http' => array(
-                    'method'    =>  'POST',
-                    'content'   =>  json_encode($params),
-                    'header'    =>  "Content-Type: application/json\r\n" .
-                                    "Accept: application/json\r\n"
-                )
-            );
-
-
-            $context    = stream_context_create( $post_options );
-            $response   = file_get_contents($url, false, $context);
-
-            /*
-            $curl_handle=curl_init();
-            curl_setopt($curl_handle, CURLOPT_URL,'http://localhost/Checkout?platform=WooCommerce');
-            curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT, 2);
-            curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, FALSE);
-            $query = curl_exec($curl_handle);
-            curl_close($curl_handle);
-            */
+            echo "<form id='xpay_payload' method='post' action='$url'>";
+            echo "<input id='payload' name='payload' value='$jparams' type='hidden'/>";
+            echo "</form>";
         ?>
 
         <!-- spinner animation -->
-        <script type="text/javascript" src="spin.min.js"></script>
+        <!--<script type="text/javascript" src="spin.min.js"></script>
 
         <script>
             var opts = {
@@ -81,6 +55,9 @@
             }
             var target = document.getElementById('spinner')
             var spinner = new Spinner(opts).spin(target);
+        </script>-->
+        <script>
+            document.getElementById('xpay_payload').submit();
         </script>
     </body>
 

@@ -120,8 +120,10 @@ function woocommerce_xpay_init() {
             $order = new WC_Order( $order_id );
 
             $transaction_details = array (
-                'order_key'     		=>  $this->settings[account_id],        //this is a merchant identifier
-                'account_id'    		=>  $this->settings[account_id],
+                //'order_key'     		=>  $this->settings[account_id],        //this is a merchant identifier
+                //'account_id'    		=>  $this->settings[account_id],
+                'order_key'    		    =>  $order_id,
+                'account_id'    		=>  30199999,
                 'total' 	    		=>  $order->order_total,
                 'url_callback'  		=>  "http://$_SERVER[HTTP_HOST]" .
                                             '/wordpress/wp-content/plugins/oxipay-wordpress/' .
@@ -150,11 +152,13 @@ function woocommerce_xpay_init() {
                 'platform'				=>	PLATFORM_NAME // required for backend
             );
 
-          	$signature = $this->generate_signature($transaction_details, $this->form_fields['api_key']);
-            $transaction_details['x_signature'] = $signature;
+          	$signature = $this->generate_signature($transaction_details, $this->settings['api_key']);
+            $this->echo_to_console($signature);
+            $this->echo_to_console($this->settings[account_id]);
+            $this->echo_to_console($this->settings[account_id]);
 
             $order->update_status('on-hold', __("Awaiting {$config['XPAY_DISPLAYNAME']} payment", 'woothemes'));
-            $qs = http_build_query($transaction_details);
+            $qs = http_build_query($transaction_details) . '&x_signature=' . $signature;
             return array(
                     'result' 	=>  'success',
                     'redirect'	=>  plugins_url("processing.php?$qs", __FILE__ )
@@ -170,26 +174,20 @@ function woocommerce_xpay_init() {
 	        	//step 2: concat all keys in form "{key}{value}"
         		$clear_text .= $key . $value;
         	}
-            $this->debug_to_console('$clear_text' , $clear_text);
-            $this->debug_to_console('---------------');
-        	//step 3: use HMAC-SHA256 function on step 4 using API key as entropy
-            //append &, requirement with woocommerce v3, refer: http://stackoverflow.com/questions/31976059/woocommerce-api-v3-authentication-issue
-            $key = $api_key . '&';
-            $hash = base64_encode( hash_hmac( "sha256", $clear_text, $api_key, true ));
-            $this->debug_to_console('hash' , $hash);
-            return str_replace('-', '', $hash);
+
+            //fwrite(STDOUT, $clear_text);
+
+            //step 3: use HMAC-SHA256 function on step 4 using API key as entropy
+            //WooCommerce v3 requires &. Refer: http://stackoverflow.com/questions/31976059/woocommerce-api-v3-authentication-issue
+            $secret = $api_key . '&';
+            $hash = base64_encode( hash_hmac( "sha256", $clear_text, $secret, true ));
+            return str_replace('+', '', $hash);
         }
 
-        // Function to output echo statements to teh browser console.
-        function debug_to_console( $data ) {
-
-
-            if ( is_array( $data ) )
-                $output = "<script>console.log( 'Debug Objects: " . implode( ',', $data) . "' );</script>";
-            else
-                $output = "<script>console.log( 'Debug Objects: " . $data . "' );</script>";
-
+        // Function to output echo statements to the browser console.
+        function echo_to_console( $data ) {
             echo $data;
+            echo "\r\n";    // End of line on Windows
         }
 
 		function admin_options() { ?>
