@@ -16,6 +16,8 @@ if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins',
 include_once( 'config.php' );
 include_once( 'callback.php' );
 
+require_once(ABSPATH.'wp-settings.php');
+
 add_action('plugins_loaded', 'woocommerce_xpay_init', 0);
 
 function woocommerce_xpay_init() {
@@ -38,7 +40,7 @@ function woocommerce_xpay_init() {
 			$this->title          = $this->get_option( 'title' );
 			$this->description    = $this->get_option( 'description' );
 
-			$this->icon = PLUGIN_DIR . 'images/xpay.png';
+			//$this->icon = PLUGIN_DIR . 'images/xpay.png';
 
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 			add_filter( 'woocommerce_thankyou_order_id',array($this,'payment_finalisation'));
@@ -85,6 +87,7 @@ function woocommerce_xpay_init() {
 					'default' 		=> __( $config['XPAY_URL'], 'woocommerce' ),
 				),
                 'api_key'   =>array(
+                    'id'        => 'merchant_api_key',
                     'title'     => __( 'API Key', 'woocommerce' ),
 					'type' 	    => 'text',
                     'default'   => ''
@@ -117,11 +120,18 @@ function woocommerce_xpay_init() {
             $order = new WC_Order( $order_id );
 
             $transaction_details = array (
-                'order_key'     		=>  '', //this is a merchant identifier
-                'account_id'    		=>  $this->settings[account_id],
+                //'order_key'     		=>  $this->settings[account_id],        //this is a merchant identifier
+                //'account_id'    		=>  $this->settings[account_id],
+                'order_key'    		    =>  $order_id,
+                'account_id'    		=>  30199999,
                 'total' 	    		=>  $order->order_total,
-                'url_callback'  		=>  CWD . '/callback2.php', //server->server callback
-                //'url_complete'  		=>  get_return_url( $order ), //server->client callback - TODO: determine if this std. thankyou is OK
+                'url_callback'  		=>  "http://$_SERVER[HTTP_HOST]" .
+                                            '/wordpress/wp-content/plugins/oxipay-wordpress/' .
+                                            '/callback.php',                    //server->server callback
+                'url_complete'  		=>  $this->get_return_url( $order ),    //server->client callback - TODO: determine if this std. thankyou is OK
+                'url_cancel'            =>  $woocommerce->cart->get_cart_url(), // redirect back to the shopping cart
+                'currency'              =>  get_woocommerce_currency(),
+                'shop_name'             =>  $this->settings[shop_name],
                 'test'          		=>  $this->settings[test_mode],
                 'first_name'    		=>  $order->billing_first_name,
                 'last_name' 			=>  $order->billing_last_name,
@@ -142,11 +152,13 @@ function woocommerce_xpay_init() {
                 'platform'				=>	PLATFORM_NAME // required for backend
             );
 
-          	$signature = generate_signature($transaction_details, $this->form_fields['api_key']);
-          	$transaction_details['signature'] = $signature;
+          	$signature = $this->generate_signature($transaction_details, $this->settings['api_key']);
+            $this->echo_to_console($signature);
+            $this->echo_to_console($this->settings[account_id]);
+            $this->echo_to_console($this->settings[account_id]);
 
             $order->update_status('on-hold', __("Awaiting {$config['XPAY_DISPLAYNAME']} payment", 'woothemes'));
-            $qs = http_build_query($transaction_details);
+            $qs = http_build_query($transaction_details) . '&x_signature=' . $signature;
             return array(
                     'result' 	=>  'success',
                     'redirect'	=>  plugins_url("processing.php?$qs", __FILE__ )
@@ -162,9 +174,20 @@ function woocommerce_xpay_init() {
 	        	//step 2: concat all keys in form "{key}{value}"
         		$clear_text .= $key . $value;
         	}
-        	//step 3: use HMAC-SHA256 function on step 4 using API key as entropy
-            $hash = hash_hmac( "sha256", $clear_text, $api_key );
-            return str_replace('-', '', $hash);
+
+            //fwrite(STDOUT, $clear_text);
+
+            //step 3: use HMAC-SHA256 function on step 4 using API key as entropy
+            //WooCommerce v3 requires &. Refer: http://stackoverflow.com/questions/31976059/woocommerce-api-v3-authentication-issue
+            $secret = $api_key . '&';
+            $hash = base64_encode( hash_hmac( "sha256", $clear_text, $secret, true ));
+            return str_replace('+', '', $hash);
+        }
+
+        // Function to output echo statements to the browser console.
+        function echo_to_console( $data ) {
+            echo $data;
+            echo "\r\n";    // End of line on Windows
         }
 
 		function admin_options() { ?>

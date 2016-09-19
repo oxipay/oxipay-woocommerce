@@ -5,39 +5,30 @@
         <title>Processing Payment</title>
     </head>
     <body>
-        <h2>We are currently processing your payment</h2>
+        <h2>Please wait, we are processing your purchase...</h2>
    
         <div id="spinner"></div>
 
-        <!--<form method="post" action="">-->
+        <!-- PHP code to post to payment gateway -->
         <?php
-            $full_url = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-            $url = "http://localhost/CCP.XPay.Secure/checkout?platform=WooCommerce";
+            include_once( 'config.php' );
 
+            $full_url = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+            $url = 'http://localhost:60343/Checkout?platform=WooCommerce';
 
             $parts = parse_url($full_url, PHP_URL_QUERY);
             parse_str($parts, $params);
 
-            sleep(2);
+            $jparams = json_encode($params);
+            echo $jparams;
 
-            $post_options = array(
-                'http' => array(
-                    'method'    =>  'POST',
-                    'content'   =>  json_encode($params),
-                    'header'    =>  "Content-Type: application/json\r\n" .
-                                    "Accept: application/json\r\n"
-                )
-            );
-
-            $context    = stream_context_create( $post_options );
-            $response   = file_get_contents($url, false, $context);
-
-
+            echo "<form id='xpay_payload' method='post' action='$url'>";
+            echo "<input id='payload' name='payload' value='$jparams' type='hidden'/>";
+            echo "</form>";
         ?>
-        <!--</form>-->
 
-        <!-- Submitting the form and spinner animation -->
-        <script type="text/javascript" src="spin.min.js"></script>
+        <!-- spinner animation -->
+        <!--<script type="text/javascript" src="spin.min.js"></script>
 
         <script>
             var opts = {
@@ -64,6 +55,9 @@
             }
             var target = document.getElementById('spinner')
             var spinner = new Spinner(opts).spin(target);
+        </script>-->
+        <script>
+            document.getElementById('xpay_payload').submit();
         </script>
     </body>
 
