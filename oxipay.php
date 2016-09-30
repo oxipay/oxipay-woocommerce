@@ -1,38 +1,39 @@
 <?php
 
 /*
- * Plugin Name: XPay Payment Gateway
- * Plugin URI: http://www.certegyezipay.com
- * Description: Easy to setup intstallment payment plans from Certegy.
- * Version: 0.9.0
+ * Plugin Name: Oxipay Payment Gateway
+ * Plugin URI: https://www.oxipay.com.au
+ * Description: Easy to setup intstallment payment plans from Oxipay.
+ * Version: 0.1.0
  * Author: FlexiGroup
  * @package WordPress
  * @author FlexiGroup
- * @since 0.9.0
+ * @since 0.1.0
  */
 
 // this checks that the woocommerce plugin is alive and well.
 if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) return;
+
 include_once( 'config.php' );
 include_once( 'callback.php' );
 
 require_once(ABSPATH.'wp-settings.php');
 
-add_action('plugins_loaded', 'woocommerce_xpay_init', 0);
+add_action('plugins_loaded', 'woocommerce_oxipay_init', 0);
 
-function woocommerce_xpay_init() {
-	class XPay_Gateway extends WC_Payment_Gateway {
+function woocommerce_oxipay_init() {
+	class Oxipay_Gateway extends WC_Payment_Gateway {
 		function __construct() {
-			$this->id 					= 'xpay';
+			$this->id 					= 'oxipay';
 			$this->has_fields 			= false;
-			$this->order_button_text 	= __( 'Proceed to ' . $config['XPAY_DISPLAYNAME'], 'woocommerce' );
+			$this->order_button_text 	= __( 'Proceed to ' . $config['OXIPAY_DISPLAYNAME'], 'woocommerce' );
 
             // Tab Title on the WooCommerce Checkout page
-			$this->method_title       	= __( $config['XPAY_DISPLAYNAME'], 'woocommerce' );
+			$this->method_title       	= __( $config['OXIPAY_DISPLAYNAME'], 'woocommerce' );
 
             // Description displayed underneath heading
-			$this->method_descripton	= __( $config['XPAY_DISPLAYNAME'] . ' is a payment gateway from FlexiGroup. ' .
-                                            'The plugin works by sending payment details to ' . $config['XPAY_DISPLAYNAME'] . ' for processing.', 'woocommerce' );
+			$this->method_descripton	= __( $config['OXIPAY_DISPLAYNAME'] . ' is a payment gateway from FlexiGroup. ' .
+                                            'The plugin works by sending payment details to ' . $config['OXIPAY_DISPLAYNAME'] . ' for processing.', 'woocommerce' );
 
 			$this->init_form_fields();
 			$this->init_settings();
@@ -40,7 +41,7 @@ function woocommerce_xpay_init() {
 			$this->title          = $this->get_option( 'title' );
 			$this->description    = $this->get_option( 'description' );
 
-			//$this->icon = PLUGIN_DIR . 'images/xpay.png';
+			//$this->icon = PLUGIN_DIR . 'images/oxipay.png';
 
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 			add_filter( 'woocommerce_thankyou_order_id',array($this,'payment_finalisation'));
@@ -52,7 +53,7 @@ function woocommerce_xpay_init() {
 				'enabled' => array(
 					'title' 		=> __( 'Enable', 'woocommerce' ),
 					'type' 			=> 'checkbox',
-					'label' 		=> __( 'Enable the ' . $config['XPAY_DISPLAYNAME'] . ' Payment Gateway', 'woocommerce' ),
+					'label' 		=> __( 'Enable the ' . $config['OXIPAY_DISPLAYNAME'] . ' Payment Gateway', 'woocommerce' ),
 					'default' 		=> 'yes'
 				),
                 'test_mode' => array(
@@ -65,26 +66,26 @@ function woocommerce_xpay_init() {
 					'title' 		=> __( 'Title', 'woocommerce' ),
 					'type' 			=> 'text',
 					'description' 	=> __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
-					'default' 		=> __( $config['XPAY_DISPLAYNAME'] , 'woocommerce' ),
+					'default' 		=> __( $config['OXIPAY_DISPLAYNAME'] , 'woocommerce' ),
 					'desc_tip'      => true,
 				),
 				'description' => array(
 					'title' 		=> __( 'Description', 'woocommerce' ),
 					'type' 			=> 'text',
 					'description' 	=> __( 'This controls the description which the user sees during checkout.', 'woocommerce' ),
-					'default' 		=> __( 'Pay using ' . $config['XPAY_DISPLAYNAME'] . ' with an interest-free installment payment plan', 'woocommerce' ),
+					'default' 		=> __( 'Pay using ' . $config['OXIPAY_DISPLAYNAME'] . ' with an interest-free installment payment plan', 'woocommerce' ),
 					'desc_tip'      => true,
 				),
 				'gateway_details' => array(
-					'title' 		=> __( $config['XPAY_DISPLAYNAME'] . ' Settings', 'woocommerce' ),
+					'title' 		=> __( $config['OXIPAY_DISPLAYNAME'] . ' Settings', 'woocommerce' ),
 					'type' 			=> 'title',
-					'description' 	=> __( 'Enter the gateway settings to process payments via the ' . $config['XPAY_DISPLAYNAME'] . ' payment gateway.', 'woocommerce' ),
-					'default' 		=> __( $config['XPAY_DISPLAYNAME'] . ' Payment', 'woocommerce' ),
+					'description' 	=> __( 'Enter the gateway settings to process payments via the ' . $config['OXIPAY_DISPLAYNAME'] . ' payment gateway.', 'woocommerce' ),
+					'default' 		=> __( $config['OXIPAY_DISPLAYNAME'] . ' Payment', 'woocommerce' ),
 				),
 				'gateway_url' => array(
-					'title' 		=> __( $config['XPAY_DISPLAYNAME'] . ' Gateway URL', 'woocommerce' ),
+					'title' 		=> __( $config['OXIPAY_DISPLAYNAME'] . ' Gateway URL', 'woocommerce' ),
 					'type' 			=> 'text',
-					'default' 		=> __( $config['XPAY_URL'], 'woocommerce' ),
+					'default' 		=> __( $config['OXIPAY_URL'], 'woocommerce' ),
 				),
                 'api_key'   =>array(
                     'id'        => 'merchant_api_key',
@@ -95,8 +96,8 @@ function woocommerce_xpay_init() {
 				'business_details' => array(
 					'title' 		=> __( 'Merchant Details', 'woocommerce' ),
 					'type' 			=> 'title',
-					'description' 	=> __( 'Enter your business details to process payments via ' . $config['XPAY_DISPLAYNAME'], 'woocommerce' ),
-					'default' 		=> __( $config['XPAY_DISPLAYNAME'] . ' Payment', 'woocommerce' ),
+					'description' 	=> __( 'Enter your business details to process payments via ' . $config['OXIPAY_DISPLAYNAME'], 'woocommerce' ),
+					'default' 		=> __( $config['OXIPAY_DISPLAYNAME'] . ' Payment', 'woocommerce' ),
 				),
                 'account_id'   =>array(
                     'title'     => __( 'Merchant ID', 'woocommerce' ),
@@ -113,7 +114,7 @@ function woocommerce_xpay_init() {
 
         /**
          * Returns the test gateway URL if enabled in the admin panel, otherwise, returns the
-         * default XPay payment gateway URL
+         * default Oxipay payment gateway URL
          */
         function process_payment( $order_id ) {
             global $woocommerce;
@@ -157,7 +158,7 @@ function woocommerce_xpay_init() {
             $this->echo_to_console($this->settings[account_id]);
             $this->echo_to_console($this->settings[account_id]);
 
-            $order->update_status('on-hold', __("Awaiting {$config['XPAY_DISPLAYNAME']} payment", 'woothemes'));
+            $order->update_status('on-hold', __("Awaiting {$config['OXIPAY_DISPLAYNAME']} payment", 'woothemes'));
             $qs = http_build_query($transaction_details) . '&x_signature=' . $signature;
             return array(
                     'result' 	=>  'success',
@@ -165,7 +166,6 @@ function woocommerce_xpay_init() {
             );
 		}
 
-		//refer: http://ad-d-dev02:8080/browse/XPAY-293
         function generate_signature( $query, $api_key ) {
         	//step 1: order by key_name ascending
         	$clear_text = '';
@@ -191,9 +191,9 @@ function woocommerce_xpay_init() {
         }
 
 		function admin_options() { ?>
-			<h2><?php _e($config['XPAY_DISPLAYNAME'],'woocommerce'); ?></h2>
-			<p><?php _e( $config['XPAY_DISPLAYNAME'] . ' is a payment gateway from FlexiGroup. The plugin works by sending payment details to ' . 
-			          $config['XPAY_DISPLAYNAME'] . ' for processing.', 'woocommerce' ); ?></p>
+			<h2><?php _e($config['OXIPAY_DISPLAYNAME'],'woocommerce'); ?></h2>
+			<p><?php _e( $config['OXIPAY_DISPLAYNAME'] . ' is a payment gateway from FlexiGroup. The plugin works by sending payment details to ' . 
+			          $config['OXIPAY_DISPLAYNAME'] . ' for processing.', 'woocommerce' ); ?></p>
 			<table class="form-table">
 			<?php $this->generate_settings_html(); ?>
 			</table> <?php
@@ -201,11 +201,11 @@ function woocommerce_xpay_init() {
 	}
 }
 
-function add_xpay_payment_gateway($methods) {
-	$methods[] = 'XPay_Gateway';
+function add_oxipay_payment_gateway($methods) {
+	$methods[] = 'Oxipay_Gateway';
 	return $methods;
 }
 
-add_filter('woocommerce_payment_gateways', 'add_xpay_payment_gateway');
+add_filter('woocommerce_payment_gateways', 'add_oxipay_payment_gateway');
 
 ?>

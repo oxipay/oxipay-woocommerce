@@ -1,25 +1,24 @@
 <?php
 DEFINE ('ENVIRONMENT', 'DEVELOPMENT');
 DEFINE ('PLATFORM_NAME', 'WooCommerce');
-//DEFINE ('PLUGIN_DIR', plugins_url( basename( plugin_dir_path( __FILE__ ) ), basename( __FILE__ ) ) . '/' );
 DEFINE ('CWD', basename( __DIR__ ));
-DEFINE ('WEBROOT', "http://localhost:60343/");
-define('ABSPATH', dirname(__FILE__).'/');
-
+DEFINE ('WEBROOT', "http://localhost:60343/"); //todo: retrieve API URL from woocommerce configuration
+DEFINE('ABSPATH', dirname(__FILE__).'/');
 
 $config = array(
-	"XPAY_DISPLAYNAME" => "OxiPay",
+	"OXIPAY_DISPLAYNAME" => "Oxipay",
 	"WAIT_URL" => "processing.php"
 );
 
+//todo: retrieve API URL from woocommerce configuration
 switch (ENVIRONMENT) {
 
 	case 'DEVELOPMENT':
-		$config['XPAY_URL'] = 'http://localhost:60343/Checkout?platform=WooCommerce';
+		$config['OXIPAY_URL'] = 'http://localhost:60343/Checkout?platform=WooCommerce';
 		$config['TEST'] = true;
 		return $config;
     case 'PRODUCTION':
-		$config['XPAY_URL'] = 'http://xpozsecure.certegyezipay.com.au/Checkout?platform=WooCommerce';
+		$config['OXIPAY_URL'] = '';
 		$config['TEST'] = false;
 		return $config;
 	default:
