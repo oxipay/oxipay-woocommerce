@@ -1,5 +1,4 @@
 <?php
-define ('ENVIRONMENT', 'DEVELOPMENT');
 define ('PLATFORM_NAME', 'woocommerce');
 define ('CWD', basename( __DIR__ ));
 define ('ABSPATH', dirname(__FILE__).'/');
