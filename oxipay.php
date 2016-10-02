@@ -70,6 +70,13 @@ function woocommerce_oxipay_init() {
 					'default' 		=> __( 'Breathe easy with ' . OXIPAY_DISPLAYNAME . ', an interest-free installment payment plan.', 'woocommerce' ),
 					'desc_tip'      => true,
 				),
+				'shop_name' => array(
+					'title' 		=> __( 'Shop Name', 'woocommerce' ),
+					'type' 			=> 'text',
+					'description' 	=> __( 'The name of the shop that will be displayed in ' . OXIPAY_DISPLAYNAME, 'woocommerce' ),
+					'default' 		=> __( '', 'woocommerce' ),
+					'desc_tip'      => true,
+				),
 				'gateway_details' => array(
 					'title' 		=> __( OXIPAY_DISPLAYNAME . ' Gateway Settings', 'woocommerce' ),
 					'type' 			=> 'title',
@@ -132,6 +139,8 @@ function woocommerce_oxipay_init() {
                 'x_url_complete'  				=>  $this->get_return_url( $order ),
                 'x_url_cancel'           		=>  $woocommerce->cart->get_cart_url(),
                 'x_test'          				=>  $this->settings['test_mode'],
+                'x_shop_country'          		=>  SHOP_COUNTRY,
+                'x_shop_name'          			=>  $this->settings['shop_name'],
 				//customer detail
                 'x_customer_first_name' 		=>  $order->billing_first_name,
                 'x_customer_last_name' 			=>  $order->billing_last_name,
