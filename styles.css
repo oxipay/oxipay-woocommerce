@@ -1,0 +1,90 @@
+body {
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#ddd, endColorstr=#eee);
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient (GradientType=0, startColorstr=#ddd, endColorstr=#eee)";
+    background-image: -ms-linear-gradient(top, #ddd 0%, #eee 100%);
+    background-image: -moz-linear-gradient(center top, #ddd, #eee);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ddd), to(#eee));
+    background-image: linear-gradient(to bottom, #ddd 0%, #eee 100%);
+    background-color: #eee;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #373a3c;
+}
+html {
+    background-color: #eee;
+}
+#topbar {
+    width: 100%;
+    background-color: #252525;
+    height: 35px;
+    padding: 10px 0;
+    text-align: center;
+    overflow: hidden;
+}
+#topbar img {
+    height: 100%;
+}
+.card {
+    box-shadow: rgba(68, 68, 68, 0.2) 1px 5px 6px;
+    border-width: 0;
+    -moz-border-radius: 7px;
+    -webkit-border-radius: 7px;
+    border-radius: 7px;
+    background-color: #f7f7f7;
+    max-width: 520px;
+    min-height: 500px;
+    margin: 0 auto;
+    position: relative;
+    margin-top: 20px;
+    text-align: center;
+    
+}
+@media screen and (max-width: 768px) {
+    .card {
+    max-width:100%;
+    margin-top: 0;
+        border-radius: 0;
+        position: absolute;
+        width: 100%;
+        min-height: 0px;
+        overflow: scroll;
+        bottom: 0;
+        top: 55px;
+    }
+}
+.card .card-heading {
+    padding: 12px;
+    background-color: white;
+    border-bottom: 1px solid #ddd;
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+}
+.card .card-heading h4 {
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-family: inherit;
+    font-weight: 500;
+    line-height: 1.1;
+    font-size: 1.5rem;
+}
+p {
+    margin:10px;
+}
+a {
+    text-decoration: none;
+    color: #e68821;
+}
+.btn {
+    display: inline-block;
+    font-weight: normal;
+    line-height: 1.25;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 0.15rem;
+    background-color: #e68821 !important;
+    color: white;
+    margin-bottom: 30px;
+}
