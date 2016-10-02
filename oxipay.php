@@ -48,43 +48,54 @@ function woocommerce_oxipay_init() {
 		function init_form_fields() {
 
 			$this->form_fields = array(
-				'enabled' => array(
-					'title' 		=> __( 'Enable', 'woocommerce' ),
+				'enabled' 			=> array(
+					'title' 		=> __( 'Enabled', 'woocommerce' ),
 					'type' 			=> 'checkbox',
 					'label' 		=> __( 'Enable the ' . OXIPAY_DISPLAYNAME . ' Payment Gateway', 'woocommerce' ),
 					'default' 		=> 'yes',
 					'description'	=> 'Disable oxipay services, your customers will not be able to use our easy installment plans.',
 					'desc_tip'		=> true
 				),
-                'test_mode' => array(
-					'title' 		=> __( 'Test Mode', 'woocommerce' ),
-					'type' 			=> 'checkbox',
-					'label' 		=> __( 'Enable Test Mode', 'woocommerce' ),
-					'default' 		=> 'no',
-					'description'	=> 'WARNING: Setting this will not process any money on our services, so do not use this setting in a production environment.',
-					'desc_tip'		=> true
+				'display_details' 	=> array(
+					'title' 		=> __( OXIPAY_DISPLAYNAME . ' Display Details', 'woocommerce' ),
+					'type' 			=> 'title',
+					'description' 	=> __( 'Enter the ' . OXIPAY_DISPLAYNAME . ' display details for your site. These details will be displayed during the WooCommerce checkout process.', 'woocommerce' ),
+					'default' 		=> __( OXIPAY_DISPLAYNAME . ' Payment', 'woocommerce' ),
 				),
-				'title' => array(
+				'title' 			=> array(
 					'title' 		=> __( 'Title', 'woocommerce' ),
 					'type' 			=> 'text',
 					'description' 	=> __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
 					'default' 		=> __( OXIPAY_DISPLAYNAME , 'woocommerce' ),
 					'desc_tip'      => true,
 				),
-				'description' => array(
+				'description' 		=> array(
 					'title' 		=> __( 'Description', 'woocommerce' ),
 					'type' 			=> 'text',
 					'description' 	=> __( 'This controls the description which the user sees during checkout.', 'woocommerce' ),
 					'default' 		=> __( 'Breathe easy with ' . OXIPAY_DISPLAYNAME . ', an interest-free installment payment plan.', 'woocommerce' ),
 					'desc_tip'      => true,
 				),
-				'gateway_details' => array(
+				'shop_details' 		=> array(
+					'title' 		=> __( OXIPAY_DISPLAYNAME . ' Shop Details', 'woocommerce' ),
+					'type' 			=> 'title',
+					'description' 	=> __( 'Enter the ' . OXIPAY_DISPLAYNAME . ' shop details for your site. These details will be displayed during the oxipay checkout process.', 'woocommerce' ),
+					'default' 		=> __( OXIPAY_DISPLAYNAME . ' Payment', 'woocommerce' ),
+				),
+				'shop_name' 		=> array(
+					'title' 		=> __( 'Shop Name', 'woocommerce' ),
+					'type' 			=> 'text',
+					'description' 	=> __( 'The name of the shop that will be displayed in ' . OXIPAY_DISPLAYNAME, 'woocommerce' ),
+					'default' 		=> __( '', 'woocommerce' ),
+					'desc_tip'      => true,
+				),
+				'gateway_details' 	=> array(
 					'title' 		=> __( OXIPAY_DISPLAYNAME . ' Gateway Settings', 'woocommerce' ),
 					'type' 			=> 'title',
 					'description' 	=> __( 'Enter the gateway settings that were supplied to you by ' . OXIPAY_DISPLAYNAME . '.', 'woocommerce' ),
 					'default' 		=> __( OXIPAY_DISPLAYNAME . ' Payment', 'woocommerce' ),
 				),
-				'oxipay_gateway_url' => array(
+				'oxipay_gateway_url'=> array(
 					'id'			=> 'oxipay_gateway_url',
 					'title' 		=> __( OXIPAY_DISPLAYNAME . ' Gateway URL', 'woocommerce' ),
 					'type' 			=> 'text',
@@ -92,7 +103,15 @@ function woocommerce_oxipay_init() {
 					'description'	=> 'This is the base URL of the Oxipay payment services. Do not change this unless directed to by Oxipay staff.',
 					'desc_tip'		=> true
 				),
-                'oxipay_api_key'   =>array(
+                'oxipay_merchant_id'=>array(
+                	'id'		    => 'oxipay_merchant_id',
+                    'title'     	=> __( 'Merchant ID', 'woocommerce' ),
+					'type' 	    	=> 'text',
+                    'default'   	=> '',
+					'description'	=> 'Oxipay will have supplied you with your Oxipay Merchant ID. <a href="https://oxipay.com.au/support">Contact us</a> if you cannot find it.',
+					'desc_tip'		=> true
+                ),
+                'oxipay_api_key'    => array(
                     'id'        	=> 'oxipay_api_key',
                     'title'     	=> __( 'API Key', 'woocommerce' ),
 					'type' 	    	=> 'text',
@@ -100,14 +119,14 @@ function woocommerce_oxipay_init() {
 					'description'	=> 'Oxipay will have supplied you with your Oxipay API key. <a href="https://oxipay.com.au/support">Contact us</a> if you cannot find it.',
 					'desc_tip'		=> true
                 ),
-                'oxipay_merchant_id'   =>array(
-                	'id'		=> 'oxipay_merchant_id',
-                    'title'     => __( 'Merchant ID', 'woocommerce' ),
-					'type' 	    => 'text',
-                    'default'   => '',
-					'description'	=> 'Oxipay will have supplied you with your Oxipay Merchant ID. <a href="https://oxipay.com.au/support">Contact us</a> if you cannot find it.',
+                'test_mode' 		=> array(
+					'title' 		=> __( 'Test Mode', 'woocommerce' ),
+					'type' 			=> 'checkbox',
+					'label' 		=> __( 'Enable Test Mode', 'woocommerce' ),
+					'default' 		=> 'no',
+					'description'	=> 'WARNING: Setting this will not process any money on our services, so do not use this setting in a production environment.',
 					'desc_tip'		=> true
-                )
+				)
 			);
 		}
 
@@ -124,31 +143,35 @@ function woocommerce_oxipay_init() {
 			$order->update_status('processing', __('Awaiting Oxipay payment processing to complete.', 'woocommerce'));
 
             $transaction_details = array (
-                'x_reference'     		=>  $order_id,
-                'x_account_id'    		=>  $this->settings['oxipay_merchant_id'],
-                'x_amount' 	    		=>  $order->order_total,
+                'x_reference'     				=>  $order_id,
+                'x_account_id'    				=>  $this->settings['oxipay_merchant_id'],
+                'x_amount' 	    				=>  $order->order_total,
+                'x_currency' 	    			=>  CURRENCY,
                 'x_url_callback'  		=>  plugins_url("callback.php"),
-                'x_url_complete'  		=>  $this->get_return_url( $order ),
-                'x_url_cancel'          =>  $woocommerce->cart->get_cart_url(),
-                'x_test'          		=>  $this->settings['test_mode'],
+                'x_url_complete'  				=>  $this->get_return_url( $order ),
+                'x_url_cancel'           =>  $woocommerce->cart->get_cart_url(),
+                'x_test'          				=>  $this->settings['test_mode'],
+                'x_shop_country'          		=>  AUSTRALIA,
+                'x_shop_name'          			=>  $this->settings['shop_name'],
 				//customer detail
-                'x_customer_first_name' =>  $order->billing_first_name,
-                'x_customer_last_name' 	=>  $order->billing_last_name,
-                'x_customer_email'      =>  $order->billing_email,
-                'x_customer_phone'		=>  $order->billing_phone,
+                'x_customer_first_name' 		=>  $order->billing_first_name,
+                'x_customer_last_name' 			=>  $order->billing_last_name,
+                'x_customer_email'      		=>  $order->billing_email,
+                'x_customer_phone'				=>  $order->billing_phone,
                 //billing detail
+                'x_customer_billing_country'	=>	AUSTRALIA,
                 'x_customer_billing_city' 	    =>  $order->billing_city,
                 'x_customer_billing_address_1' 	=>  $order->billing_address_1,
                 'x_customer_billing_address_2' 	=>  $order->billing_address_2,
                 'x_customer_billing_state' 	    =>  $order->billing_state,
                 'x_customer_billing_zip' 		=>  $order->billing_postcode,
                 //shipping detail
+                'x_customer_shipping_country'	=>	AUSTRALIA,
  				'x_customer_shipping_city' 	    =>  $order->postal_city,
                 'x_customer_shipping_address_1' =>  $order->postal_address_1,
                 'x_customer_shipping_address_2' =>  $order->postal_address_2,
                 'x_customer_shipping_state' 	=>  $order->postal_state,
                 'x_customer_shipping_zip' 		=>  $order->postal_postcode,
-                'platform'						=>	PLATFORM_NAME
             );
 
           	$signature = $this->generate_signature($transaction_details, $this->settings['api_key']);
