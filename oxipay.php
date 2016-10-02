@@ -48,7 +48,7 @@ function woocommerce_oxipay_init() {
 		function init_form_fields() {
 
 			$this->form_fields = array(
-				'enabled' => array(
+				'enabled' 			=> array(
 					'title' 		=> __( 'Enable', 'woocommerce' ),
 					'type' 			=> 'checkbox',
 					'label' 		=> __( 'Enable the ' . OXIPAY_DISPLAYNAME . ' Payment Gateway', 'woocommerce' ),
@@ -56,34 +56,34 @@ function woocommerce_oxipay_init() {
 					'description'	=> 'Disable oxipay services, your customers will not be able to use our easy installment plans.',
 					'desc_tip'		=> true
 				),
-				'title' => array(
+				'title' 			=> array(
 					'title' 		=> __( 'Title', 'woocommerce' ),
 					'type' 			=> 'text',
 					'description' 	=> __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
 					'default' 		=> __( OXIPAY_DISPLAYNAME , 'woocommerce' ),
 					'desc_tip'      => true,
 				),
-				'description' => array(
+				'description' 		=> array(
 					'title' 		=> __( 'Description', 'woocommerce' ),
 					'type' 			=> 'text',
 					'description' 	=> __( 'This controls the description which the user sees during checkout.', 'woocommerce' ),
 					'default' 		=> __( 'Breathe easy with ' . OXIPAY_DISPLAYNAME . ', an interest-free installment payment plan.', 'woocommerce' ),
 					'desc_tip'      => true,
 				),
-				'shop_name' => array(
+				'shop_name' 		=> array(
 					'title' 		=> __( 'Shop Name', 'woocommerce' ),
 					'type' 			=> 'text',
 					'description' 	=> __( 'The name of the shop that will be displayed in ' . OXIPAY_DISPLAYNAME, 'woocommerce' ),
 					'default' 		=> __( '', 'woocommerce' ),
 					'desc_tip'      => true,
 				),
-				'gateway_details' => array(
+				'gateway_details' 	=> array(
 					'title' 		=> __( OXIPAY_DISPLAYNAME . ' Gateway Settings', 'woocommerce' ),
 					'type' 			=> 'title',
 					'description' 	=> __( 'Enter the gateway settings that were supplied to you by ' . OXIPAY_DISPLAYNAME . '.', 'woocommerce' ),
 					'default' 		=> __( OXIPAY_DISPLAYNAME . ' Payment', 'woocommerce' ),
 				),
-				'oxipay_gateway_url' => array(
+				'oxipay_gateway_url'=> array(
 					'id'			=> 'oxipay_gateway_url',
 					'title' 		=> __( OXIPAY_DISPLAYNAME . ' Gateway URL', 'woocommerce' ),
 					'type' 			=> 'text',
@@ -91,15 +91,15 @@ function woocommerce_oxipay_init() {
 					'description'	=> 'This is the base URL of the Oxipay payment services. Do not change this unless directed to by Oxipay staff.',
 					'desc_tip'		=> true
 				),
-                'oxipay_merchant_id'   =>array(
-                	'id'		=> 'oxipay_merchant_id',
-                    'title'     => __( 'Merchant ID', 'woocommerce' ),
-					'type' 	    => 'text',
-                    'default'   => '',
+                'oxipay_merchant_id'=>array(
+                	'id'		    => 'oxipay_merchant_id',
+                    'title'     	=> __( 'Merchant ID', 'woocommerce' ),
+					'type' 	    	=> 'text',
+                    'default'   	=> '',
 					'description'	=> 'Oxipay will have supplied you with your Oxipay Merchant ID. <a href="https://oxipay.com.au/support">Contact us</a> if you cannot find it.',
 					'desc_tip'		=> true
                 ),
-                'oxipay_api_key'   =>array(
+                'oxipay_api_key'    => array(
                     'id'        	=> 'oxipay_api_key',
                     'title'     	=> __( 'API Key', 'woocommerce' ),
 					'type' 	    	=> 'text',
@@ -107,7 +107,7 @@ function woocommerce_oxipay_init() {
 					'description'	=> 'Oxipay will have supplied you with your Oxipay API key. <a href="https://oxipay.com.au/support">Contact us</a> if you cannot find it.',
 					'desc_tip'		=> true
                 ),
-                'test_mode' => array(
+                'test_mode' 		=> array(
 					'title' 		=> __( 'Test Mode', 'woocommerce' ),
 					'type' 			=> 'checkbox',
 					'label' 		=> __( 'Enable Test Mode', 'woocommerce' ),
