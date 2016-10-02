@@ -56,14 +56,6 @@ function woocommerce_oxipay_init() {
 					'description'	=> 'Disable oxipay services, your customers will not be able to use our easy installment plans.',
 					'desc_tip'		=> true
 				),
-                'test_mode' => array(
-					'title' 		=> __( 'Test Mode', 'woocommerce' ),
-					'type' 			=> 'checkbox',
-					'label' 		=> __( 'Enable Test Mode', 'woocommerce' ),
-					'default' 		=> 'no',
-					'description'	=> 'WARNING: Setting this will not process any money on our services, so do not use this setting in a production environment.',
-					'desc_tip'		=> true
-				),
 				'title' => array(
 					'title' 		=> __( 'Title', 'woocommerce' ),
 					'type' 			=> 'text',
@@ -92,6 +84,14 @@ function woocommerce_oxipay_init() {
 					'description'	=> 'This is the base URL of the Oxipay payment services. Do not change this unless directed to by Oxipay staff.',
 					'desc_tip'		=> true
 				),
+                'oxipay_merchant_id'   =>array(
+                	'id'		=> 'oxipay_merchant_id',
+                    'title'     => __( 'Merchant ID', 'woocommerce' ),
+					'type' 	    => 'text',
+                    'default'   => '',
+					'description'	=> 'Oxipay will have supplied you with your Oxipay Merchant ID. <a href="https://oxipay.com.au/support">Contact us</a> if you cannot find it.',
+					'desc_tip'		=> true
+                ),
                 'oxipay_api_key'   =>array(
                     'id'        	=> 'oxipay_api_key',
                     'title'     	=> __( 'API Key', 'woocommerce' ),
@@ -100,14 +100,14 @@ function woocommerce_oxipay_init() {
 					'description'	=> 'Oxipay will have supplied you with your Oxipay API key. <a href="https://oxipay.com.au/support">Contact us</a> if you cannot find it.',
 					'desc_tip'		=> true
                 ),
-                'oxipay_merchant_id'   =>array(
-                	'id'		=> 'oxipay_merchant_id',
-                    'title'     => __( 'Merchant ID', 'woocommerce' ),
-					'type' 	    => 'text',
-                    'default'   => '',
-					'description'	=> 'Oxipay will have supplied you with your Oxipay Merchant ID. <a href="https://oxipay.com.au/support">Contact us</a> if you cannot find it.',
+                'test_mode' => array(
+					'title' 		=> __( 'Test Mode', 'woocommerce' ),
+					'type' 			=> 'checkbox',
+					'label' 		=> __( 'Enable Test Mode', 'woocommerce' ),
+					'default' 		=> 'no',
+					'description'	=> 'WARNING: Setting this will not process any money on our services, so do not use this setting in a production environment.',
 					'desc_tip'		=> true
-                )
+				)
 			);
 		}
 
