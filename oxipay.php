@@ -147,9 +147,9 @@ function woocommerce_oxipay_init() {
                 'x_account_id'    				=>  $this->settings['oxipay_merchant_id'],
                 'x_amount' 	    				=>  $order->order_total,
                 'x_currency' 	    			=>  CURRENCY,
-                'x_url_callback'  		=>  plugins_url("callback.php"),
+                'x_url_callback'  				=>  plugins_url("callback.php"),
                 'x_url_complete'  				=>  $this->get_return_url( $order ),
-                'x_url_cancel'           =>  $woocommerce->cart->get_cart_url(),
+                'x_url_cancel'           		=>  $woocommerce->cart->get_cart_url(),
                 'x_test'          				=>  $this->settings['test_mode'],
                 'x_shop_country'          		=>  AUSTRALIA,
                 'x_shop_name'          			=>  $this->settings['shop_name'],
@@ -172,6 +172,9 @@ function woocommerce_oxipay_init() {
                 'x_customer_shipping_address_2' =>  $order->postal_address_2,
                 'x_customer_shipping_state' 	=>  $order->postal_state,
                 'x_customer_shipping_zip' 		=>  $order->postal_postcode,
+                //pass the gateway URL through to the processing page.
+                //TODO: the processing.php page should probably resolve this differently.
+                'gateway_url' 					=>  $this->settings['oxipay_gateway_url'],
             );
 
           	$signature = $this->generate_signature($transaction_details, $this->settings['api_key']);
@@ -195,7 +198,9 @@ function woocommerce_oxipay_init() {
         	$clear_text = '';
         	ksort($query);
         	foreach ($query as $key => $value) {
-        		$clear_text .= $key . $value;
+        		if (substr($key, 0, 2) === "x_") {
+        			$clear_text .= $key . $value;
+        		}
         	}
             //WooCommerce v3 requires &. Refer: http://stackoverflow.com/questions/31976059/woocommerce-api-v3-authentication-issue
             $secret = $api_key . '&';

@@ -20,15 +20,17 @@
 
 <?php
 include_once( 'config.php' );
+include_once( 'config.php' );
 
-$baseUrl = get_option('oxipay_gateway_url'); //todo: this doesn't work
-$url = $baseUrl . OXIPAY_CHECKOUT_URL;
 parse_str($_SERVER['QUERY_STRING'], $query);
 
+$url = $query["gateway_url"];
 echo "<form id='oxipay_payload' method='post' action='$url'>";
 
 foreach ($query as $item => $value) {
-    echo "<input id='$item' name='$item' value='$value' type='hidden'/>";
+    if (substr($item, 0, 2) === "x_") {
+        echo "<input id='$item' name='$item' value='$value' type='hidden'/>";
+    }
 }
 
 echo "</form>";
