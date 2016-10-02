@@ -16,6 +16,7 @@ if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins',
 
 require_once( 'config.php' );
 require_once( 'callback.php' );
+require_once( 'crypto.php' );
 require_once(ABSPATH.'wp-settings.php');
 
 add_action('plugins_loaded', 'woocommerce_oxipay_init', 0);
@@ -148,7 +149,7 @@ function woocommerce_oxipay_init() {
                 'platform'				=>	PLATFORM_NAME
             );
 
-          	$signature = $this->generate_signature($transaction_details, $this->settings['api_key']);
+          	$signature = oxipay_sign($transaction_details, $this->settings['api_key']);
 			$transaction_details['x_signature'] = $signature;
             $order->update_status('on-hold', __('Awaiting '.OXIPAY_DISPLAYNAME.' payment', 'woothemes'));
             $qs = http_build_query($transaction_details);
@@ -157,37 +158,6 @@ function woocommerce_oxipay_init() {
                     'result' 	=>  'success',
                     'redirect'	=>  plugins_url("oxipay/processing.php?$qs", __FILE__ )
             );
-		}
-
-		/**
-		 * Generates a HMAC based on the merchants api key and the request
-		 * @param $query
-		 * @param $api_key
-		 * @return mixed
-		 */
-		function generate_signature($query, $api_key ) {
-        	$clear_text = '';
-        	ksort($query);
-        	foreach ($query as $key => $value) {
-        		$clear_text .= $key . $value;
-        	}
-            //WooCommerce v3 requires &. Refer: http://stackoverflow.com/questions/31976059/woocommerce-api-v3-authentication-issue
-            $secret = $api_key . '&';
-            $hash = base64_encode( hash_hmac( "sha256", $clear_text, $secret, true ));
-            return str_replace('+', '', $hash);
-        }
-
-		/**
-		 * validates and associative array that contains a hmac signature against an api key
-		 * @param $query array
-		 * @param $api_key string
-		 * @return bool
-		 */
-		public function is_valid_signature($query, $api_key) {
-			$actualSignature = $query['x_signature'];
-			unset($query['x_signature']);
-			$expectedSignature = $this->generate_signature($query, $api_key);
-			return $actualSignature == $expectedSignature;
 		}
 
 		/**
