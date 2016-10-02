@@ -148,7 +148,6 @@ function woocommerce_oxipay_init() {
                 'x_customer_shipping_address_2' =>  $order->postal_address_2,
                 'x_customer_shipping_state' 	=>  $order->postal_state,
                 'x_customer_shipping_zip' 		=>  $order->postal_postcode,
-                'platform'						=>	PLATFORM_NAME
             );
 
           	$signature = $this->generate_signature($transaction_details, $this->settings['api_key']);
