@@ -125,7 +125,7 @@ function woocommerce_oxipay_init() {
                 'order_key'     		=>  $order_id,
                 'account_id'    		=>  $this->settings['oxipay_merchant_id'],
                 'total' 	    		=>  $order->order_total,
-                'url_callback'  		=>  plugins_url("callback.php"),
+                'url_callback'  		=>  plugins_url("/oxipay/callback.php"),
                 'url_complete'  		=>  $this->get_return_url( $order ),
                 'url_cancel'            =>  $woocommerce->cart->get_cart_url(),
                 'test'          		=>  $this->settings['test_mode'],
@@ -155,7 +155,7 @@ function woocommerce_oxipay_init() {
 
             return array(
                     'result' 	=>  'success',
-                    'redirect'	=>  plugins_url("processing.php?$qs", __FILE__ )
+                    'redirect'	=>  plugins_url("oxipay/processing.php?$qs", __FILE__ )
             );
 		}
 
