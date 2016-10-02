@@ -49,12 +49,18 @@ function woocommerce_oxipay_init() {
 
 			$this->form_fields = array(
 				'enabled' 			=> array(
-					'title' 		=> __( 'Enable', 'woocommerce' ),
+					'title' 		=> __( 'Enabled', 'woocommerce' ),
 					'type' 			=> 'checkbox',
 					'label' 		=> __( 'Enable the ' . OXIPAY_DISPLAYNAME . ' Payment Gateway', 'woocommerce' ),
 					'default' 		=> 'yes',
 					'description'	=> 'Disable oxipay services, your customers will not be able to use our easy installment plans.',
 					'desc_tip'		=> true
+				),
+				'display_details' 	=> array(
+					'title' 		=> __( OXIPAY_DISPLAYNAME . ' Display Details', 'woocommerce' ),
+					'type' 			=> 'title',
+					'description' 	=> __( 'Enter the ' . OXIPAY_DISPLAYNAME . ' display details for your site. These details will be displayed during the WooCommerce checkout process.', 'woocommerce' ),
+					'default' 		=> __( OXIPAY_DISPLAYNAME . ' Payment', 'woocommerce' ),
 				),
 				'title' 			=> array(
 					'title' 		=> __( 'Title', 'woocommerce' ),
@@ -69,6 +75,12 @@ function woocommerce_oxipay_init() {
 					'description' 	=> __( 'This controls the description which the user sees during checkout.', 'woocommerce' ),
 					'default' 		=> __( 'Breathe easy with ' . OXIPAY_DISPLAYNAME . ', an interest-free installment payment plan.', 'woocommerce' ),
 					'desc_tip'      => true,
+				),
+				'shop_details' 		=> array(
+					'title' 		=> __( OXIPAY_DISPLAYNAME . ' Shop Details', 'woocommerce' ),
+					'type' 			=> 'title',
+					'description' 	=> __( 'Enter the ' . OXIPAY_DISPLAYNAME . ' shop details for your site. These details will be displayed during the oxipay checkout process.', 'woocommerce' ),
+					'default' 		=> __( OXIPAY_DISPLAYNAME . ' Payment', 'woocommerce' ),
 				),
 				'shop_name' 		=> array(
 					'title' 		=> __( 'Shop Name', 'woocommerce' ),
@@ -169,7 +181,7 @@ function woocommerce_oxipay_init() {
 
             return array(
                     'result' 	=>  'success',
-                    'redirect'	=>  plugins_url("oxipay/processing.php?$qs", __FILE__ )
+                    'redirect'	=>  plugins_url("processing.php?$qs", __FILE__ )
             );
 		}
 
