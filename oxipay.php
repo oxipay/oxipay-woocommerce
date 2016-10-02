@@ -111,10 +111,12 @@ function woocommerce_oxipay_init() {
 			);
 		}
 
-        /**
-         * Returns the test gateway URL if enabled in the admin panel, otherwise, returns the
-         * default Oxipay payment gateway URL
-         */
+		/**
+		 * Returns the test gateway URL if enabled in the admin panel, otherwise, returns the
+		 * default Oxipay payment gateway URL
+		 * @param int $order_id
+		 * @return array
+		 */
         function process_payment( $order_id ) {
             global $woocommerce;
             $order = new WC_Order( $order_id );
@@ -123,7 +125,7 @@ function woocommerce_oxipay_init() {
                 'order_key'     		=>  $order_id,
                 'account_id'    		=>  $this->settings['oxipay_merchant_id'],
                 'total' 	    		=>  $order->order_total,
-                'url_callback'  		=>  "http://$_SERVER[HTTP_HOST]/wordpress/wp-content/plugins/oxipay-wordpress//callback.php",
+                'url_callback'  		=>  plugins_url("callback.php"),
                 'url_complete'  		=>  $this->get_return_url( $order ),
                 'url_cancel'            =>  $woocommerce->cart->get_cart_url(),
                 'test'          		=>  $this->settings['test_mode'],
@@ -157,7 +159,13 @@ function woocommerce_oxipay_init() {
             );
 		}
 
-        function generate_signature( $query, $api_key ) {
+		/**
+		 * Generates a HMAC based on the merchants api key and the request
+		 * @param $query
+		 * @param $api_key
+		 * @return mixed
+		 */
+		function generate_signature($query, $api_key ) {
         	$clear_text = '';
         	ksort($query);
         	foreach ($query as $key => $value) {
@@ -169,6 +177,22 @@ function woocommerce_oxipay_init() {
             return str_replace('+', '', $hash);
         }
 
+		/**
+		 * validates and associative array that contains a hmac signature against an api key
+		 * @param $query array
+		 * @param $api_key string
+		 * @return bool
+		 */
+		public function is_valid_signature($query, $api_key) {
+			$actualSignature = $query['x_signature'];
+			unset($query['x_signature']);
+			$expectedSignature = $this->generate_signature($query, $api_key);
+			return $actualSignature == $expectedSignature;
+		}
+
+		/**
+		 * Renders plugin configuration markup
+		 */
 		function admin_options() { ?>
 			<h2><?php _e(OXIPAY_DISPLAYNAME,'woocommerce'); ?></h2>
 			<p><?php _e($this->method_description, 'woocommerce' ); ?></p>
