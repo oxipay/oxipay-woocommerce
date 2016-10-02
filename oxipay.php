@@ -177,8 +177,10 @@ function woocommerce_oxipay_init() {
                 'gateway_url' 					=>  $this->settings['oxipay_gateway_url'],
             );
 
+			ksort($transaction_details);
           	$signature = $this->generate_signature($transaction_details, $this->settings['api_key']);
 			$transaction_details['x_signature'] = $signature;
+
             $order->update_status('on-hold', __('Awaiting '.OXIPAY_DISPLAYNAME.' payment', 'woothemes'));
             $qs = http_build_query($transaction_details);
 
@@ -196,7 +198,6 @@ function woocommerce_oxipay_init() {
 		 */
 		function generate_signature($query, $api_key ) {
         	$clear_text = '';
-        	ksort($query);
         	foreach ($query as $key => $value) {
         		if (substr($key, 0, 2) === "x_") {
         			$clear_text .= $key . $value;

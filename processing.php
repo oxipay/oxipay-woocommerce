@@ -20,11 +20,11 @@
 
 <?php
 include_once( 'config.php' );
-include_once( 'config.php' );
 
 parse_str($_SERVER['QUERY_STRING'], $query);
 
 $url = $query["gateway_url"];
+
 echo "<form id='oxipay_payload' method='post' action='$url'>";
 
 foreach ($query as $item => $value) {
