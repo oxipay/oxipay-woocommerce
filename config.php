@@ -8,4 +8,4 @@ define ("WAIT_URL", "processing.php");
 define ('OXIPAY_CHECKOUT_URL', '/Checkout?platform=WooCommerce');
 define ('TEST', true);
 define ('CURRENCY', 'AUD');
-define ('SHOP_COUNTRY', 'AU');
+define ('AUSTRALIA', 'AU');

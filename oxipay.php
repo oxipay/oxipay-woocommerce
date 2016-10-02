@@ -139,7 +139,7 @@ function woocommerce_oxipay_init() {
                 'x_url_complete'  				=>  $this->get_return_url( $order ),
                 'x_url_cancel'           		=>  $woocommerce->cart->get_cart_url(),
                 'x_test'          				=>  $this->settings['test_mode'],
-                'x_shop_country'          		=>  SHOP_COUNTRY,
+                'x_shop_country'          		=>  AUSTRALIA,
                 'x_shop_name'          			=>  $this->settings['shop_name'],
 				//customer detail
                 'x_customer_first_name' 		=>  $order->billing_first_name,
@@ -147,12 +147,14 @@ function woocommerce_oxipay_init() {
                 'x_customer_email'      		=>  $order->billing_email,
                 'x_customer_phone'				=>  $order->billing_phone,
                 //billing detail
+                'x_customer_billing_country'	=>	AUSTRALIA,
                 'x_customer_billing_city' 	    =>  $order->billing_city,
                 'x_customer_billing_address_1' 	=>  $order->billing_address_1,
                 'x_customer_billing_address_2' 	=>  $order->billing_address_2,
                 'x_customer_billing_state' 	    =>  $order->billing_state,
                 'x_customer_billing_zip' 		=>  $order->billing_postcode,
                 //shipping detail
+                'x_customer_shipping_country'	=>	AUSTRALIA,
  				'x_customer_shipping_city' 	    =>  $order->postal_city,
                 'x_customer_shipping_address_1' =>  $order->postal_address_1,
                 'x_customer_shipping_address_2' =>  $order->postal_address_2,
