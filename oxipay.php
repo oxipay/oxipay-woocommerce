@@ -121,31 +121,34 @@ function woocommerce_oxipay_init() {
             global $woocommerce;
             $order = new WC_Order( $order_id );
 
+			$order->update_status('processing', __('Awaiting Oxipay payment processing to complete.', 'woocommerce'));
+
             $transaction_details = array (
-                'order_key'     		=>  $order_id,
-                'account_id'    		=>  $this->settings['oxipay_merchant_id'],
-                'total' 	    		=>  $order->order_total,
-                'url_callback'  		=>  plugins_url("/oxipay/callback.php"),
-                'url_complete'  		=>  $this->get_return_url( $order ),
-                'url_cancel'            =>  $woocommerce->cart->get_cart_url(),
-                'test'          		=>  $this->settings['test_mode'],
-                'first_name'    		=>  $order->billing_first_name,
-                'last_name' 			=>  $order->billing_last_name,
-                'email'         		=>  $order->billing_email,
-                'phone_mobile'			=>  $order->billing_phone,
+                'x_reference'     		=>  $order_id,
+                'x_account_id'    		=>  $this->settings['oxipay_merchant_id'],
+                'x_amount' 	    		=>  $order->order_total,
+                'x_url_callback'  		=>  plugins_url("/oxipay/callback.php"),
+                'x_url_complete'  		=>  $this->get_return_url( $order ),
+                'x_url_cancel'           =>  $woocommerce->cart->get_cart_url(),
+                'x_test'          		=>  $this->settings['test_mode'],
+				//customer detail
+                'x_customer_first_name' =>  $order->billing_first_name,
+                'x_customer_last_name' 	=>  $order->billing_last_name,
+                'x_customer_email'      =>  $order->billing_email,
+                'x_customer_phone'		=>  $order->billing_phone,
                 //billing detail
-                'billing_city' 	        =>  $order->billing_city,
-                'billing_address_1' 	=>  $order->billing_address_1,
-                'billing_address_2' 	=>  $order->billing_address_2,
-                'billing_state' 	    =>  $order->billing_state,
-                'billing_postcode' 		=>  $order->billing_postcode,
+                'x_customer_billing_city' 	    =>  $order->billing_city,
+                'x_customer_billing_address_1' 	=>  $order->billing_address_1,
+                'x_customer_billing_address_2' 	=>  $order->billing_address_2,
+                'x_customer_billing_state' 	    =>  $order->billing_state,
+                'x_customer_billing_zip' 		=>  $order->billing_postcode,
                 //shipping detail
- 				'shipping_city' 	    =>  $order->postal_city,
-                'shipping_address_1' 	=>  $order->postal_address_1,
-                'shipping_address_2' 	=>  $order->postal_address_2,
-                'shipping_state' 	    =>  $order->postal_state,
-                'shipping_postcode' 	=>  $order->postal_postcode,
-                'platform'				=>	PLATFORM_NAME
+ 				'x_customer_shipping_city' 	    =>  $order->postal_city,
+                'x_customer_shipping_address_1' =>  $order->postal_address_1,
+                'x_customer_shipping_address_2' =>  $order->postal_address_2,
+                'x_customer_shipping_state' 	=>  $order->postal_state,
+                'x_customer_shipping_zip' 		=>  $order->postal_postcode,
+                'platform'						=>	PLATFORM_NAME
             );
 
           	$signature = $this->generate_signature($transaction_details, $this->settings['api_key']);
