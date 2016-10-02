@@ -161,15 +161,15 @@ function woocommerce_oxipay_init() {
                 //billing detail
                 'x_customer_billing_country'	=>	AUSTRALIA,
                 'x_customer_billing_city' 	    =>  $order->billing_city,
-                'x_customer_billing_address_1' 	=>  $order->billing_address_1,
-                'x_customer_billing_address_2' 	=>  $order->billing_address_2,
+                'x_customer_billing_address1' 	=>  $order->billing_address_1,
+                'x_customer_billing_address2' 	=>  $order->billing_address_2,
                 'x_customer_billing_state' 	    =>  $order->billing_state,
                 'x_customer_billing_zip' 		=>  $order->billing_postcode,
                 //shipping detail
                 'x_customer_shipping_country'	=>	AUSTRALIA,
  				'x_customer_shipping_city' 	    =>  $order->postal_city,
-                'x_customer_shipping_address_1' =>  $order->postal_address_1,
-                'x_customer_shipping_address_2' =>  $order->postal_address_2,
+                'x_customer_shipping_address1' =>  $order->postal_address_1,
+                'x_customer_shipping_address2' =>  $order->postal_address_2,
                 'x_customer_shipping_state' 	=>  $order->postal_state,
                 'x_customer_shipping_zip' 		=>  $order->postal_postcode,
                 //pass the gateway URL through to the processing page.
