@@ -147,9 +147,9 @@ function woocommerce_oxipay_init() {
                 'x_account_id'    				=>  $this->settings['oxipay_merchant_id'],
                 'x_amount' 	    				=>  $order->order_total,
                 'x_currency' 	    			=>  CURRENCY,
-                'x_url_callback'  				=>  plugins_url("/oxipay/callback.php"),
+                'x_url_callback'  		=>  plugins_url("callback.php"),
                 'x_url_complete'  				=>  $this->get_return_url( $order ),
-                'x_url_cancel'           		=>  $woocommerce->cart->get_cart_url(),
+                'x_url_cancel'           =>  $woocommerce->cart->get_cart_url(),
                 'x_test'          				=>  $this->settings['test_mode'],
                 'x_shop_country'          		=>  AUSTRALIA,
                 'x_shop_name'          			=>  $this->settings['shop_name'],
@@ -228,13 +228,7 @@ function woocommerce_oxipay_init() {
 			</table> <?php
 		}
 
-		private function getOxipayUrl() {
-			return $this->settings('gateway_url');
-		}
 
-		private function getOxipayCheckoutUrl() {
-			return $this->getOxipayUrl() . OXIPAY_CHECKOUT_URL;
-		}
 	}
 }
 
