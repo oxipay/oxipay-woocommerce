@@ -124,19 +124,19 @@ function woocommerce_oxipay_init() {
 			$order->update_status('processing', __('Awaiting Oxipay payment processing to complete.', 'woocommerce'));
 
             $transaction_details = array (
-                'x_reference'     		=>  $order_id,
-                'x_account_id'    		=>  $this->settings['oxipay_merchant_id'],
-                'x_amount' 	    		=>  $order->order_total,
-                'x_currency' 	    	=>  CURRENCY,
-                'x_url_callback'  		=>  plugins_url("/oxipay/callback.php"),
-                'x_url_complete'  		=>  $this->get_return_url( $order ),
-                'x_url_cancel'           =>  $woocommerce->cart->get_cart_url(),
-                'x_test'          		=>  $this->settings['test_mode'],
+                'x_reference'     				=>  $order_id,
+                'x_account_id'    				=>  $this->settings['oxipay_merchant_id'],
+                'x_amount' 	    				=>  $order->order_total,
+                'x_currency' 	    			=>  CURRENCY,
+                'x_url_callback'  				=>  plugins_url("/oxipay/callback.php"),
+                'x_url_complete'  				=>  $this->get_return_url( $order ),
+                'x_url_cancel'           		=>  $woocommerce->cart->get_cart_url(),
+                'x_test'          				=>  $this->settings['test_mode'],
 				//customer detail
-                'x_customer_first_name' =>  $order->billing_first_name,
-                'x_customer_last_name' 	=>  $order->billing_last_name,
-                'x_customer_email'      =>  $order->billing_email,
-                'x_customer_phone'		=>  $order->billing_phone,
+                'x_customer_first_name' 		=>  $order->billing_first_name,
+                'x_customer_last_name' 			=>  $order->billing_last_name,
+                'x_customer_email'      		=>  $order->billing_email,
+                'x_customer_phone'				=>  $order->billing_phone,
                 //billing detail
                 'x_customer_billing_city' 	    =>  $order->billing_city,
                 'x_customer_billing_address_1' 	=>  $order->billing_address_1,
