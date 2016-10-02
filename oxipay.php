@@ -178,7 +178,7 @@ function woocommerce_oxipay_init() {
             );
 
 			ksort($transaction_details);
-          	$signature = $this->generate_signature($transaction_details, $this->settings['api_key']);
+          	$signature = $this->generate_signature($transaction_details, $this->settings['oxipay_api_key']);
 			$transaction_details['x_signature'] = $signature;
 
             $order->update_status('on-hold', __('Awaiting '.OXIPAY_DISPLAYNAME.' payment', 'woothemes'));
@@ -203,10 +203,8 @@ function woocommerce_oxipay_init() {
         			$clear_text .= $key . $value;
         		}
         	}
-            //WooCommerce v3 requires &. Refer: http://stackoverflow.com/questions/31976059/woocommerce-api-v3-authentication-issue
-            $secret = $api_key . '&';
-            $hash = base64_encode( hash_hmac( "sha256", $clear_text, $secret, true ));
-            return str_replace('+', '', $hash);
+            $hash = hash_hmac( "sha256", $clear_text, $api_key);
+            return str_replace('-', '', $hash);
         }
 
 		/**
