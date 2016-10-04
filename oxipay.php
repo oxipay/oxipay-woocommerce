@@ -15,7 +15,6 @@
 if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) return;
 
 require_once( 'config.php' );
-require_once( 'callback.php' );
 require_once(ABSPATH.'wp-settings.php');
 
 add_action('plugins_loaded', 'woocommerce_oxipay_init', 0);
