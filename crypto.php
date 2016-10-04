@@ -12,7 +12,8 @@
  * @param $api_key
  * @return mixed
  */
-function oxipay_sign($query, $api_key ) {
+function oxipay_sign($query, $api_key )
+{
     $clear_text = '';
     ksort($query);
     foreach ($query as $key => $value) {
@@ -20,7 +21,7 @@ function oxipay_sign($query, $api_key ) {
     }
     //WooCommerce v3 requires &. Refer: http://stackoverflow.com/questions/31976059/woocommerce-api-v3-authentication-issue
     $secret = $api_key . '&';
-    $hash = base64_encode( hash_hmac( "sha256", $clear_text, $secret, true ));
+    $hash = base64_encode(hash_hmac("sha256", $clear_text, $secret, true));
     return str_replace('+', '', $hash);
 }
 
@@ -30,7 +31,8 @@ function oxipay_sign($query, $api_key ) {
  * @param $api_key string
  * @return bool
  */
-public function oxipay_checksign($query, $api_key) {
+function oxipay_checksign($query, $api_key)
+{
     $actualSignature = $query['x_signature'];
     unset($query['x_signature']);
     $expectedSignature = oxipay_sign($query, $api_key);
