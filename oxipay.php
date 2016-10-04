@@ -226,32 +226,43 @@ function woocommerce_oxipay_init() {
 
 
 
-		function payment_finalisation($order_id) {
-			$order = wc_get_order( $order_id );
+		function payment_finalisation($order_id)
+		{
+			$order = wc_get_order($order_id);
 			$full_url = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 			$parts = parse_url($full_url, PHP_URL_QUERY);
 			parse_str($parts, $params);
+			ksort($params);
 
-			// Get the status of the order from XPay and handle accordingly
-			switch ($params['x_response']) {
+			if (oxipay_checksign($params, $this->settings['oxipay_api_key'])) {
 
-				case "completed":
-					$order->add_order_note( __( 'Payment approved using ' . $config['OXIPAY_DISPLAYNAME'] . '. Your Order ID is '. $order->id, 'woocommerce' ) );
-					$order->payment_complete($response->id);
-					woocommerce_empty_cart();
+				// Get the status of the order from XPay and handle accordingly
+				switch ($params['x_result']) {
 
-				case "failed":
-					$order->add_order_note( __( 'Payment pending using ' . $config['OXIPAY_DISPLAYNAME'] . '. Your Order ID is '. $order->id, 'woocommerce' ) );
-					$order->update_status('on-hold');
+					case "completed":
+						$order->add_order_note(__('Payment approved using ' . $config['OXIPAY_DISPLAYNAME'] . '. Your Order ID is ' . $order->id, 'woocommerce'));
+						$order->payment_complete($params['x_reference']);
+						woocommerce_empty_cart();
+						break;
 
-				case "pending":
-					$order->add_order_note( __( 'Payment declined using ' . $config['OXIPAY_DISPLAYNAME'] . '. Your Order ID is '. $order->id, 'woocommerce' ) );
-					$order->update_status('failed');
+					case "failed":
+						$order->add_order_note(__('Payment pending using ' . $config['OXIPAY_DISPLAYNAME'] . '. Your Order ID is ' . $order->id, 'woocommerce'));
+						$order->update_status('on-hold');
+						break;
+
+					case "pending":
+						$order->add_order_note(__('Payment declined using ' . $config['OXIPAY_DISPLAYNAME'] . '. Your Order ID is ' . $order->id, 'woocommerce'));
+						$order->update_status('failed');
+						break;
+				}
+
+				return $order_id;
 			}
-
-			return $order_id;
+			else
+			{
+				throw new \HttpInvalidParamException("Signature check failure.");
+			}
 		}
-
 	}
 }
 
