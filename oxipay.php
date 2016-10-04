@@ -103,6 +103,14 @@ function woocommerce_oxipay_init() {
 					'description'	=> 'This is the base URL of the Oxipay payment services. Do not change this unless directed to by Oxipay staff.',
 					'desc_tip'		=> true
 				),
+				'oxipay_sandbox_gateway_url'=> array(
+					'id'			=> 'oxipay_sandbox_gateway_url',
+					'title' 		=> __( OXIPAY_DISPLAYNAME . ' Sandbox Gateway URL', 'woocommerce' ),
+					'type' 			=> 'text',
+					'default' 		=> __( 'https://xpozsecure.certegyezipay.com.au/Checkout?platform=WooCommerce', 'woocommerce' ),
+					'description'	=> 'This is the base URL of the Oxipay sandbox services. If this test mode is enabled, and this is set - the sandbox will be used. If this is not set, with test mode enabled, the sandbox will not be used, but a test flag will still be sent.',
+					'desc_tip'		=> true
+				),
                 'oxipay_merchant_id'=>array(
                 	'id'		    => 'oxipay_merchant_id',
                     'title'     	=> __( 'Merchant ID', 'woocommerce' ),
@@ -141,40 +149,40 @@ function woocommerce_oxipay_init() {
             $order = new WC_Order( $order_id );
 
 			$order->update_status('processing', __('Awaiting Oxipay payment processing to complete.', 'woocommerce'));
-
+			$gatewayUrl = $this->getGatewayUrl();
             $transaction_details = array (
-                'x_reference'     				=>  $order_id,
-                'x_account_id'    				=>  $this->settings['oxipay_merchant_id'],
-                'x_amount' 	    				=>  $order->order_total,
-                'x_currency' 	    			=>  CURRENCY,
-                'x_url_callback'  				=>  plugins_url("callback.php", __FILE__),
-                'x_url_complete'  				=>  $this->get_return_url( $order ),
-                'x_url_cancel'           		=>  $woocommerce->cart->get_cart_url(),
-                'x_test'          				=>  $this->settings['test_mode'],
-                'x_shop_country'          		=>  AUSTRALIA,
-                'x_shop_name'          			=>  $this->settings['shop_name'],
+                'x_reference'     				=> $order_id,
+                'x_account_id'    				=> $this->settings['oxipay_merchant_id'],
+                'x_amount' 	    				=> $order->order_total,
+                'x_currency' 	    			=> CURRENCY,
+                'x_url_callback'  				=> plugins_url("callback.php", __FILE__),
+                'x_url_complete'  				=> $this->get_return_url( $order ),
+                'x_url_cancel'           		=> $woocommerce->cart->get_cart_url(),
+                'x_test'          				=> $this->settings['test_mode'],
+                'x_shop_country'          		=> AUSTRALIA,
+                'x_shop_name'          			=> $this->settings['shop_name'],
 				//customer detail
-                'x_customer_first_name' 		=>  $order->billing_first_name,
-                'x_customer_last_name' 			=>  $order->billing_last_name,
-                'x_customer_email'      		=>  $order->billing_email,
-                'x_customer_phone'				=>  $order->billing_phone,
+                'x_customer_first_name' 		=> $order->billing_first_name,
+                'x_customer_last_name' 			=> $order->billing_last_name,
+                'x_customer_email'      		=> $order->billing_email,
+                'x_customer_phone'				=> $order->billing_phone,
                 //billing detail
-                'x_customer_billing_country'	=>	AUSTRALIA,
-                'x_customer_billing_city' 	    =>  $order->billing_city,
-                'x_customer_billing_address1' 	=>  $order->billing_address_1,
-                'x_customer_billing_address2' 	=>  $order->billing_address_2,
-                'x_customer_billing_state' 	    =>  $order->billing_state,
-                'x_customer_billing_zip' 		=>  $order->billing_postcode,
+                'x_customer_billing_country'	=> AUSTRALIA,
+                'x_customer_billing_city' 	    => $order->billing_city,
+                'x_customer_billing_address1' 	=> $order->billing_address_1,
+                'x_customer_billing_address2' 	=> $order->billing_address_2,
+                'x_customer_billing_state' 	    => $order->billing_state,
+                'x_customer_billing_zip' 		=> $order->billing_postcode,
                 //shipping detail
-                'x_customer_shipping_country'	=>	AUSTRALIA,
- 				'x_customer_shipping_city' 	    =>  $order->postal_city,
-                'x_customer_shipping_address1' =>  $order->postal_address_1,
-                'x_customer_shipping_address2' =>  $order->postal_address_2,
-                'x_customer_shipping_state' 	=>  $order->postal_state,
-                'x_customer_shipping_zip' 		=>  $order->postal_postcode,
+                'x_customer_shipping_country'	=> AUSTRALIA,
+ 				'x_customer_shipping_city' 	    => $order->postal_city,
+                'x_customer_shipping_address1'  => $order->postal_address_1,
+                'x_customer_shipping_address2'  => $order->postal_address_2,
+                'x_customer_shipping_state' 	=> $order->postal_state,
+                'x_customer_shipping_zip' 		=> $order->postal_postcode,
                 //pass the gateway URL through to the processing page.
                 //TODO: the processing.php page should probably resolve this differently.
-                'gateway_url' 					=>  $this->settings['oxipay_gateway_url'],
+                'gateway_url' 					=> $gatewayUrl
             );
 
 			ksort($transaction_details);
@@ -190,6 +198,19 @@ function woocommerce_oxipay_init() {
             );
 		}
 
+		/**
+		 * enforces test mode logic to return the correct gateway URL
+		 */
+		private function getGatewayUrl() {
+			$testMode = strtolower($this->settings['test_mode']) == 'yes';
+			$sandboxUrl = $this->settings['oxipay_sandbox_gateway_url'];
+			$gatewayUrl = $this->settings['oxipay_gateway_url'];
+			$hasSandboxUrl = !is_null($sandboxUrl) && $sandboxUrl != '';
+			if($testMode && $hasSandboxUrl)
+				return $sandboxUrl;
+
+			return $gatewayUrl;
+		}
 		/**
 		 * Generates a HMAC based on the merchants api key and the request
 		 * @param $query
