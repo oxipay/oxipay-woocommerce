@@ -15,14 +15,13 @@
 function oxipay_sign($query, $api_key )
 {
     $clear_text = '';
-    ksort($query);
     foreach ($query as $key => $value) {
-        $clear_text .= $key . $value;
+        if (substr($key, 0, 2) === "x_") {
+            $clear_text .= $key . $value;
+        }
     }
-    //WooCommerce v3 requires &. Refer: http://stackoverflow.com/questions/31976059/woocommerce-api-v3-authentication-issue
-    $secret = $api_key . '&';
-    $hash = base64_encode(hash_hmac("sha256", $clear_text, $secret, true));
-    return str_replace('+', '', $hash);
+    $hash = hash_hmac( "sha256", $clear_text, $api_key);
+    return str_replace('-', '', $hash);
 }
 
 /**

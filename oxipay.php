@@ -152,7 +152,7 @@ function woocommerce_oxipay_init() {
                 'x_url_cancel'           		=>  $woocommerce->cart->get_cart_url(),
                 'x_test'          				=>  $this->settings['test_mode'],
                 'x_shop_country'          		=>  AUSTRALIA,
-                'x_shop_name'          			=>  $this->settings['shop_name'],
+                'x_shop_name'          			=>  'test1234',
 				//customer detail
                 'x_customer_first_name' 		=>  $order->billing_first_name,
                 'x_customer_last_name' 			=>  $order->billing_last_name,
@@ -178,7 +178,7 @@ function woocommerce_oxipay_init() {
             );
 
 			ksort($transaction_details);
-          	$signature = oxipay_sign($transaction_details, $this->settings['api_key']);
+          	$signature = oxipay_sign($transaction_details, $this->settings['oxipay_api_key']);
 			$transaction_details['x_signature'] = $signature;
 
             $order->update_status('on-hold', __('Awaiting '.OXIPAY_DISPLAYNAME.' payment', 'woothemes'));
