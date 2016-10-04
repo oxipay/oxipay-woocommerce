@@ -147,7 +147,7 @@ function woocommerce_oxipay_init() {
                 'x_account_id'    				=>  $this->settings['oxipay_merchant_id'],
                 'x_amount' 	    				=>  $order->order_total,
                 'x_currency' 	    			=>  CURRENCY,
-                'x_url_callback'  				=>  plugins_url("callback.php"),
+                'x_url_callback'  				=>  plugins_url("callback.php", __FILE__),
                 'x_url_complete'  				=>  $this->get_return_url( $order ),
                 'x_url_cancel'           		=>  $woocommerce->cart->get_cart_url(),
                 'x_test'          				=>  $this->settings['test_mode'],
