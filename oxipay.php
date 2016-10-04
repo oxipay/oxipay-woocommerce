@@ -14,6 +14,7 @@
 // this checks that the woocommerce plugin is alive and well.
 if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) return;
 
+require_once( 'crypto.php' );
 require_once( 'config.php' );
 require_once(ABSPATH.'wp-settings.php');
 
@@ -185,7 +186,7 @@ function woocommerce_oxipay_init() {
 
             return array(
                     'result' 	=>  'success',
-                    'redirect'	=>  plugins_url("oxipay/processing.php?$qs", __FILE__ )
+                    'redirect'	=>  plugins_url("processing.php?$qs", __FILE__ )
             );
 		}
 
