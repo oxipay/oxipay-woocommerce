@@ -4,11 +4,11 @@
  * Plugin Name: Oxipay Payment Gateway
  * Plugin URI: https://www.oxipay.com.au
  * Description: Easy to setup installment payment plans from <a href="https://oxipay.com.au">Oxipay</a>.
- * Version: 0.1.0
+ * Version: 0.2.0
  * Author: FlexiGroup
  * @package WordPress
  * @author FlexiGroup
- * @since 0.1.0
+ * @since 0.2.0
  */
 
 // this checks that the woocommerce plugin is alive and well.
