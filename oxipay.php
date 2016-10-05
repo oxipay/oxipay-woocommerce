@@ -21,7 +21,7 @@ require_once(ABSPATH.'wp-settings.php');
 add_action('plugins_loaded', 'woocommerce_oxipay_init', 0);
 
 function woocommerce_oxipay_init() {
-	class Oxipay_Gateway extends WC_Payment_Gateway {
+	class WC_Oxipay_Gateway extends WC_Payment_Gateway {
 		function __construct() {
 			$this->id = 'oxipay';
 			$this->has_fields = false;
@@ -41,6 +41,7 @@ function woocommerce_oxipay_init() {
 
 			//$this->icon = PLUGIN_DIR . 'images/oxipay.png';
 
+			add_action( 'woocommerce_api_wc_oxipay_gateway', array($this, 'oxipay_callback'));
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 			add_filter( 'woocommerce_thankyou_order_id',array($this,'payment_finalisation'));
 		}
@@ -268,11 +269,17 @@ function woocommerce_oxipay_init() {
 				$order->update_status('failed');
 			}
 		}
+
+		// USAGE:  http://myurl.com/?wc-api=WC_Oxipay_Gateway
+		function oxipay_callback()
+		{
+			throw new \HttpInvalidParamException();
+		}
 	}
 }
 
 function add_oxipay_payment_gateway($methods) {
-	$methods[] = 'Oxipay_Gateway';
+	$methods[] = 'WC_Oxipay_Gateway';
 	return $methods;
 }
 
