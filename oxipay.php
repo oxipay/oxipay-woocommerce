@@ -14,14 +14,14 @@
 // this checks that the woocommerce plugin is alive and well.
 if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) return;
 
+require_once( 'crypto.php' );
 require_once( 'config.php' );
-require_once( 'callback.php' );
 require_once(ABSPATH.'wp-settings.php');
 
 add_action('plugins_loaded', 'woocommerce_oxipay_init', 0);
 
 function woocommerce_oxipay_init() {
-	class Oxipay_Gateway extends WC_Payment_Gateway {
+	class WC_Oxipay_Gateway extends WC_Payment_Gateway {
 		function __construct() {
 			$this->id = 'oxipay';
 			$this->has_fields = false;
@@ -41,6 +41,7 @@ function woocommerce_oxipay_init() {
 
 			//$this->icon = PLUGIN_DIR . 'images/oxipay.png';
 
+			add_action( 'woocommerce_api_wc_oxipay_gateway', array($this, 'oxipay_callback'));
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 			add_filter( 'woocommerce_thankyou_order_id',array($this,'payment_finalisation'));
 		}
@@ -186,7 +187,7 @@ function woocommerce_oxipay_init() {
             );
 
 			ksort($transaction_details);
-          	$signature = $this->generate_signature($transaction_details, $this->settings['oxipay_api_key']);
+          	$signature = oxipay_sign($transaction_details, $this->settings['oxipay_api_key']);
 			$transaction_details['x_signature'] = $signature;
 
             $order->update_status('on-hold', __('Awaiting '.OXIPAY_DISPLAYNAME.' payment', 'woothemes'));
@@ -211,35 +212,6 @@ function woocommerce_oxipay_init() {
 
 			return $gatewayUrl;
 		}
-		/**
-		 * Generates a HMAC based on the merchants api key and the request
-		 * @param $query
-		 * @param $api_key
-		 * @return mixed
-		 */
-		function generate_signature($query, $api_key ) {
-        	$clear_text = '';
-        	foreach ($query as $key => $value) {
-        		if (substr($key, 0, 2) === "x_") {
-        			$clear_text .= $key . $value;
-        		}
-        	}
-            $hash = hash_hmac( "sha256", $clear_text, $api_key);
-            return str_replace('-', '', $hash);
-        }
-
-		/**
-		 * validates and associative array that contains a hmac signature against an api key
-		 * @param $query array
-		 * @param $api_key string
-		 * @return bool
-		 */
-		public function is_valid_signature($query, $api_key) {
-			$actualSignature = $query['x_signature'];
-			unset($query['x_signature']);
-			$expectedSignature = $this->generate_signature($query, $api_key);
-			return $actualSignature == $expectedSignature;
-		}
 
 		/**
 		 * Renders plugin configuration markup
@@ -254,11 +226,60 @@ function woocommerce_oxipay_init() {
 		}
 
 
+
+		function payment_finalisation($order_id)
+		{
+			$order = wc_get_order($order_id);
+			$cart = WC()->session->get('cart', null);
+			$full_url = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+			$parts = parse_url($full_url, PHP_URL_QUERY);
+			parse_str($parts, $params);
+			ksort($params);
+
+			if (oxipay_checksign($params, $this->settings['oxipay_api_key'])) {
+
+				// Get the status of the order from XPay and handle accordingly
+				switch ($params['x_result']) {
+
+					case "completed":
+						$order->add_order_note(__('Payment approved using ' . OXIPAY_DISPLAYNAME . '. Reference #'. $params['x_transaction_id'], 'woocommerce'));
+						$order->payment_complete($params['x_reference']);
+						if (!is_null($cart)) {
+							$cart->empty_cart();
+						}
+						break;
+
+					case "failed":
+						$order->add_order_note(__('Payment declined using ' . OXIPAY_DISPLAYNAME . '. Reference #'. $params['x_transaction_id'], 'woocommerce'));
+						$order->update_status('failed');
+						break;
+
+					case "pending":
+						$order->add_order_note(__('Payment pending using ' . OXIPAY_DISPLAYNAME . '. Reference #'. $params['x_transaction_id'], 'woocommerce'));
+						$order->update_status('on-hold', 'Error may have occurred with ' . OXIPAY_DISPLAYNAME . '. Reference #'. $params['x_transaction_id']);
+						break;
+				}
+
+				return $order_id;
+			}
+			else
+			{
+				$order->add_order_note(__(OXIPAY_DISPLAYNAME . ' payment response failed signature validation. Please check your Merchant Number and API key or contact Oxipay for assistance.', 0, 'woocommerce'));
+				$order->add_order_note(__('Payment declined using ' . OXIPAY_DISPLAYNAME . '. Your Order ID is ' . $order->id, 'woocommerce'));
+				$order->update_status('failed');
+			}
+		}
+
+		// USAGE:  http://myurl.com/?wc-api=WC_Oxipay_Gateway
+		function oxipay_callback()
+		{
+			throw new \HttpInvalidParamException();
+		}
 	}
 }
 
 function add_oxipay_payment_gateway($methods) {
-	$methods[] = 'Oxipay_Gateway';
+	$methods[] = 'WC_Oxipay_Gateway';
 	return $methods;
 }
 
