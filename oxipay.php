@@ -242,7 +242,7 @@ function woocommerce_oxipay_init() {
 				switch ($params['x_result']) {
 
 					case "completed":
-						$order->add_order_note(__('Payment approved using ' . OXIPAY_DISPLAYNAME . '. Reference #'. $params['x_transaction_id'], 'woocommerce'));
+						$order->add_order_note(__('Payment approved using ' . OXIPAY_DISPLAYNAME . '. Reference #'. $params['x_gateway_reference'], 'woocommerce'));
 						$order->payment_complete($params['x_reference']);
 						if (!is_null($cart)) {
 							$cart->empty_cart();
@@ -250,13 +250,13 @@ function woocommerce_oxipay_init() {
 						break;
 
 					case "failed":
-						$order->add_order_note(__('Payment declined using ' . OXIPAY_DISPLAYNAME . '. Reference #'. $params['x_transaction_id'], 'woocommerce'));
+						$order->add_order_note(__('Payment declined using ' . OXIPAY_DISPLAYNAME . '. Reference #'. $params['x_gateway_reference'], 'woocommerce'));
 						$order->update_status('failed');
 						break;
 
 					case "pending":
-						$order->add_order_note(__('Payment pending using ' . OXIPAY_DISPLAYNAME . '. Reference #'. $params['x_transaction_id'], 'woocommerce'));
-						$order->update_status('on-hold', 'Error may have occurred with ' . OXIPAY_DISPLAYNAME . '. Reference #'. $params['x_transaction_id']);
+						$order->add_order_note(__('Payment pending using ' . OXIPAY_DISPLAYNAME . '. Reference #'. $params['x_gateway_reference'], 'woocommerce'));
+						$order->update_status('on-hold', 'Error may have occurred with ' . OXIPAY_DISPLAYNAME . '. Reference #'. $params['x_gateway_reference']);
 						break;
 				}
 
