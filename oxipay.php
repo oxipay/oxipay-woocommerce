@@ -229,6 +229,7 @@ function woocommerce_oxipay_init() {
 		function payment_finalisation($order_id)
 		{
 			$order = wc_get_order($order_id);
+			$cart = WC()->session->get('cart', null);
 			$full_url = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 			$parts = parse_url($full_url, PHP_URL_QUERY);
 			parse_str($parts, $params);
@@ -240,19 +241,21 @@ function woocommerce_oxipay_init() {
 				switch ($params['x_result']) {
 
 					case "completed":
-						$order->add_order_note(__('Payment approved using ' . $config['OXIPAY_DISPLAYNAME'] . '. Your Order ID is ' . $order->id, 'woocommerce'));
+						$order->add_order_note(__('Payment approved using ' . OXIPAY_DISPLAYNAME . '. Your Order ID is ' . $order->id, 'woocommerce'));
 						$order->payment_complete($params['x_reference']);
-						woocommerce_empty_cart();
+						if (!is_null($cart)) {
+							$cart->empty_cart();
+						}
 						break;
 
 					case "failed":
-						$order->add_order_note(__('Payment pending using ' . $config['OXIPAY_DISPLAYNAME'] . '. Your Order ID is ' . $order->id, 'woocommerce'));
-						$order->update_status('on-hold');
+						$order->add_order_note(__('Payment declined using ' . OXIPAY_DISPLAYNAME . '. Your Order ID is ' . $order->id, 'woocommerce'));
+						$order->update_status('failed');
 						break;
 
 					case "pending":
-						$order->add_order_note(__('Payment declined using ' . $config['OXIPAY_DISPLAYNAME'] . '. Your Order ID is ' . $order->id, 'woocommerce'));
-						$order->update_status('failed');
+						$order->add_order_note(__('Payment pending using ' . OXIPAY_DISPLAYNAME . '. Your Order ID is ' . $order->id, 'woocommerce'));
+						$order->update_status('on-hold');
 						break;
 				}
 
@@ -260,7 +263,9 @@ function woocommerce_oxipay_init() {
 			}
 			else
 			{
-				throw new \HttpInvalidParamException("Signature check failure.");
+				$order->add_order_note(__(OXIPAY_DISPLAYNAME . ' payment response failed signature validation. Please check your Merchant Number and API key or contact Oxipay for assistance.', 0, 'woocommerce'));
+				$order->add_order_note(__('Payment declined using ' . OXIPAY_DISPLAYNAME . '. Your Order ID is ' . $order->id, 'woocommerce'));
+				$order->update_status('failed');
 			}
 		}
 	}
