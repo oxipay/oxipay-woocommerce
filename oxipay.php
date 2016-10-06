@@ -40,7 +40,7 @@ function woocommerce_oxipay_init() {
 
 			$this->title = $this->get_option( 'title' );
 			$this->description = $this->get_option( 'description' );
-			$this->countries = 'AU';
+			$this->countries = OXIPAY_DEFAULT_COUNTRY;
 			$this->icon = plugins_url('oxipay/images/oxipay.svg');
 
 			add_action( 'woocommerce_api_wc_oxipay_gateway', array($this, 'oxipay_callback'));
@@ -168,12 +168,12 @@ function woocommerce_oxipay_init() {
                 'x_reference'     				=> $order_id,
                 'x_account_id'    				=> $this->settings['oxipay_merchant_id'],
                 'x_amount' 	    				=> $order->order_total,
-                'x_currency' 	    			=> CURRENCY,
+                'x_currency' 	    			=> OXIPAY_DEFAULT_CURRENCY,
                 'x_url_callback'  				=> plugins_url("callback.php", __FILE__),
                 'x_url_complete'  				=> $this->get_return_url( $order ),
                 'x_url_cancel'           		=> $woocommerce->cart->get_cart_url(),
                 'x_test'          				=> $this->settings['test_mode'],
-                'x_shop_country'          		=> AUSTRALIA,
+                'x_shop_country'          		=> OXIPAY_DEFAULT_COUNTRY,
                 'x_shop_name'          			=> $this->settings['shop_name'],
 				//customer detail
                 'x_customer_first_name' 		=> $order->billing_first_name,
@@ -181,14 +181,14 @@ function woocommerce_oxipay_init() {
                 'x_customer_email'      		=> $order->billing_email,
                 'x_customer_phone'				=> $order->billing_phone,
                 //billing detail
-                'x_customer_billing_country'	=> AUSTRALIA,
+                'x_customer_billing_country'	=> OXIPAY_DEFAULT_COUNTRY,
                 'x_customer_billing_city' 	    => $order->billing_city,
                 'x_customer_billing_address1' 	=> $order->billing_address_1,
                 'x_customer_billing_address2' 	=> $order->billing_address_2,
                 'x_customer_billing_state' 	    => $order->billing_state,
                 'x_customer_billing_zip' 		=> $order->billing_postcode,
                 //shipping detail
-                'x_customer_shipping_country'	=> AUSTRALIA,
+                'x_customer_shipping_country'	=> OXIPAY_DEFAULT_COUNTRY,
  				'x_customer_shipping_city' 	    => $order->postal_city,
                 'x_customer_shipping_address1'  => $order->postal_address_1,
                 'x_customer_shipping_address2'  => $order->postal_address_2,
