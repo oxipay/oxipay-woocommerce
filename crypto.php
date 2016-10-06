@@ -15,6 +15,7 @@
 function oxipay_sign($query, $api_key )
 {
     $clear_text = '';
+    ksort($query);
     foreach ($query as $key => $value) {
         if (substr($key, 0, 2) === "x_") {
             $clear_text .= $key . $value;
@@ -36,5 +37,20 @@ function oxipay_checksign($query, $api_key)
     unset($query['x_signature']);
     $expectedSignature = oxipay_sign($query, $api_key);
     return $actualSignature == $expectedSignature;
+}
+
+function generate_processing_form($query) {
+    $url = $query["gateway_url"];
+
+    echo "<form id='oxipayload' method='post' action='$url'>";
+
+    foreach ($query as $item => $value) {
+        if (substr($item, 0, 2) === "x_") {
+            echo "<input id='$item' name='$item' value='$value' type='hidden'/>";
+        }
+    }
+
+    echo "</form>";
+    echo "<script>document.getElementById('oxipayload').submit();</script>";
 }
 ?>
