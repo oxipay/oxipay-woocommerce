@@ -20,6 +20,9 @@ require_once(ABSPATH.'wp-settings.php');
 
 add_action('plugins_loaded', 'woocommerce_oxipay_init', 0);
 
+/**
+ * Hook for WC plugin subsystem to initialise the Oxipay plugin
+ */
 function woocommerce_oxipay_init() {
 	class WC_Oxipay_Gateway extends WC_Payment_Gateway {
 		function __construct() {
@@ -38,14 +41,17 @@ function woocommerce_oxipay_init() {
 
 			$this->title = $this->get_option( 'title' );
 			$this->description = $this->get_option( 'description' );
-
-			//$this->icon = PLUGIN_DIR . 'images/oxipay.png';
+			$this->countries = 'AU';
+			$this->icon = plugins_url('oxipay/images/oxipay.svg');
 
 			add_action( 'woocommerce_api_wc_oxipay_gateway', array($this, 'oxipay_callback'));
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 			add_filter( 'woocommerce_thankyou_order_id',array($this,'payment_finalisation'));
 		}
 
+		/**
+		 * WC override to display the administration property page
+		 */
 		function init_form_fields() {
 
 			$this->form_fields = array(
@@ -148,6 +154,14 @@ function woocommerce_oxipay_init() {
         function process_payment( $order_id ) {
             global $woocommerce;
             $order = new WC_Order( $order_id );
+			$order->update_status('pending');
+			if($order->billing_country != $this->countries || $order->shipping_country != $this->countries)
+			{
+				$errorMessage = "&nbsp;Orders from outside Australia are not supported by Oxipay. Please select a different payment option.";
+				$order->cancel_order($errorMessage);
+				wc_add_notice( __('Payment error: ', 'woothemes') . $errorMessage, 'error' );
+				return;
+			}
 
 			$order->update_status('processing', __('Awaiting Oxipay payment processing to complete.', 'woocommerce'));
 			$gatewayUrl = $this->getGatewayUrl();
@@ -186,7 +200,6 @@ function woocommerce_oxipay_init() {
                 'gateway_url' 					=> $gatewayUrl
             );
 
-			ksort($transaction_details);
           	$signature = oxipay_sign($transaction_details, $this->settings['oxipay_api_key']);
 			$transaction_details['x_signature'] = $signature;
 
@@ -226,7 +239,12 @@ function woocommerce_oxipay_init() {
 		}
 
 
-
+		/**
+		 * This is a filter setup to receive the results from the Oxipay services to show the required
+		 * outcome for the order based on the 'x_result' property
+		 * @param $order_id
+		 * @return mixed
+		 */
 		function payment_finalisation($order_id)
 		{
 			$order = wc_get_order($order_id);
@@ -234,7 +252,7 @@ function woocommerce_oxipay_init() {
 			$full_url = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 			$parts = parse_url($full_url, PHP_URL_QUERY);
 			parse_str($parts, $params);
-			ksort($params);
+
 
 			if (oxipay_checksign($params, $this->settings['oxipay_api_key'])) {
 

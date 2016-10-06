@@ -20,26 +20,11 @@
 
 <?php
 include_once( 'config.php' );
-
+include_once( 'crypto.php' );
 parse_str($_SERVER['QUERY_STRING'], $query);
-
-$url = $query["gateway_url"];
-
-echo "<form id='oxipay_payload' method='post' action='$url'>";
-
-foreach ($query as $item => $value) {
-    if (substr($item, 0, 2) === "x_") {
-        echo "<input id='$item' name='$item' value='$value' type='hidden'/>";
-    }
-}
-
-echo "</form>";
-
+generate_processing_form($query);
 ?>
 
-<script>
-    document.getElementById('oxipay_payload').submit();
-</script>
 </body>
 
 </html>
