@@ -16,7 +16,6 @@ if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins',
 
 require_once( 'crypto.php' );
 require_once( 'config.php' );
-require_once(ABSPATH.'wp-settings.php');
 
 add_action('plugins_loaded', 'woocommerce_oxipay_init', 0);
 
