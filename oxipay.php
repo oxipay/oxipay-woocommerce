@@ -154,13 +154,12 @@ function woocommerce_oxipay_init() {
             global $woocommerce;
             $order = new WC_Order( $order_id );
 			$order->update_status('pending');
-			if($order->billing_country != $this->countries || $order->shipping_country != $this->countries)
-			{
-				$errorMessage = "&nbsp;Orders from outside Australia are not supported by Oxipay. Please select a different payment option.";
-				$order->cancel_order($errorMessage);
-				wc_add_notice( __('Payment error: ', 'woothemes') . $errorMessage, 'error' );
-				return;
-			}
+
+			$isValid = true;
+			$isValid = $isValid && $this->checkCustomerLocation($order);
+			$isValid = $isValid && $this->checkOrderAmount($order);
+
+			if(!$isValid) return;
 
 			$order->update_status('processing', __('Awaiting Oxipay payment processing to complete.', 'woocommerce'));
 			$gatewayUrl = $this->getGatewayUrl();
@@ -291,6 +290,43 @@ function woocommerce_oxipay_init() {
 		function oxipay_callback()
 		{
 			throw new \HttpInvalidParamException();
+		}
+
+		/**
+		 * Ensure the customer is being billed from and is shipping to, Australia.
+		 * @param $order
+		 * @return bool
+		 */
+		private function checkCustomerLocation($order)
+		{
+			if ($order->billing_country != $this->countries || $order->shipping_country != $this->countries) {
+				$errorMessage = "&nbsp;Orders from outside Australia are not supported by Oxipay. Please select a different payment option.";
+				$order->cancel_order($errorMessage);
+				$this->logValidationError($errorMessage);
+
+				return false;
+			}
+			return true;
+		}
+
+		/**
+		 * Ensure the order amount is >= $20
+		 * @param $order
+		 * @return true
+		 */
+		private function checkOrderAmount($order)
+		{
+			if($order->order_total < 20) {
+				$errorMessage = "&nbsp;Orders under $20 AUD are not supported by Oxipay. Please select a different payment option.";
+				$order->cancel_order($errorMessage);
+				$this->logValidationError($errorMessage);
+				return false;
+			}
+			return true;
+		}
+
+		private function logValidationError($message) {
+			wc_add_notice(__('Payment error: ', 'woothemes') . $message, 'error');
 		}
 	}
 }
