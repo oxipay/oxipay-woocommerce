@@ -1,8 +1,8 @@
 <?php
-define ('PLATFORM_NAME', 'woocommerce');
-define ('CWD', basename( __DIR__ ));
-define ('ABSPATH', dirname(__FILE__).'/');
+define ('OXIPAY_PLATFORM_NAME', 'woocommerce');
+define ('OXIPAY_CWD', basename( __DIR__ ));
 define ("OXIPAY_DISPLAYNAME", "Oxipay");
-define ("WAIT_URL", "processing.php");
-define ('OXIPAY_CHECKOUT_URL', '/Checkout?platform=WooCommerce');
-define ('TEST', true);
+define ("OXIPAY_WAIT_URL", "processing.php");
+define ('OXIPAY_TEST', true);
+define ('OXIPAY_DEFAULT_CURRENCY', 'AUD');
+define ('OXIPAY_DEFAULT_COUNTRY', 'AU');

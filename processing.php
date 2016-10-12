@@ -1,34 +1,30 @@
-<!-- MIT Licensing -->
-
 <html>
-    <head>
-        <title>Processing Payment</title>
-    </head>
-    <body>
-        <h2>Please wait, we are processing your purchase...</h2>
-   
-        <div id="spinner"></div>
+<head>
+    <title>Processing Payment</title>
+    <link rel="stylesheet" href="css/oxipay.css">
+    <meta name="viewport" content="width=device-width">
+</head>
+<body>
+<div id="top-bar">
+    <img id="logo" src="images/oxipay.svg">
+</div>
+<div class="card">
+    <div class="card-block card-heading"> <h4> Processing</h4> </div>
+    <p>Please wait while we process your request</p>
+    <div id="spinner"></div>
+</div>
 
-        <?php
-            include_once( 'config.php' );
+<!-- spinner animation -->
+<script src="js/lib/spin.min.js"></script>
+<script src="js/spinner.js"></script>
 
-            $full_url = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-            $url = 'http://localhost:60343/Checkout?platform=WooCommerce'; //todo: from config
+<?php
+include_once( 'config.php' );
+include_once( 'crypto.php' );
+parse_str($_SERVER['QUERY_STRING'], $query);
+generate_processing_form($query);
+?>
 
-            $parts = parse_url($full_url, PHP_URL_QUERY);
-            parse_str($parts, $params);
-
-            $jparams = json_encode($params);
-            echo $jparams;
-
-            echo "<form id='oxipay_payload' method='post' action='$url'>";
-            echo "<input id='payload' name='payload' value='$jparams' type='hidden'/>";
-            echo "</form>";
-        ?>
-        <!-- TODO: INCORPORATE PROCESSING.HTML -->
-        <script>
-            document.getElementById('oxipay_payload').submit();
-        </script>
-    </body>
+</body>
 
 </html>
