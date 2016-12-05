@@ -4,11 +4,11 @@
  * Plugin Name: Oxipay Payment Gateway
  * Plugin URI: https://www.oxipay.com.au
  * Description: Easy to setup installment payment plans from <a href="https://oxipay.com.au">Oxipay</a>.
- * Version: 0.4.0
+ * Version: 0.4.2
  * Author: FlexiGroup
  * @package WordPress
  * @author FlexiGroup
- * @since 0.4.0
+ * @since 0.4.2
  */
 
 // this checks that the woocommerce plugin is alive and well.
@@ -299,14 +299,20 @@ function woocommerce_oxipay_init() {
 		 */
 		private function checkCustomerLocation($order)
 		{
-			if ($order->billing_country != $this->countries || $order->shipping_country != $this->countries) {
-				$errorMessage = "&nbsp;Orders from outside Australia are not supported by Oxipay. Please select a different payment option.";
-				$order->cancel_order($errorMessage);
-				$this->logValidationError($errorMessage);
+			// The following get shipping and billing countires, and filters null or empty values
+			// Then we check to see if there is just a single unique value that is equal to AU, otherwise we 
+			// display an error message.
+            $countries = array($order->billing_country, $order->shipping_country);
+            $set_addresses = array_filter($countries);
+            $valid_addresses = (count(array_unique($set_addresses)) === 1 && end($set_addresses) === $this->countries);
 
-				return false;
-			}
-			return true;
+            if (!$valid_addresses) {
+                $errorMessage = "&nbsp;Orders from outside Australia are not supported by Oxipay. Please select a different payment option.";
+                $order->cancel_order($errorMessage);
+                $this->logValidationError($errorMessage);
+                return false;
+            }
+            return true;
 		}
 
 		/**
