@@ -299,17 +299,20 @@ function woocommerce_oxipay_init() {
 		 */
 		private function checkCustomerLocation($order)
 		{
-			$invalidBillingCountry=$order->billing_country != $this->countries && (!(is_null($order->billing_country)) || !(empty($order->billing_country)));
-			$invalidShippingCountry=$order->shipping_country != $this->countries && (!(is_null($order->shipping_country)) || !(empty($order->billing_country)));
+			// The following get shipping and billing countires, and filters null or empty values
+			// Then we check to see if there is just a single unique value that is equal to AU, otherwise we 
+			// display an error message.
+            $countries = array($order->billing_country, $order->shipping_country);
+            $set_addresses = array_filter($countries);
+            $valid_addresses = (count(array_unique($set_addresses)) === 1 && end($set_addresses) === $this->countries);
 
-			if ($invalidBillingCountry || $invalidShippingCountry) {
-				$errorMessage = "&nbsp;Orders from outside Australia or New Zealand are not supported by Oxipay. Please select a different payment option.";
-				$order->cancel_order($errorMessage);
-				$this->logValidationError($errorMessage);
-
-				return false;
-			}
-			return true;
+            if (!$valid_addresses) {
+                $errorMessage = "&nbsp;Orders from outside Australia are not supported by Oxipay. Please select a different payment option.";
+                $order->cancel_order($errorMessage);
+                $this->logValidationError($errorMessage);
+                return false;
+            }
+            return true;
 		}
 
 		/**
