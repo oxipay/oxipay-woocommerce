@@ -24,21 +24,36 @@ add_action('plugins_loaded', 'woocommerce_oxipay_init', 0);
  */
 function woocommerce_oxipay_init() {
 	class WC_Oxipay_Gateway extends WC_Payment_Gateway {
+		public static $country_config = array (
+			'AU' => array (
+				'name'			=> 'Australia',
+				'currency_code' => 'AUD',
+				'base_url'		=> 'https://oxipay.com.au',
+			),
+			'NZ' => array (
+				'name'			=> 'New Zealand',
+				'currency_code'	=> 'NZD',
+				'base_url'	=> 'https://oxipay.co.nz'
+			)
+		);
+
 		function __construct() {
+			$this->init_form_fields();
+			$this->init_settings();
+			$this->country_code  = $this->get_option( 'country' );
+			$this->country_name  = self::$country_config[$this->country_code]['name'];
+			$this->currency_code = self::$country_config[$this->country_code]['currency_code'];
+			$this->base_url      = self::$country_config[$this->country_code]['base_url'];
+			$this->support_url   = "$this->base_url/support";
+
 			$this->id = 'oxipay';
 			$this->has_fields = false;
 			$this->order_button_text = __( 'Proceed to ' . OXIPAY_DISPLAYNAME, 'woocommerce' );
 			$this->method_title      = __( OXIPAY_DISPLAYNAME, 'woocommerce' );
-			$this->method_descripton = __( 'Easy to setup installment payment plans from <a href="https://oxipay.com.au">Oxipay</a>' );
-
-			$this->init_form_fields();
-			$this->init_settings();
+			$this->method_descripton = __( 'Easy to setup installment payment plans from ' . OXIPAY_DISPLAYNAME );
 
 			$this->title         = $this->get_option( 'title' );
 			$this->description   = $this->get_option( 'description' );
-			$this->country_code  = $this->get_option( 'country' );
-			$this->country_name  = OXIPAY_COUNTRIES[$this->country_code].name;
-			$this->currency_code = OXIPAY_COUNTRIES[$this->currency_code].currency_code;
 			$this->icon          = plugins_url('oxipay/images/oxipay.png');
 
 			add_action( 'woocommerce_api_wc_oxipay_gateway', array($this, 'oxipay_callback'));
@@ -50,7 +65,6 @@ function woocommerce_oxipay_init() {
 		 * WC override to display the administration property page
 		 */
 		function init_form_fields() {
-
 			$this->form_fields = array(
 				'enabled' 			=> array(
 					'title' 		=> __( 'Enabled', 'woocommerce' ),
@@ -96,10 +110,10 @@ function woocommerce_oxipay_init() {
 				'country'=> array(
 					'title'			=> __( 'Country', 'woocommerce' ),
 					'type'			=> 'select',
-					'description'	=> 'Select the country in which this store operates.'
+					'description'	=> 'Select the country in which this store operates.',
 					'options'		=> array(
-						'AU'		=> __( OXIPAY_COUNTRIES['AU'].name, 'woocommerce' ),
-						'NZ'		=> __( OXIPAY_COUNTRIES['NZ'].name, 'woocommerce' )
+						'AU'		=> __( self::$country_config['AU']['name'], 'woocommerce' ),
+						'NZ'		=> __( self::$country_config['NZ']['name'], 'woocommerce' )
 					)
 				),
 				'gateway_details' 	=> array(
@@ -112,7 +126,7 @@ function woocommerce_oxipay_init() {
 					'id'			=> 'oxipay_gateway_url',
 					'title' 		=> __( OXIPAY_DISPLAYNAME . ' Gateway URL', 'woocommerce' ),
 					'type' 			=> 'text',
-					'default' 		=> __( '', 'woocommerce' ),
+					'default' 		=> __( 'https://secure.oxipay.com.au/Checkout?platform=WooCommerce', 'woocommerce' ),
 					'description'	=> 'This is the base URL of the Oxipay payment services. Do not change this unless directed to by Oxipay staff.',
 					'desc_tip'		=> true
 				),
@@ -120,7 +134,7 @@ function woocommerce_oxipay_init() {
 					'id'			=> 'oxipay_sandbox_gateway_url',
 					'title' 		=> __( OXIPAY_DISPLAYNAME . ' Sandbox Gateway URL', 'woocommerce' ),
 					'type' 			=> 'text',
-					'default' 		=> __( 'https://xpozsecure.certegyezipay.com.au/Checkout?platform=WooCommerce', 'woocommerce' ),
+					'default' 		=> __( 'https://sandboxsecure.oxipay.com.au/Checkout?platform=WooCommerce', 'woocommerce' ),
 					'description'	=> 'This is the base URL of the Oxipay sandbox services. If this test mode is enabled, and this is set - the sandbox will be used. If this is not set, with test mode enabled, the sandbox will not be used, but a test flag will still be sent.',
 					'desc_tip'		=> true
 				),
@@ -129,7 +143,7 @@ function woocommerce_oxipay_init() {
                     'title'     	=> __( 'Merchant ID', 'woocommerce' ),
 					'type' 	    	=> 'text',
                     'default'   	=> '',
-					'description'	=> 'Oxipay will have supplied you with your Oxipay Merchant ID. <a href="https://oxipay.com.au/support">Contact us</a> if you cannot find it.',
+					'description'	=> 'Oxipay will have supplied you with your Oxipay Merchant ID. Contact us if you cannot find it.',
 					'desc_tip'		=> true
                 ),
                 'oxipay_api_key'    => array(
@@ -137,7 +151,7 @@ function woocommerce_oxipay_init() {
                     'title'     	=> __( 'API Key', 'woocommerce' ),
 					'type' 	    	=> 'text',
                     'default'   	=> '',
-					'description'	=> 'Oxipay will have supplied you with your Oxipay API key. <a href="https://oxipay.com.au/support">Contact us</a> if you cannot find it.',
+					'description'	=> 'Oxipay will have supplied you with your Oxipay API key. Contact us if you cannot find it.',
 					'desc_tip'		=> true
                 ),
                 'test_mode' 		=> array(
@@ -237,7 +251,7 @@ function woocommerce_oxipay_init() {
 		function admin_options() { ?>
 			<h2><?php _e(OXIPAY_DISPLAYNAME,'woocommerce'); ?></h2>
 			<p><?php _e($this->method_description, 'woocommerce' ); ?></p>
-			<p>For help setting this plugin up please contact our support team via <a href="https://oxipay.com.au/support">Oxipay support</a></p>
+			<p>For help setting this plugin up please contact our support team.</p>
 			<table class="form-table">
 			<?php $this->generate_settings_html(); ?>
 			</table> <?php
@@ -296,7 +310,7 @@ function woocommerce_oxipay_init() {
 		// USAGE:  http://myurl.com/?wc-api=WC_Oxipay_Gateway
 		function oxipay_callback()
 		{
-			throw new \HttpInvalidParamException();
+			throw new HttpInvalidParamException();
 		}
 
 		/**
