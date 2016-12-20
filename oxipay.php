@@ -28,20 +28,18 @@ function woocommerce_oxipay_init() {
 			$this->id = 'oxipay';
 			$this->has_fields = false;
 			$this->order_button_text = __( 'Proceed to ' . OXIPAY_DISPLAYNAME, 'woocommerce' );
-
-            // Tab Title on the WooCommerce Checkout page
-			$this->method_title = __( OXIPAY_DISPLAYNAME, 'woocommerce' );
-
-            // Description displayed underneath heading
+			$this->method_title      = __( OXIPAY_DISPLAYNAME, 'woocommerce' );
 			$this->method_descripton = __( 'Easy to setup installment payment plans from <a href="https://oxipay.com.au">Oxipay</a>' );
 
 			$this->init_form_fields();
 			$this->init_settings();
 
-			$this->title = $this->get_option( 'title' );
-			$this->description = $this->get_option( 'description' );
-			$this->countries = OXIPAY_DEFAULT_COUNTRY;
-			$this->icon = plugins_url('oxipay/images/oxipay.png');
+			$this->title         = $this->get_option( 'title' );
+			$this->description   = $this->get_option( 'description' );
+			$this->country_code  = $this->get_option( 'country' );
+			$this->country_name  = OXIPAY_COUNTRIES[$this->country_code].name;
+			$this->currency_code = OXIPAY_COUNTRIES[$this->currency_code].currency_code;
+			$this->icon          = plugins_url('oxipay/images/oxipay.png');
 
 			add_action( 'woocommerce_api_wc_oxipay_gateway', array($this, 'oxipay_callback'));
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
@@ -94,6 +92,15 @@ function woocommerce_oxipay_init() {
 					'description' 	=> __( 'The name of the shop that will be displayed in ' . OXIPAY_DISPLAYNAME, 'woocommerce' ),
 					'default' 		=> __( '', 'woocommerce' ),
 					'desc_tip'      => true,
+				),
+				'country'=> array(
+					'title'			=> __( 'Country', 'woocommerce' ),
+					'type'			=> 'select',
+					'description'	=> 'Select the country in which this store operates.'
+					'options'		=> array(
+						'AU'		=> __( OXIPAY_COUNTRIES['AU'].name, 'woocommerce' ),
+						'NZ'		=> __( OXIPAY_COUNTRIES['NZ'].name, 'woocommerce' )
+					)
 				),
 				'gateway_details' 	=> array(
 					'title' 		=> __( OXIPAY_DISPLAYNAME . ' Gateway Settings', 'woocommerce' ),
@@ -167,12 +174,12 @@ function woocommerce_oxipay_init() {
                 'x_reference'     				=> $order_id,
                 'x_account_id'    				=> $this->settings['oxipay_merchant_id'],
                 'x_amount' 	    				=> $order->order_total,
-                'x_currency' 	    			=> OXIPAY_DEFAULT_CURRENCY,
+                'x_currency' 	    			=> $this->currency_code,
                 'x_url_callback'  				=> plugins_url("callback.php", __FILE__),
                 'x_url_complete'  				=> $this->get_return_url( $order ),
                 'x_url_cancel'           		=> $woocommerce->cart->get_cart_url(),
                 'x_test'          				=> $this->settings['test_mode'],
-                'x_shop_country'          		=> OXIPAY_DEFAULT_COUNTRY,
+                'x_shop_country'          		=> $this->country,
                 'x_shop_name'          			=> $this->settings['shop_name'],
 				//customer detail
                 'x_customer_first_name' 		=> $order->billing_first_name,
@@ -180,14 +187,14 @@ function woocommerce_oxipay_init() {
                 'x_customer_email'      		=> $order->billing_email,
                 'x_customer_phone'				=> $order->billing_phone,
                 //billing detail
-                'x_customer_billing_country'	=> OXIPAY_DEFAULT_COUNTRY,
+                'x_customer_billing_country'	=> $this->country,
                 'x_customer_billing_city' 	    => $order->billing_city,
                 'x_customer_billing_address1' 	=> $order->billing_address_1,
                 'x_customer_billing_address2' 	=> $order->billing_address_2,
                 'x_customer_billing_state' 	    => $order->billing_state,
                 'x_customer_billing_zip' 		=> $order->billing_postcode,
                 //shipping detail
-                'x_customer_shipping_country'	=> OXIPAY_DEFAULT_COUNTRY,
+                'x_customer_shipping_country'	=> $this->country,
  				'x_customer_shipping_city' 	    => $order->postal_city,
                 'x_customer_shipping_address1'  => $order->postal_address_1,
                 'x_customer_shipping_address2'  => $order->postal_address_2,
@@ -304,10 +311,10 @@ function woocommerce_oxipay_init() {
 			// display an error message.
             $countries = array($order->billing_country, $order->shipping_country);
             $set_addresses = array_filter($countries);
-            $valid_addresses = (count(array_unique($set_addresses)) === 1 && end($set_addresses) === $this->countries);
+            $valid_addresses = (count(array_unique($set_addresses)) === 1 && end($set_addresses) === $this->country_code);
 
             if (!$valid_addresses) {
-                $errorMessage = "&nbsp;Orders from outside Australia are not supported by Oxipay. Please select a different payment option.";
+                $errorMessage = "&nbsp;Orders from outside " . $this->country_name . " are not supported by " . OXIPAY_DISPLAYNAME .". Please select a different payment option.";
                 $order->cancel_order($errorMessage);
                 $this->logValidationError($errorMessage);
                 return false;
@@ -323,7 +330,7 @@ function woocommerce_oxipay_init() {
 		private function checkOrderAmount($order)
 		{
 			if($order->order_total < 20) {
-				$errorMessage = "&nbsp;Orders under $20 AUD are not supported by Oxipay. Please select a different payment option.";
+				$errorMessage = "&nbsp;Orders under " . $this->currency_code . "$20 are not supported by " . OXIPAY_DISPLAYNAME . ". Please select a different payment option.";
 				$order->cancel_order($errorMessage);
 				$this->logValidationError($errorMessage);
 				return false;

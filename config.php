@@ -6,3 +6,13 @@ define ("OXIPAY_WAIT_URL", "processing.php");
 define ('OXIPAY_TEST', true);
 define ('OXIPAY_DEFAULT_CURRENCY', 'AUD');
 define ('OXIPAY_DEFAULT_COUNTRY', 'AU');
+define ('OXIPAY_COUNTRIES', array (
+	'AU' => array (
+		'name'			=> 'Australia',
+		'currency_code' => 'AUD'
+	),
+	'NZ' => array (
+		'name'			=> 'New Zealand',
+		'currency_code'	=> 'NZD'
+	)
+));
