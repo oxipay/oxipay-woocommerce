@@ -40,13 +40,16 @@ function oxipay_checksign($query, $api_key)
 }
 
 function generate_processing_form($query) {
-    $url = $query["gateway_url"];
+    $url = htmlentities($query["gateway_url"]);
 
     echo "<form id='oxipayload' method='post' action='$url'>";
 
     foreach ($query as $item => $value) {
+        $i = htmlentities($item);
+        $v = htmlentities($value);
+
         if (substr($item, 0, 2) === "x_") {
-            echo "<input id='$item' name='$item' value='$value' type='hidden'/>";
+            echo "<input id='$i' name='$i' value='$v' type='hidden'/>";
         }
     }
 
