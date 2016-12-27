@@ -292,7 +292,8 @@ function woocommerce_oxipay_init() {
 		// USAGE:  http://myurl.com/?wc-api=WC_Oxipay_Gateway
 		function oxipay_callback()
 		{
-			throw new HttpInvalidParamException();
+			//todo: provide asynchronous callback implementation for increased resilience during network disruption
+			throw new Exception("Not implemented");
 		}
 
 		/**
