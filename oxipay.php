@@ -25,11 +25,7 @@ add_action('plugins_loaded', 'woocommerce_oxipay_init', 0);
 function woocommerce_oxipay_init() {
 	class WC_Oxipay_Gateway extends WC_Payment_Gateway {
 
-
 		function __construct() {
-
-
-
 			$this->id = 'oxipay';
 			$this->has_fields = false;
 			$this->order_button_text = __( 'Proceed to ' . Config::display_name, 'woocommerce' );
@@ -99,6 +95,7 @@ function woocommerce_oxipay_init() {
 					'type'			=> 'select',
 					'description'	=> 'Select the closest region in which this store communicates with Oxipay. This will ensure your customers receive the best possible experience.',
 					'options'		=> array(
+						''			=> __( 'Please select...', 'woocommerce' ),
 						'AU'		=> __( Config::countries['AU']['name'], 'woocommerce' ),
 						'NZ'		=> __( Config::countries['NZ']['name'], 'woocommerce' )
 					)
@@ -308,12 +305,15 @@ function woocommerce_oxipay_init() {
 			// The following get shipping and billing countries, and filters null or empty values
 			// Then we check to see if there is just a single unique value that is equal to AU, otherwise we 
 			// display an error message.
+
             $countries = array($order->billing_country, $order->shipping_country);
             $set_addresses = array_filter($countries);
-            $valid_addresses = (count(array_unique($set_addresses)) === 1 && end($set_addresses) === $this->getCountryName());
+			$countryCode = $this->getCountryCode();
+			$countryName = $this->getCountryName();
+			$valid_addresses = (count(array_unique($set_addresses)) === 1 && end($set_addresses) === $countryCode);
 
             if (!$valid_addresses) {
-                $errorMessage = "&nbsp;Orders from outside " . $this->getCountryName() . " are not supported by " . Config::display_name .". Please select a different payment option.";
+                $errorMessage = "&nbsp;Orders from outside " . $countryName . " are not supported by " . Config::display_name .". Please select a different payment option.";
                 $order->cancel_order($errorMessage);
                 $this->logValidationError($errorMessage);
                 return false;
