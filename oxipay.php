@@ -24,18 +24,7 @@ add_action('plugins_loaded', 'woocommerce_oxipay_init', 0);
  */
 function woocommerce_oxipay_init() {
 	class WC_Oxipay_Gateway extends WC_Payment_Gateway {
-		public static $country_config = array (
-			'AU' => array (
-				'name'			=> 'Australia',
-				'currency_code' => 'AUD',
-				'base_url'		=> 'https://oxipay.com.au',
-			),
-			'NZ' => array (
-				'name'			=> 'New Zealand',
-				'currency_code'	=> 'NZD',
-				'base_url'	=> 'https://oxipay.co.nz'
-			)
-		);
+
 
 		function __construct() {
 
@@ -43,9 +32,9 @@ function woocommerce_oxipay_init() {
 
 			$this->id = 'oxipay';
 			$this->has_fields = false;
-			$this->order_button_text = __( 'Proceed to ' . OXIPAY_DISPLAYNAME, 'woocommerce' );
-			$this->method_title      = __( OXIPAY_DISPLAYNAME, 'woocommerce' );
-			$this->method_descripton = __( 'Easy to setup installment payment plans from ' . OXIPAY_DISPLAYNAME );
+			$this->order_button_text = __( 'Proceed to ' . Config::display_name, 'woocommerce' );
+			$this->method_title      = __( Config::display_name, 'woocommerce' );
+			$this->method_descripton = __( 'Easy to setup installment payment plans from ' . Config::display_name );
 
 			$this->init_form_fields();
 			$this->init_settings();
@@ -67,62 +56,62 @@ function woocommerce_oxipay_init() {
 				'enabled' 			=> array(
 					'title' 		=> __( 'Enabled', 'woocommerce' ),
 					'type' 			=> 'checkbox',
-					'label' 		=> __( 'Enable the ' . OXIPAY_DISPLAYNAME . ' Payment Gateway', 'woocommerce' ),
+					'label' 		=> __( 'Enable the ' . Config::display_name . ' Payment Gateway', 'woocommerce' ),
 					'default' 		=> 'yes',
 					'description'	=> 'Disable oxipay services, your customers will not be able to use our easy installment plans.',
 					'desc_tip'		=> true
 				),
 				'display_details' 	=> array(
-					'title' 		=> __( OXIPAY_DISPLAYNAME . ' Display Details', 'woocommerce' ),
+					'title' 		=> __( Config::display_name . ' Display Details', 'woocommerce' ),
 					'type' 			=> 'title',
-					'description' 	=> __( 'Enter the ' . OXIPAY_DISPLAYNAME . ' display details for your site. These details will be displayed during the WooCommerce checkout process.', 'woocommerce' ),
-					'default' 		=> __( OXIPAY_DISPLAYNAME . ' Payment', 'woocommerce' ),
+					'description' 	=> __( 'Enter the ' . Config::display_name . ' display details for your site. These details will be displayed during the WooCommerce checkout process.', 'woocommerce' ),
+					'default' 		=> __( Config::display_name . ' Payment', 'woocommerce' ),
 				),
 				'title' 			=> array(
 					'title' 		=> __( 'Title', 'woocommerce' ),
 					'type' 			=> 'text',
 					'description' 	=> __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
-					'default' 		=> __( OXIPAY_DISPLAYNAME , 'woocommerce' ),
+					'default' 		=> __( Config::display_name , 'woocommerce' ),
 					'desc_tip'      => true,
 				),
 				'description' 		=> array(
 					'title' 		=> __( 'Description', 'woocommerce' ),
 					'type' 			=> 'text',
 					'description' 	=> __( 'This controls the description which the user sees during checkout.', 'woocommerce' ),
-					'default' 		=> __( 'Breathe easy with ' . OXIPAY_DISPLAYNAME . ', an interest-free installment payment plan.', 'woocommerce' ),
+					'default' 		=> __( 'Breathe easy with ' . Config::display_name . ', an interest-free installment payment plan.', 'woocommerce' ),
 					'desc_tip'      => true,
 				),
 				'shop_details' 		=> array(
-					'title' 		=> __( OXIPAY_DISPLAYNAME . ' Shop Details', 'woocommerce' ),
+					'title' 		=> __( Config::display_name . ' Shop Details', 'woocommerce' ),
 					'type' 			=> 'title',
-					'description' 	=> __( 'Enter the ' . OXIPAY_DISPLAYNAME . ' shop details for your site. These details will be displayed during the oxipay checkout process.', 'woocommerce' ),
-					'default' 		=> __( OXIPAY_DISPLAYNAME . ' Payment', 'woocommerce' ),
+					'description' 	=> __( 'Enter the ' . Config::display_name . ' shop details for your site. These details will be displayed during the oxipay checkout process.', 'woocommerce' ),
+					'default' 		=> __( Config::display_name . ' Payment', 'woocommerce' ),
 				),
 				'shop_name' 		=> array(
 					'title' 		=> __( 'Shop Name', 'woocommerce' ),
 					'type' 			=> 'text',
-					'description' 	=> __( 'The name of the shop that will be displayed in ' . OXIPAY_DISPLAYNAME, 'woocommerce' ),
+					'description' 	=> __( 'The name of the shop that will be displayed in ' . Config::display_name, 'woocommerce' ),
 					'default' 		=> __( '', 'woocommerce' ),
 					'desc_tip'      => true,
 				),
 				'country'=> array(
-					'title'			=> __( 'Country', 'woocommerce' ),
+					'title'			=> __( 'Oxipay Region', 'woocommerce' ),
 					'type'			=> 'select',
-					'description'	=> 'Select the country in which this store operates.',
+					'description'	=> 'Select the closest region in which this store communicates with Oxipay. This will ensure your customers receive the best possible experience.',
 					'options'		=> array(
-						'AU'		=> __( self::$country_config['AU']['name'], 'woocommerce' ),
-						'NZ'		=> __( self::$country_config['NZ']['name'], 'woocommerce' )
+						'AU'		=> __( Config::countries['AU']['name'], 'woocommerce' ),
+						'NZ'		=> __( Config::countries['NZ']['name'], 'woocommerce' )
 					)
 				),
 				'gateway_details' 	=> array(
-					'title' 		=> __( OXIPAY_DISPLAYNAME . ' Gateway Settings', 'woocommerce' ),
+					'title' 		=> __( Config::display_name . ' Gateway Settings', 'woocommerce' ),
 					'type' 			=> 'title',
-					'description' 	=> __( 'Enter the gateway settings that were supplied to you by ' . OXIPAY_DISPLAYNAME . '.', 'woocommerce' ),
-					'default' 		=> __( OXIPAY_DISPLAYNAME . ' Payment', 'woocommerce' ),
+					'description' 	=> __( 'Enter the gateway settings that were supplied to you by ' . Config::display_name . '.', 'woocommerce' ),
+					'default' 		=> __( Config::display_name . ' Payment', 'woocommerce' ),
 				),
 				'oxipay_gateway_url'=> array(
 					'id'			=> 'oxipay_gateway_url',
-					'title' 		=> __( OXIPAY_DISPLAYNAME . ' Gateway URL', 'woocommerce' ),
+					'title' 		=> __( Config::display_name . ' Gateway URL', 'woocommerce' ),
 					'type' 			=> 'text',
 					'default' 		=> __( 'https://secure.oxipay.com.au/Checkout?platform=WooCommerce', 'woocommerce' ),
 					'description'	=> 'This is the base URL of the Oxipay payment services. Do not change this unless directed to by Oxipay staff.',
@@ -130,7 +119,7 @@ function woocommerce_oxipay_init() {
 				),
 				'oxipay_sandbox_gateway_url'=> array(
 					'id'			=> 'oxipay_sandbox_gateway_url',
-					'title' 		=> __( OXIPAY_DISPLAYNAME . ' Sandbox Gateway URL', 'woocommerce' ),
+					'title' 		=> __( Config::display_name . ' Sandbox Gateway URL', 'woocommerce' ),
 					'type' 			=> 'text',
 					'default' 		=> __( 'https://sandboxsecure.oxipay.com.au/Checkout?platform=WooCommerce', 'woocommerce' ),
 					'description'	=> 'This is the base URL of the Oxipay sandbox services. If this test mode is enabled, and this is set - the sandbox will be used. If this is not set, with test mode enabled, the sandbox will not be used, but a test flag will still be sent.',
@@ -186,12 +175,12 @@ function woocommerce_oxipay_init() {
                 'x_reference'     				=> $order_id,
                 'x_account_id'    				=> $this->settings['oxipay_merchant_id'],
                 'x_amount' 	    				=> $order->order_total,
-                'x_currency' 	    			=> $this->currency_code,
+                'x_currency' 	    			=> $this->getCurrencyCode(),
                 'x_url_callback'  				=> plugins_url("callback.php", __FILE__),
                 'x_url_complete'  				=> $this->get_return_url( $order ),
                 'x_url_cancel'           		=> $woocommerce->cart->get_cart_url(),
                 'x_test'          				=> $this->settings['test_mode'],
-                'x_shop_country'          		=> $this->country,
+                'x_shop_country'          		=> $this->getCountryCode(),
                 'x_shop_name'          			=> $this->settings['shop_name'],
 				//customer detail
                 'x_customer_first_name' 		=> $order->billing_first_name,
@@ -199,28 +188,26 @@ function woocommerce_oxipay_init() {
                 'x_customer_email'      		=> $order->billing_email,
                 'x_customer_phone'				=> $order->billing_phone,
                 //billing detail
-                'x_customer_billing_country'	=> $this->country,
+                'x_customer_billing_country'	=> $order->billing_country,
                 'x_customer_billing_city' 	    => $order->billing_city,
                 'x_customer_billing_address1' 	=> $order->billing_address_1,
                 'x_customer_billing_address2' 	=> $order->billing_address_2,
                 'x_customer_billing_state' 	    => $order->billing_state,
                 'x_customer_billing_zip' 		=> $order->billing_postcode,
                 //shipping detail
-                'x_customer_shipping_country'	=> $this->country,
+                'x_customer_shipping_country'	=> $order->billing_country,
  				'x_customer_shipping_city' 	    => $order->postal_city,
                 'x_customer_shipping_address1'  => $order->postal_address_1,
                 'x_customer_shipping_address2'  => $order->postal_address_2,
                 'x_customer_shipping_state' 	=> $order->postal_state,
                 'x_customer_shipping_zip' 		=> $order->postal_postcode,
-                //pass the gateway URL through to the processing page.
-                //TODO: the processing.php page should probably resolve this differently.
                 'gateway_url' 					=> $gatewayUrl
             );
 
           	$signature = oxipay_sign($transaction_details, $this->settings['oxipay_api_key']);
 			$transaction_details['x_signature'] = $signature;
 
-            $order->update_status('on-hold', __('Awaiting '.OXIPAY_DISPLAYNAME.' payment', 'woothemes'));
+            $order->update_status('on-hold', __('Awaiting '.Config::display_name.' payment', 'woothemes'));
             $qs = http_build_query($transaction_details);
 
             return array(
@@ -247,7 +234,7 @@ function woocommerce_oxipay_init() {
 		 * Renders plugin configuration markup
 		 */
 		function admin_options() { ?>
-			<h2><?php _e(OXIPAY_DISPLAYNAME,'woocommerce'); ?></h2>
+			<h2><?php _e(Config::display_name,'woocommerce'); ?></h2>
 			<p><?php _e($this->method_description, 'woocommerce' ); ?></p>
 			<p>For help setting this plugin up please contact our support team.</p>
 			<table class="form-table">
@@ -277,7 +264,7 @@ function woocommerce_oxipay_init() {
 				switch ($params['x_result']) {
 
 					case "completed":
-						$order->add_order_note(__('Payment approved using ' . OXIPAY_DISPLAYNAME . '. Reference #'. $params['x_gateway_reference'], 'woocommerce'));
+						$order->add_order_note(__('Payment approved using ' . Config::display_name . '. Reference #'. $params['x_gateway_reference'], 'woocommerce'));
 						$order->payment_complete($params['x_reference']);
 						if (!is_null($cart)) {
 							$cart->empty_cart();
@@ -285,13 +272,13 @@ function woocommerce_oxipay_init() {
 						break;
 
 					case "failed":
-						$order->add_order_note(__('Payment declined using ' . OXIPAY_DISPLAYNAME . '. Reference #'. $params['x_gateway_reference'], 'woocommerce'));
+						$order->add_order_note(__('Payment declined using ' . Config::display_name . '. Reference #'. $params['x_gateway_reference'], 'woocommerce'));
 						$order->update_status('failed');
 						break;
 
 					case "pending":
-						$order->add_order_note(__('Payment pending using ' . OXIPAY_DISPLAYNAME . '. Reference #'. $params['x_gateway_reference'], 'woocommerce'));
-						$order->update_status('on-hold', 'Error may have occurred with ' . OXIPAY_DISPLAYNAME . '. Reference #'. $params['x_gateway_reference']);
+						$order->add_order_note(__('Payment pending using ' . Config::display_name . '. Reference #'. $params['x_gateway_reference'], 'woocommerce'));
+						$order->update_status('on-hold', 'Error may have occurred with ' . Config::display_name . '. Reference #'. $params['x_gateway_reference']);
 						break;
 				}
 
@@ -299,8 +286,8 @@ function woocommerce_oxipay_init() {
 			}
 			else
 			{
-				$order->add_order_note(__(OXIPAY_DISPLAYNAME . ' payment response failed signature validation. Please check your Merchant Number and API key or contact Oxipay for assistance.', 0, 'woocommerce'));
-				$order->add_order_note(__('Payment declined using ' . OXIPAY_DISPLAYNAME . '. Your Order ID is ' . $order->id, 'woocommerce'));
+				$order->add_order_note(__(Config::display_name . ' payment response failed signature validation. Please check your Merchant Number and API key or contact Oxipay for assistance.', 0, 'woocommerce'));
+				$order->add_order_note(__('Payment declined using ' . Config::display_name . '. Your Order ID is ' . $order->id, 'woocommerce'));
 				$order->update_status('failed');
 			}
 		}
@@ -318,15 +305,15 @@ function woocommerce_oxipay_init() {
 		 */
 		private function checkCustomerLocation($order)
 		{
-			// The following get shipping and billing countires, and filters null or empty values
+			// The following get shipping and billing countries, and filters null or empty values
 			// Then we check to see if there is just a single unique value that is equal to AU, otherwise we 
 			// display an error message.
             $countries = array($order->billing_country, $order->shipping_country);
             $set_addresses = array_filter($countries);
-            $valid_addresses = (count(array_unique($set_addresses)) === 1 && end($set_addresses) === $this->country_code);
+            $valid_addresses = (count(array_unique($set_addresses)) === 1 && end($set_addresses) === $this->getCountryName());
 
             if (!$valid_addresses) {
-                $errorMessage = "&nbsp;Orders from outside " . $this->country_name . " are not supported by " . OXIPAY_DISPLAYNAME .". Please select a different payment option.";
+                $errorMessage = "&nbsp;Orders from outside " . $this->getCountryName() . " are not supported by " . Config::display_name .". Please select a different payment option.";
                 $order->cancel_order($errorMessage);
                 $this->logValidationError($errorMessage);
                 return false;
@@ -342,7 +329,7 @@ function woocommerce_oxipay_init() {
 		private function checkOrderAmount($order)
 		{
 			if($order->order_total < 20) {
-				$errorMessage = "&nbsp;Orders under " . $this->currency_code . "$20 are not supported by " . OXIPAY_DISPLAYNAME . ". Please select a different payment option.";
+				$errorMessage = "&nbsp;Orders under " . $this->getCurrencyCode() . $this->getCurrencySymbol() . "20 are not supported by " . Config::display_name . ". Please select a different payment option.";
 				$order->cancel_order($errorMessage);
 				$this->logValidationError($errorMessage);
 				return false;
@@ -362,18 +349,37 @@ function woocommerce_oxipay_init() {
 			return $this->get_option('country');
 		}
 
+		/**
+		 * @return string
+		 */
 		private function getCountryName() {
-			return self::$country_config[$this->getCountryCode()]['name'];
+			return Config::countries[$this->getCountryCode()]['name'];
 		}
 
+		/**
+		 * @return string
+		 */
 		private function getCurrencyCode() {
-			return self::$country_config[$this->getCountryCode()]['currency_code'];
+			return Config::countries[$this->getCountryCode()]['currency_code'];
 		}
 
+		/**
+		 * @return string
+		 */
+		private function getCurrencySymbol() {
+			return Config::countries[$this->getCountryCode()]['currency_symbol'];
+		}
+
+		/**
+		 * @return string
+		 */
 		private function getBaseUrl() {
-			return self::$country_config[$this->getCountryCode()]['base_url'];
+			return Config::countries[$this->getCountryCode()]['base_url'];
 		}
 
+		/**
+		 * @return string
+		 */
 		private function getSupportUrl() {
 			$baseUrl = $this->getBaseUrl();
 			return "$baseUrl/support";
