@@ -38,19 +38,17 @@ function woocommerce_oxipay_init() {
 		);
 
 		function __construct() {
-			$this->init_form_fields();
-			$this->init_settings();
-			$this->country_code  = $this->get_option( 'country' );
-			$this->country_name  = self::$country_config[$this->country_code]['name'];
-			$this->currency_code = self::$country_config[$this->country_code]['currency_code'];
-			$this->base_url      = self::$country_config[$this->country_code]['base_url'];
-			$this->support_url   = "$this->base_url/support";
+
+
 
 			$this->id = 'oxipay';
 			$this->has_fields = false;
 			$this->order_button_text = __( 'Proceed to ' . OXIPAY_DISPLAYNAME, 'woocommerce' );
 			$this->method_title      = __( OXIPAY_DISPLAYNAME, 'woocommerce' );
 			$this->method_descripton = __( 'Easy to setup installment payment plans from ' . OXIPAY_DISPLAYNAME );
+
+			$this->init_form_fields();
+			$this->init_settings();
 
 			$this->title         = $this->get_option( 'title' );
 			$this->description   = $this->get_option( 'description' );
@@ -354,6 +352,31 @@ function woocommerce_oxipay_init() {
 
 		private function logValidationError($message) {
 			wc_add_notice(__('Payment error: ', 'woothemes') . $message, 'error');
+		}
+
+		/**
+		 * @return string
+		 */
+		private function getCountryCode()
+		{
+			return $this->get_option('country');
+		}
+
+		private function getCountryName() {
+			return self::$country_config[$this->getCountryCode()]['name'];
+		}
+
+		private function getCurrencyCode() {
+			return self::$country_config[$this->getCountryCode()]['currency_code'];
+		}
+
+		private function getBaseUrl() {
+			return self::$country_config[$this->getCountryCode()]['base_url'];
+		}
+
+		private function getSupportUrl() {
+			$baseUrl = $this->getBaseUrl();
+			return "$baseUrl/support";
 		}
 	}
 }
