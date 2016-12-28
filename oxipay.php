@@ -239,7 +239,6 @@ function woocommerce_oxipay_init() {
 			</table> <?php
 		}
 
-
 		/**
 		 * This is a filter setup to receive the results from the Oxipay services to show the required
 		 * outcome for the order based on the 'x_result' property
