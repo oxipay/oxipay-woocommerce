@@ -142,7 +142,7 @@ function woocommerce_oxipay_init() {
                     'title'     	=> __( 'API Key', 'woocommerce' ),
 					'type' 	    	=> 'text',
                     'default'   	=> '',
-					'description'	=> 'Oxipay will have supplied you with your Oxipay API key. Contact us if you cannot find it.',
+					'description'	=> 'Oxipay will have supplied you with your Oxipay API key. <a href="'.$this->getSupportUrl().'">Contact us</a> if you cannot find it.',
 					'desc_tip'		=> true
                 ),
                 'test_mode' 		=> array(
@@ -437,7 +437,13 @@ function woocommerce_oxipay_init() {
 		 * @return string
 		 */
 		private function getBaseUrl() {
-			return Config::countries[$this->getCountryCode()]['base_url'];
+			$tld = Config::countries[$this->getCountryCode()]['tld'];
+			$displayName = strtolower(Config::display_name);
+			if($this->is_null_or_empty($tld)) {
+				$tld = ".com.au";
+			}
+
+			return "https://{$displayName}{$tld}";
 		}
 
 		/**
@@ -445,7 +451,8 @@ function woocommerce_oxipay_init() {
 		 */
 		private function getSupportUrl() {
 			$baseUrl = $this->getBaseUrl();
-			return "$baseUrl/support";
+
+			return "$baseUrl/contact";
 		}
 
 		/**

@@ -9,13 +9,13 @@ class Config {
             'name'				=> 'Australia',
             'currency_code' 	=> 'AUD',
             'currency_symbol'	=> '$',
-            'base_url'			=> 'https://oxipay.com.au',
+            'tld'			=> '.com.au',
         ),
         'NZ' => array (
             'name'				=> 'New Zealand',
             'currency_code'		=> 'NZD',
             'currency_symbol' 	=> '$',
-            'base_url'			=> 'https://oxipay.co.nz'
+            'tld'			=> '.co.nz'
         )
     );
 
