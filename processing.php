@@ -20,9 +20,29 @@
 
 <?php
 include_once( 'config.php' );
-include_once( 'crypto.php' );
+
 parse_str($_SERVER['QUERY_STRING'], $query);
+
+function generate_processing_form($query) {
+    $url = htmlentities($query["gateway_url"]);
+
+    echo "<form id='oxipayload' method='post' action='$url'>";
+
+    foreach ($query as $i => $v) {
+        $item = htmlentities($i);
+        $value = htmlentities($v);
+
+        if (substr($item, 0, 2) === "x_") {
+            echo "<input id='$item' name='$item' value='$value' type='hidden'/>";
+        }
+    }
+
+    echo "</form>";
+    echo "<script>document.getElementById('oxipayload').submit();</script>";
+}
+
 generate_processing_form($query);
+
 ?>
 
 </body>
