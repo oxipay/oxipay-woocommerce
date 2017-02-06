@@ -49,6 +49,7 @@ function woocommerce_oxipay_init() {
 			add_action( 'woocommerce_api_wc_oxipay_gateway', array($this, 'oxipay_callback'));
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 			add_filter( 'woocommerce_thankyou_order_id',array($this,'payment_finalisation'));
+			add_filter( 'the_title',array($this,'order_received_title'), 11);
 		}
 
 		/**
@@ -350,6 +351,33 @@ function woocommerce_oxipay_init() {
 				$order->update_status('failed');
 			}
 		}
+
+		/**
+		 * This is a filter setup to override the title on the order received page
+		 * in the case where the payment has failed
+		 * @param $title
+		 * @return string
+		 */
+		function order_received_title( $title ) {
+			global $wp_query;
+
+			//copying woocommerce logic from wc_page_endpoint_title() in wc-page-functions.php
+			if ( ! is_null( $wp_query ) && ! is_admin() && is_main_query() && in_the_loop() && is_page() && is_wc_endpoint_url() ) {
+				//make sure we are on the Order Received page and have the payment result available
+				$endpoint = WC()->query->get_current_endpoint();
+				if( $endpoint == 'order-received' && ! empty( $_GET['x_result'] ) ){
+					//look at the x_result query var. Ideally we'd load the order and look at the status, but this has not been updated when this filter runs
+					if( $_GET['x_result'] == 'failed' ){
+						$title = 'Payment Failed';
+					}
+				}
+				//copying woocommerce code- the filter only needs to run once
+				remove_filter( 'the_title', array( $this, 'order_received_title' ), 11 );
+			}
+
+			return $title;
+		}
+
 
 		// USAGE:  http://myurl.com/?wc-api=WC_Oxipay_Gateway
 		function oxipay_callback()
