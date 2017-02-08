@@ -24,13 +24,13 @@ include_once( 'config.php' );
 parse_str($_SERVER['QUERY_STRING'], $query);
 
 function generate_processing_form($query) {
-    $url = htmlentities($query["gateway_url"]);
+    $url = htmlspecialchars( $query["gateway_url"], ENT_QUOTES );
 
     echo "<form id='oxipayload' method='post' action='$url'>";
 
     foreach ($query as $i => $v) {
-        $item = htmlentities($i);
-        $value = htmlentities($v);
+        $item = htmlspecialchars( $i, ENT_QUOTES );
+        $value = htmlspecialchars( $v, ENT_QUOTES );
 
         if (substr($item, 0, 2) === "x_") {
             echo "<input id='$item' name='$item' value='$value' type='hidden'/>";
