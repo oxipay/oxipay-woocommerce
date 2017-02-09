@@ -4,14 +4,17 @@
 //define ('OXIPAY_DISPLAYNAME', 'Oxipay');
 
 class Config {
-    const countries = array (
-        'AU' => array (
+    const COUNTRY_AUSTRALIA = 'AU';
+    const COUNTRY_NEW_ZEALAND = 'NZ';
+
+    const COUNTRIES = array (
+        self::COUNTRY_AUSTRALIA => array (
             'name'				=> 'Australia',
             'currency_code' 	=> 'AUD',
             'currency_symbol'	=> '$',
             'tld'			=> '.com.au',
         ),
-        'NZ' => array (
+        self::COUNTRY_NEW_ZEALAND => array (
             'name'				=> 'New Zealand',
             'currency_code'		=> 'NZD',
             'currency_symbol' 	=> '$',
@@ -19,6 +22,6 @@ class Config {
         )
     );
 
-    const platform_name = 'woocommerce';
-    const display_name = 'Oxipay';
+    const PLATFORM_NAME = 'woocommerce';
+    const DISPLAY_NAME = 'Oxipay';
 }
