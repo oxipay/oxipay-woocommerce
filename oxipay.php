@@ -44,7 +44,7 @@ function woocommerce_oxipay_init() {
 
 			$this->title         = $this->get_option( 'title' );
 			$this->description   = $this->get_option( 'description' );
-			$this->icon          = plugins_url('oxipay/images/oxipay.png');
+			$this->icon          = plugin_dir_url( __FILE__ ) .  'images/oxipay.png';
 
 			add_action( 'woocommerce_api_wc_oxipay_gateway', array($this, 'oxipay_callback'));
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
