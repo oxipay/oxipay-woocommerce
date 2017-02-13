@@ -24,6 +24,9 @@ add_action('plugins_loaded', 'woocommerce_oxipay_init', 0);
  */
 function woocommerce_oxipay_init() {
 	class WC_Oxipay_Gateway extends WC_Payment_Gateway {
+		//current version of the plugin- used to run upgrade tasks on update
+		const PLUGIN_CURRENT_VERSION = '0.4.8';
+
 		//todo: localise these string constants
 		const PLUGIN_NO_GATEWAY_LOG_MSG = 'Transaction attempted with no gateway URL set. Please check oxipay plugin configuration, and provide a gateway URL.';
 		const PLUGIN_MISCONFIGURATION_CLIENT_MSG = 'There is an issue with the site configuration, which has been logged. We apologize for any inconvenience. Please try again later. ';
@@ -31,8 +34,6 @@ function woocommerce_oxipay_init() {
 		const PLUGIN_NO_MERCHANT_ID_SET_LOG_MSG = 'Transaction attempted with no Merchant ID key. Please check oxipay plugin configuration, and provide an Merchant ID.';
 		const PLUGIN_NO_SANDBOX_GATEWAY_LOG_MSG = 'Test Transaction attempted with no sandbox gateway URL set. Please check oxipay plugin configuration, and provide a sandbox gateway URL.';
 		const PLUGIN_NO_REGION_LOG_MSG = 'Transaction attemped with no Oxipay region set. Please check oxipay plugin configuration, and provide an Oxipay region.';
-		//Allow single run upgrade processes. If an upgrade task is needed, increment this and add your logic to the upgrade() function
-		const DB_UPGRADE_VERSION = 1;
 
 		function __construct() {
 			$this->id = 'oxipay';
@@ -72,7 +73,7 @@ function woocommerce_oxipay_init() {
 		function init_form_fields() {
 			//Build options for the country select field from the config
 			$countryOptions = array('' => __( 'Please select...', 'woocommerce' ));
-			foreach(Config::$countries as $countryCode => $country){
+			foreach( Config::$countries as $countryCode => $country ){
 				$countryOptions[$countryCode] = __( $country['name'], 'woocommerce' );
 			}
 
@@ -118,7 +119,7 @@ function woocommerce_oxipay_init() {
 					'default' 		=> __( '', 'woocommerce' ),
 					'desc_tip'      => true,
 				),
-				'country'=> array(
+				'country'			=> array(
 					'title'			=> __( 'Oxipay Region', 'woocommerce' ),
 					'type'			=> 'select',
 					'description'	=> 'Select the closest region in which this store communicates with Oxipay. This will ensure your customers receive the best possible experience.',
@@ -183,49 +184,43 @@ function woocommerce_oxipay_init() {
 		 */
 		function init_upgrade_process() {
 			//get the current upgrade version. This will default to 0 before version 0.4.5 of the plugin
-			$currentDbVersion = isset( $this->settings['db_version'] ) ? $this->settings['db_version'] : 0;
+			$currentDbVersion = isset( $this->settings['db_plugin_version'] ) ? $this->settings['db_plugin_version'] : 0;
 			//see if the current upgrade version is lower than the latest version
-			if ( $currentDbVersion < self::DB_UPGRADE_VERSION ) {
+			if ( version_compare( $currentDbVersion, self::PLUGIN_CURRENT_VERSION ) < 0 ) {
 				//run the upgrade process
 				if($this->upgrade( $currentDbVersion )){
 					//update the stored upgrade version if the upgrade process was successful
-					$this->updateSetting('db_version', self::DB_UPGRADE_VERSION);
+					$this->updateSetting( 'db_plugin_version', self::PLUGIN_CURRENT_VERSION );
 				}
 			}
 		}
 
 		/**
-		 * Run one off upgrade routines. A DB stored version numberis compared to the class constant to
+		 * Run one off upgrade routines. A DB stored version number is compared to the class constant to
 		 * tell if processes need to run.
-		 * Increment the class constant and add the task here when an upgrade task is needed.
+		 * Update the class constant each time the version number changes. Add tasks here to handle
+		 * upgrade tasks when needed.
 		 * Users coming from especially old versions may have multiple version upgrade tasks to process.
 		 *
 		 * @param int $currentDbVersion
 		 * @return bool
 		 */
 		private function upgrade( $currentDbVersion ) {
-			//add processes per version here.
-			if ( $current_db_version < 1 ) {
+			//set URLs back to default on every update
+			$this->setGatewayUrlsToDefault();
+
+			//processing for users coming from a version before 0.4.8
+			if ( version_compare( $currentDbVersion, '0.4.8' ) < 0 ) {
 				//detect and save a country if one is not set- the country field was a recent field addition
-				if($this->is_null_or_empty($this->settings['country']) && ! $this->is_null_or_empty($this->settings['oxipay_gateway_url'])){
+				if( $this->is_null_or_empty( $this->settings['country'] ) && ! $this->is_null_or_empty( $this->settings['oxipay_gateway_url'] ) ){
 					//look at the gateway url and set the country from the tld used
-					foreach(Config::$countries as $countryCode => $country){
+					foreach( Config::$countries as $countryCode => $country ){
 						if( stripos($this->settings['oxipay_gateway_url'], $country['tld'] ) !== false){
-							$this->updateSetting('country', $countryCode);
+							$this->updateSetting( 'country', $countryCode );
 						}
 					}
 				}
-
-				//gateway URLs have changed in this version- update the URLs
-				$this->setGatewayUrlsToDefault();
 			}
-
-			/*
-			//for future upgrades, self::DB_UPGRADE_VERSION should be set to 2 and logic put here
-			if ( $current_db_version < 2 ){
-				//update a setting, create a DB table etc.
-			}
-			*/
 
 			return true;
 		}
@@ -600,14 +595,15 @@ function woocommerce_oxipay_init() {
 		 * @return string
 		 */
 		private function getDefaultGatewayUrl($countryCode = false){
-			if(!$countryCode){
+			//fetch the country code from settings if not passed in
+			if( !$countryCode ){
 				$countryCode = $this->getCountryCode();
 			}
-			if($this->is_null_or_empty(Config::$countries[$countryCode])) {
-				$countryCode = Config::COUNTRY_AUSTRALIA;
-			}
+
 			$tld = Config::$countries[$countryCode]['tld'];
-			if($this->is_null_or_empty($tld)) {
+			//make sure we have a TLD for the country from the config
+			if( $this->is_null_or_empty( $tld ) ) {
+				//fall back on the Australian TLD
 				$tld = ".com.au";
 			}
 			$displayName = strtolower(Config::DISPLAY_NAME);
@@ -623,19 +619,20 @@ function woocommerce_oxipay_init() {
 		 * @return string
 		 */
 		private function getDefaultSandboxGatewayUrl($countryCode = false){
-			if(!$countryCode){
+			//fetch the country code from settings if not passed in
+			if( !$countryCode ){
 				$countryCode = $this->getCountryCode();
 			}
-			if($this->is_null_or_empty(Config::$countries[$countryCode])) {
-				$countryCode = Config::COUNTRY_AUSTRALIA;
-			}
+
 			$tld = Config::$countries[$countryCode]['tld'];
-			if($this->is_null_or_empty($tld)) {
+			//make sure we have a TLD for the country from the config
+			if( $this->is_null_or_empty( $tld ) ) {
+				//fall back on the Australian TLD
 				$tld = ".com.au";
 			}
 			$displayName = strtolower(Config::DISPLAY_NAME);
 
-			return "https://sandboxsecure.{$displayName}{$tld}/Checkout?platform=WooCommerce";
+			return "https://securesandbox.{$displayName}{$tld}/Checkout?platform=WooCommerce";
 		}
 
 		/**
