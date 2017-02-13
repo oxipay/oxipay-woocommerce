@@ -4,11 +4,11 @@
  * Plugin Name: Oxipay Payment Gateway
  * Plugin URI: https://www.oxipay.com.au
  * Description: Easy to setup installment payment plans from <a href="https://oxipay.com.au">Oxipay</a>.
- * Version: 0.4.5
+ * Version: 0.4.8
  * Author: FlexiGroup
  * @package WordPress
  * @author FlexiGroup
- * @since 0.4.2
+ * @since 0.4.8
  */
 
 // this checks that the woocommerce plugin is alive and well.
@@ -49,7 +49,7 @@ function woocommerce_oxipay_init() {
 
 			$this->title         = $this->get_option( 'title' );
 			$this->description   = $this->get_option( 'description' );
-			$this->icon          = plugins_url('oxipay/images/oxipay.png');
+			$this->icon          = plugin_dir_url( __FILE__ ) .  'images/oxipay.png';
 
 			add_action( 'admin_enqueue_scripts', array( $this, 'admin_scripts' ) );
 			add_action( 'woocommerce_api_wc_oxipay_gateway', array( $this, 'oxipay_callback') );
@@ -72,7 +72,7 @@ function woocommerce_oxipay_init() {
 		function init_form_fields() {
 			//Build options for the country select field from the config
 			$countryOptions = array('' => __( 'Please select...', 'woocommerce' ));
-			foreach(Config::COUNTRIES as $countryCode => $country){
+			foreach(Config::$countries as $countryCode => $country){
 				$countryOptions[$countryCode] = __( $country['name'], 'woocommerce' );
 			}
 
@@ -209,7 +209,7 @@ function woocommerce_oxipay_init() {
 				//detect and save a country if one is not set- the country field was a recent field addition
 				if($this->is_null_or_empty($this->settings['country']) && ! $this->is_null_or_empty($this->settings['oxipay_gateway_url'])){
 					//look at the gateway url and set the country from the tld used
-					foreach(Config::COUNTRIES as $countryCode => $country){
+					foreach(Config::$countries as $countryCode => $country){
 						if( stripos($this->settings['oxipay_gateway_url'], $country['tld'] ) !== false){
 							$this->updateSetting('country', $countryCode);
 						}
@@ -399,7 +399,7 @@ function woocommerce_oxipay_init() {
 			<?php
 
 			$countryUrls = array();
-			foreach(Config::COUNTRIES as $countryCode => $country){
+			foreach(Config::$countries as $countryCode => $country){
 				$countryUrls[$countryCode] = array('gateway' => $this->getDefaultGatewayUrl($countryCode),
 												   'sandbox' => $this->getDefaultSandboxGatewayUrl($countryCode) );
 			}
@@ -553,28 +553,28 @@ function woocommerce_oxipay_init() {
 		 * @return string
 		 */
 		private function getCountryName() {
-			return Config::COUNTRIES[$this->getCountryCode()]['name'];
+			return Config::$countries[$this->getCountryCode()]['name'];
 		}
 
 		/**
 		 * @return string
 		 */
 		private function getCurrencyCode() {
-			return Config::COUNTRIES[$this->getCountryCode()]['currency_code'];
+			return Config::$countries[$this->getCountryCode()]['currency_code'];
 		}
 
 		/**
 		 * @return string
 		 */
 		private function getCurrencySymbol() {
-			return Config::COUNTRIES[$this->getCountryCode()]['currency_symbol'];
+			return Config::$countries[$this->getCountryCode()]['currency_symbol'];
 		}
 
 		/**
 		 * @return string
 		 */
 		private function getBaseUrl() {
-			$tld = Config::COUNTRIES[$this->getCountryCode()]['tld'];
+			$tld = Config::$countries[$this->getCountryCode()]['tld'];
 			$displayName = strtolower(Config::DISPLAY_NAME);
 			if($this->is_null_or_empty($tld)) {
 				$tld = ".com.au";
@@ -603,10 +603,10 @@ function woocommerce_oxipay_init() {
 			if(!$countryCode){
 				$countryCode = $this->getCountryCode();
 			}
-			if($this->is_null_or_empty(Config::COUNTRIES[$countryCode])) {
+			if($this->is_null_or_empty(Config::$countries[$countryCode])) {
 				$countryCode = Config::COUNTRY_AUSTRALIA;
 			}
-			$tld = Config::COUNTRIES[$countryCode]['tld'];
+			$tld = Config::$countries[$countryCode]['tld'];
 			if($this->is_null_or_empty($tld)) {
 				$tld = ".com.au";
 			}
@@ -626,10 +626,10 @@ function woocommerce_oxipay_init() {
 			if(!$countryCode){
 				$countryCode = $this->getCountryCode();
 			}
-			if($this->is_null_or_empty(Config::COUNTRIES[$countryCode])) {
+			if($this->is_null_or_empty(Config::$countries[$countryCode])) {
 				$countryCode = Config::COUNTRY_AUSTRALIA;
 			}
-			$tld = Config::COUNTRIES[$countryCode]['tld'];
+			$tld = Config::$countries[$countryCode]['tld'];
 			if($this->is_null_or_empty($tld)) {
 				$tld = ".com.au";
 			}

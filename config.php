@@ -7,7 +7,7 @@ class Config {
     const COUNTRY_AUSTRALIA = 'AU';
     const COUNTRY_NEW_ZEALAND = 'NZ';
 
-    const COUNTRIES = array (
+    static $countries = array (
         self::COUNTRY_AUSTRALIA => array (
             'name'				=> 'Australia',
             'currency_code' 	=> 'AUD',
