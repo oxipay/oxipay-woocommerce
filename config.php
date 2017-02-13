@@ -4,7 +4,7 @@
 //define ('OXIPAY_DISPLAYNAME', 'Oxipay');
 
 class Config {
-    const countries = array (
+    static $countries = array (
         'AU' => array (
             'name'				=> 'Australia',
             'currency_code' 	=> 'AUD',

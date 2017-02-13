@@ -4,11 +4,11 @@
  * Plugin Name: Oxipay Payment Gateway
  * Plugin URI: https://www.oxipay.com.au
  * Description: Easy to setup installment payment plans from <a href="https://oxipay.com.au">Oxipay</a>.
- * Version: 0.4.6
+ * Version: 0.4.7
  * Author: FlexiGroup
  * @package WordPress
  * @author FlexiGroup
- * @since 0.4.6
+ * @since 0.4.7
  */
 
 // this checks that the woocommerce plugin is alive and well.
@@ -104,8 +104,8 @@ function woocommerce_oxipay_init() {
 					'description'	=> 'Select the closest region in which this store communicates with Oxipay. This will ensure your customers receive the best possible experience.',
 					'options'		=> array(
 						''			=> __( 'Please select...', 'woocommerce' ),
-						'AU'		=> __( Config::countries['AU']['name'], 'woocommerce' ),
-						'NZ'		=> __( Config::countries['NZ']['name'], 'woocommerce' )
+						'AU'		=> __( Config::$countries['AU']['name'], 'woocommerce' ),
+						'NZ'		=> __( Config::$countries['NZ']['name'], 'woocommerce' )
 					)
 				),
 				'gateway_details' 	=> array(
@@ -444,28 +444,28 @@ function woocommerce_oxipay_init() {
 		 * @return string
 		 */
 		private function getCountryName() {
-			return Config::countries[$this->getCountryCode()]['name'];
+			return Config::$countries[$this->getCountryCode()]['name'];
 		}
 
 		/**
 		 * @return string
 		 */
 		private function getCurrencyCode() {
-			return Config::countries[$this->getCountryCode()]['currency_code'];
+			return Config::$countries[$this->getCountryCode()]['currency_code'];
 		}
 
 		/**
 		 * @return string
 		 */
 		private function getCurrencySymbol() {
-			return Config::countries[$this->getCountryCode()]['currency_symbol'];
+			return Config::$countries[$this->getCountryCode()]['currency_symbol'];
 		}
 
 		/**
 		 * @return string
 		 */
 		private function getBaseUrl() {
-			$tld = Config::countries[$this->getCountryCode()]['tld'];
+			$tld = Config::$countries[$this->getCountryCode()]['tld'];
 			$displayName = strtolower(Config::display_name);
 			if($this->is_null_or_empty($tld)) {
 				$tld = ".com.au";
