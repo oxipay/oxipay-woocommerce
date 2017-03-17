@@ -411,6 +411,9 @@ function woocommerce_oxipay_init() {
 		 */
 		function payment_finalisation($order_id)
 		{
+			$payment_method = get_post_meta( $order_id, '_payment_method', true );
+			if ($payment_method != "oxipay") return $order_id;
+
 			$order = wc_get_order($order_id);
 			$cart = WC()->session->get('cart', null);
 			$full_url = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
@@ -441,8 +444,6 @@ function woocommerce_oxipay_init() {
 						$order->update_status('on-hold', 'Error may have occurred with ' . Config::DISPLAY_NAME . '. Reference #'. $params['x_gateway_reference']);
 						break;
 				}
-
-				return $order_id;
 			}
 			else
 			{
@@ -450,6 +451,8 @@ function woocommerce_oxipay_init() {
 				$order->add_order_note(__('Payment declined using ' . Config::DISPLAY_NAME . '. Your Order ID is ' . $order->id, 'woocommerce'));
 				$order->update_status('failed');
 			}
+
+			return $order_id;
 		}
 
 		/**
