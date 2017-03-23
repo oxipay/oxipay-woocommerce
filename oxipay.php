@@ -256,6 +256,7 @@ function woocommerce_oxipay_init() {
         function process_payment( $order_id ) {
             global $woocommerce;
             $order = new WC_Order( $order_id );
+			$order->update_status('pending');
 			$gatewayUrl = $this->getGatewayUrl();
 
 			$isValid = true;
@@ -266,6 +267,8 @@ function woocommerce_oxipay_init() {
 
 			if(!$isValid) return;
 
+			$order->update_status('processing', __('Awaiting Oxipay payment processing to complete.', 'woocommerce'));
+
             $transaction_details = array (
                 'x_reference'     				=> $order_id,
                 'x_account_id'    				=> $this->settings['oxipay_merchant_id'],
@@ -273,7 +276,7 @@ function woocommerce_oxipay_init() {
                 'x_currency' 	    			=> $this->getCurrencyCode(),
                 'x_url_callback'  				=> plugins_url("callback.php", __FILE__),
                 'x_url_complete'  				=> $this->get_return_url( $order ),
-                'x_url_cancel'           		=> esc_url_raw( $order->get_cancel_order_url_raw() ),
+                'x_url_cancel'           		=> $woocommerce->cart->get_cart_url(),
                 'x_test'          				=> $this->settings['test_mode'],
                 'x_shop_country'          		=> $this->getCountryCode(),
                 'x_shop_name'          			=> $this->settings['shop_name'],
@@ -302,6 +305,7 @@ function woocommerce_oxipay_init() {
           	$signature = oxipay_sign($transaction_details, $this->settings['oxipay_api_key']);
 			$transaction_details['x_signature'] = $signature;
 
+            $order->update_status('on-hold', __('Awaiting '.Config::DISPLAY_NAME.' payment', 'woothemes'));
             $qs = http_build_query($transaction_details);
 
             return array(
