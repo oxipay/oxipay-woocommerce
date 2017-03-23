@@ -4,7 +4,7 @@
  * Plugin Name: Oxipay Payment Gateway
  * Plugin URI: https://www.oxipay.com.au
  * Description: Easy to setup installment payment plans from <a href="https://oxipay.com.au">Oxipay</a>.
- * Version: 0.4.8
+ * Version: 1.0.0
  * Author: FlexiGroup
  * @package WordPress
  * @author FlexiGroup
@@ -25,14 +25,13 @@ add_action('plugins_loaded', 'woocommerce_oxipay_init', 0);
 function woocommerce_oxipay_init() {
 	class WC_Oxipay_Gateway extends WC_Payment_Gateway {
 		//current version of the plugin- used to run upgrade tasks on update
-		const PLUGIN_CURRENT_VERSION = '0.4.8';
+		const PLUGIN_CURRENT_VERSION = '1.0.0';
 
 		//todo: localise these string constants
 		const PLUGIN_NO_GATEWAY_LOG_MSG = 'Transaction attempted with no gateway URL set. Please check oxipay plugin configuration, and provide a gateway URL.';
 		const PLUGIN_MISCONFIGURATION_CLIENT_MSG = 'There is an issue with the site configuration, which has been logged. We apologize for any inconvenience. Please try again later. ';
 		const PLUGIN_NO_API_KEY_LOG_MSG = 'Transaction attempted with no API key set. Please check oxipay plugin configuration, and provide an API Key';
 		const PLUGIN_NO_MERCHANT_ID_SET_LOG_MSG = 'Transaction attempted with no Merchant ID key. Please check oxipay plugin configuration, and provide an Merchant ID.';
-		const PLUGIN_NO_SANDBOX_GATEWAY_LOG_MSG = 'Test Transaction attempted with no sandbox gateway URL set. Please check oxipay plugin configuration, and provide a sandbox gateway URL.';
 		const PLUGIN_NO_REGION_LOG_MSG = 'Transaction attemped with no Oxipay region set. Please check oxipay plugin configuration, and provide an Oxipay region.';
 
 		function __construct() {
@@ -141,15 +140,6 @@ function woocommerce_oxipay_init() {
 					'desc_tip'		=> true,
 					'custom_attributes' => array('required' => 'required'),
 				),
-				'oxipay_sandbox_gateway_url'=> array(
-					'id'			=> 'oxipay_sandbox_gateway_url',
-					'title' 		=> __( Config::DISPLAY_NAME . ' Sandbox Gateway URL', 'woocommerce' ),
-					'type' 			=> 'text',
-					'default' 		=> $this->getDefaultSandboxGatewayUrl(),
-					'description'	=> 'This is the base URL of the Oxipay sandbox services. If this test mode is enabled, and this is set - the sandbox will be used. If this is not set, with test mode enabled, the sandbox will not be used, but a test flag will still be sent.',
-					'desc_tip'		=> true,
-					'custom_attributes' => array('required' => 'required'),
-				),
                 'oxipay_merchant_id'=>array(
                 	'id'		    => 'oxipay_merchant_id',
                     'title'     	=> __( 'Merchant ID', 'woocommerce' ),
@@ -167,15 +157,7 @@ function woocommerce_oxipay_init() {
 					'description'	=> 'Oxipay will have supplied you with your Oxipay API key. <a href="'.$this->getSupportUrl().'">Contact us</a> if you cannot find it.',
 					'desc_tip'		=> true,
 					'custom_attributes' => array('required' => 'required'),
-                ),
-                'test_mode' 		=> array(
-					'title' 		=> __( 'Test Mode', 'woocommerce' ),
-					'type' 			=> 'checkbox',
-					'label' 		=> __( 'Enable Test Mode', 'woocommerce' ),
-					'default' 		=> 'no',
-					'description'	=> 'WARNING: Setting this will not process any money on our services, so do not use this setting in a production environment.',
-					'desc_tip'		=> true
-				)
+                )
 			);
 		}
 
@@ -236,22 +218,17 @@ function woocommerce_oxipay_init() {
 
 		private function setGatewayUrlsToDefault(){
 			$defaultGatewayUrl = $this->getDefaultGatewayUrl();
-			$defaultSandboxUrl = $this->getDefaultSandboxGatewayUrl();
 
 			if( strlen( $this->settings['oxipay_gateway_url'] ) == 0 || $this->settings['oxipay_gateway_url'] != $defaultGatewayUrl ){
 				$this->updateSetting( 'oxipay_gateway_url', $defaultGatewayUrl );
 			}
-
-			if( strlen( $this->settings['oxipay_sandbox_gateway_url'] ) == 0 || $this->settings['oxipay_sandbox_gateway_url'] != $defaultSandboxUrl ){
-				$this->updateSetting( 'oxipay_sandbox_gateway_url', $defaultSandboxUrl );
-			}
 		}
 
 		/**
-		 * Returns the test gateway URL if enabled in the admin panel, otherwise, returns the
-		 * default Oxipay payment gateway URL
+		 * Generates the payment gateway request parameters and signature and redirects to the
+		 * payment gateway through the invisible processing.php form
 		 * @param int $order_id
-		 * @return array
+		 * @return next view array
 		 */
         function process_payment( $order_id ) {
             global $woocommerce;
@@ -274,7 +251,7 @@ function woocommerce_oxipay_init() {
                 'x_url_callback'  				=> plugins_url("callback.php", __FILE__),
                 'x_url_complete'  				=> $this->get_return_url( $order ),
                 'x_url_cancel'           		=> esc_url_raw( $order->get_cancel_order_url_raw() ),
-                'x_test'          				=> $this->settings['test_mode'],
+                'x_test'          				=> 'false',
                 'x_shop_country'          		=> $this->getCountryCode(),
                 'x_shop_name'          			=> $this->settings['shop_name'],
 				//customer detail
@@ -318,12 +295,9 @@ function woocommerce_oxipay_init() {
 		{
 			$apiKey = $this->settings[ 'oxipay_api_key' ];
 			$merchantId = $this->settings[ 'oxipay_merchant_id' ];
-			$testMode = strtolower($this->settings['test_mode']) == 'yes';
-			$sandboxUrl = $this->settings['oxipay_sandbox_gateway_url'];
 			$gatewayUrl = $this->settings['oxipay_gateway_url'];
 			$region = $this->settings['country'];
 
-			$hasSandboxUrl = !$this->is_null_or_empty($sandboxUrl);
 			$hasGatewayUrl = !$this->is_null_or_empty($gatewayUrl);
 
 			$isValid = true;
@@ -345,16 +319,6 @@ function woocommerce_oxipay_init() {
 				$isValid = false;
 			}
 
-			if($testMode && !$hasSandboxUrl) {
-				$logMsg = self::PLUGIN_NO_SANDBOX_GATEWAY_LOG_MSG;
-				$isValid = false;
-			}
-
-			if(!$testMode && !$hasGatewayUrl) {
-				$logMsg = self::PLUGIN_NO_API_KEY_LOG_MSG;
-				$isValid = false;
-			}
-
 			if(!$isValid) {
 				$order->cancel_order($logMsg);
 				$this->logValidationError($clientMsg);
@@ -364,17 +328,12 @@ function woocommerce_oxipay_init() {
 		}
 
 		/**
-		 * enforces test mode logic to return the correct gateway URL
+		 * returns the gateway URL
 		 */
 		private function getGatewayUrl() {
-			$testMode = strtolower($this->settings['test_mode']) == 'yes';
-			$sandboxUrl = $this->settings['oxipay_sandbox_gateway_url'];
 			$gatewayUrl = $this->settings['oxipay_gateway_url'];
 
-			if($testMode)
-				return $sandboxUrl;
-			else
-				return $gatewayUrl;
+			return $gatewayUrl;
 		}
 
 		/**
@@ -391,8 +350,7 @@ function woocommerce_oxipay_init() {
 
 			$countryUrls = array();
 			foreach(Config::$countries as $countryCode => $country){
-				$countryUrls[$countryCode] = array('gateway' => $this->getDefaultGatewayUrl($countryCode),
-												   'sandbox' => $this->getDefaultSandboxGatewayUrl($countryCode) );
+				$countryUrls[$countryCode] = array('gateway' => $this->getDefaultGatewayUrl($countryCode));
 			}
 			if( count( $countryUrls ) > 0 ) {
 				?>
@@ -411,9 +369,6 @@ function woocommerce_oxipay_init() {
 		 */
 		function payment_finalisation($order_id)
 		{
-			$payment_method = get_post_meta( $order_id, '_payment_method', true );
-			if ($payment_method != "oxipay") return $order_id;
-
 			$order = wc_get_order($order_id);
 			$cart = WC()->session->get('cart', null);
 			$full_url = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
@@ -444,6 +399,8 @@ function woocommerce_oxipay_init() {
 						$order->update_status('on-hold', 'Error may have occurred with ' . Config::DISPLAY_NAME . '. Reference #'. $params['x_gateway_reference']);
 						break;
 				}
+
+				return $order_id;
 			}
 			else
 			{
@@ -451,8 +408,6 @@ function woocommerce_oxipay_init() {
 				$order->add_order_note(__('Payment declined using ' . Config::DISPLAY_NAME . '. Your Order ID is ' . $order->id, 'woocommerce'));
 				$order->update_status('failed');
 			}
-
-			return $order_id;
 		}
 
 		/**
@@ -608,30 +563,6 @@ function woocommerce_oxipay_init() {
 			$displayName = strtolower(Config::DISPLAY_NAME);
 
 			return "https://secure.{$displayName}{$tld}/Checkout?platform=WooCommerce";
-		}
-
-		/**
-		 * Return the default sandbox URL for the given country code.
-		 * If no country code is provided, use the currently set country.
-		 * Default to Australia if no country or an invalid country is set.
-		 * @param $str
-		 * @return string
-		 */
-		private function getDefaultSandboxGatewayUrl($countryCode = false){
-			//fetch the country code from settings if not passed in
-			if( !$countryCode ){
-				$countryCode = $this->getCountryCode();
-			}
-
-			$tld = Config::$countries[$countryCode]['tld'];
-			//make sure we have a TLD for the country from the config
-			if( $this->is_null_or_empty( $tld ) ) {
-				//fall back on the Australian TLD
-				$tld = ".com.au";
-			}
-			$displayName = strtolower(Config::DISPLAY_NAME);
-
-			return "https://securesandbox.{$displayName}{$tld}/Checkout?platform=WooCommerce";
 		}
 
 		/**
