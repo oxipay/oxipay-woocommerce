@@ -4,7 +4,7 @@
  * Plugin Name: Oxipay Payment Gateway
  * Plugin URI: https://www.oxipay.com.au
  * Description: Easy to setup installment payment plans from <a href="https://oxipay.com.au">Oxipay</a>.
- * Version: 0.4.8
+ * Version: 0.4.20
  * Author: FlexiGroup
  * @package WordPress
  * @author FlexiGroup
@@ -25,7 +25,7 @@ add_action('plugins_loaded', 'woocommerce_oxipay_init', 0);
 function woocommerce_oxipay_init() {
 	class WC_Oxipay_Gateway extends WC_Payment_Gateway {
 		//current version of the plugin- used to run upgrade tasks on update
-		const PLUGIN_CURRENT_VERSION = '0.4.8';
+		const PLUGIN_CURRENT_VERSION = '0.4.20';
 
 		//todo: localise these string constants
 		const PLUGIN_NO_GATEWAY_LOG_MSG = 'Transaction attempted with no gateway URL set. Please check oxipay plugin configuration, and provide a gateway URL.';
