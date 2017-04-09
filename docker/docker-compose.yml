@@ -1,0 +1,21 @@
+version: '2'
+
+services:
+
+  wordpress:
+    image: wordpress
+    ports:
+      - 8080:80
+    environment:
+      WORDPRESS_DB_PASSWORD: t9e3ioz0
+    depends_on:
+      - mysql
+    links:
+      - mysql
+    volumes:
+      - "../:/var/www/html/wp-content/plugins/oxipay-woocommerce"
+
+  mysql:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: t9e3ioz0

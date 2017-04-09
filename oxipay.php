@@ -33,6 +33,9 @@ function woocommerce_oxipay_init() {
 		const PLUGIN_NO_API_KEY_LOG_MSG = 'Transaction attempted with no API key set. Please check oxipay plugin configuration, and provide an API Key';
 		const PLUGIN_NO_MERCHANT_ID_SET_LOG_MSG = 'Transaction attempted with no Merchant ID key. Please check oxipay plugin configuration, and provide an Merchant ID.';
 		const PLUGIN_NO_REGION_LOG_MSG = 'Transaction attemped with no Oxipay region set. Please check oxipay plugin configuration, and provide an Oxipay region.';
+		const PLUGIN_CURRENCY_MISMATCH = 'The currency code configured in the Oxipay plugin does not match the configured WooCommerce currency code';
+
+		public $logger = null;
 
 		function __construct() {
 			$this->id = 'oxipay';
@@ -40,6 +43,8 @@ function woocommerce_oxipay_init() {
 			$this->order_button_text = __( 'Proceed to ' . Config::DISPLAY_NAME, 'woocommerce' );
 			$this->method_title      = __( Config::DISPLAY_NAME, 'woocommerce' );
 			$this->method_descripton = __( 'Easy to setup installment payment plans from ' . Config::DISPLAY_NAME );
+
+			$this->logger = wc_get_logger();
 
 			$this->init_form_fields();
 			$this->init_settings();
@@ -319,12 +324,111 @@ function woocommerce_oxipay_init() {
 				$isValid = false;
 			}
 
-			if(!$isValid) {
-				$order->cancel_order($logMsg);
-				$this->logValidationError($clientMsg);
+			try {
+				$merchantCountryCode = $this->getMerchantCountryCode($this->getGatewayUrl());
+
+				if(!$this->hasValidCurrencyConfiguration($merchantCountryCode)) {
+					$logMsg = self::PLUGIN_CURRENCY_MISMATCH;
+					$isValid = false;
+				}
+			} catch (Exception $e) {
+				$logMsg = $e->getMessage();
+				$isValid = false;
+				$this->logger->error($e->getMessage());
 			}
 
+			if(!$isValid) {
+				// @todo replace with WC_Order::cancel_order
+				// The WC_Order::cancel_order function is deprecated since version 3.0.
+				$order->cancel_order($logMsg);
+				$this->logger->notice($logMsg);
+				$this->logValidationError($clientMsg);
+			}
 			return $isValid;
+		}
+
+		/**
+		 * This will ensure that the currently configured currency matches that of the currency for the 
+		 * currently configured OxiPay Region. 
+		 * 
+		 * @param string $merchantCountryCode Configured country code. see getMerchantCountryCode();
+		 * @param bool
+		 */
+		private function hasValidCurrencyConfiguration($merchantCountryCode)
+		{
+			$wcCurrencyCode = get_woocommerce_currency();
+
+			// check that the configured currency matches the
+			// valid currency for the merchants country
+			// based on a matching ccTLD and 
+			if (isset(Config::$countries[$merchantCountryCode]['currency_code'])) {
+				$requiredCurrencyCode = Config::$countries[$merchantCountryCode]['currency_code'];
+				return ($requiredCurrencyCode == $wcCurrencyCode);
+			}
+			$this->logger->error(__('Can not find the merchant country code in the configuration'));
+
+			return false;
+		}
+
+		/**
+		 * At the plugin level there are two ways to determine the country
+		 * of a merchant:
+		 * 
+		 *  a) By the ccTLD of the configured payment gateway URL e.g. .com.au
+		 *     or .co.nz ('payment gateway URL' is a plugin configuration in
+		 * WordPress/WooCommerce admin)
+		 *  b) By the configured country code (plugin configuration in
+		 *     WordPress/WooCommerce admin)
+		 * 
+		 * This method will use the ccTLD match to a country code in the configuration
+		 * Assuming both match (which they should) the matching country code will be returned
+		 * 
+		 * @param string $gatewayUrl Required to extract the ccTLD
+		 * @throws \InvalidArgumentException
+		 * @throws \Exception
+		 * @return string
+		 */
+		private function getMerchantCountryCode($gatewayUrl)
+		{
+
+			// @todo work out why $this->getCountryCode() isn't returning results
+			$configuredCountryCode = $this->settings['country'];
+
+			// extract the host from the Oxipay Gateway URL
+			$host = parse_url($gatewayUrl, PHP_URL_HOST);
+
+			if (!empty($host)) {
+
+				$ccTLDCountryCode = null;
+				foreach (Config::$countries as $code=>$arr) {
+					if (isset($arr['tld'])) {
+						if (false !== strpos($host, $arr['tld'])) {
+							$ccTLDCountryCode = $code;
+							break;
+						}
+					}
+				}
+
+				if (empty($ccTLDCountryCode)) {
+					$msg = sprintf(__('The host %s does not have a valid ccTLD'), $host);
+					throw new Exception($msg);
+				}
+
+				if ($ccTLDCountryCode == $configuredCountryCode) {
+					return $ccTLDCountryCode;
+				}
+
+				$msg = sprintf(
+					__('ccTLD derrived country code: %s, for the Oxipay Gateway URL: %s, does not match the Oxipay Region: %s'),
+					$ccTLDCountryCode,
+					$host,
+					$configuredCountryCode
+				);
+				throw new Exception($msg);
+			}
+			$msg = __('Unable to parse the configured gatewayURL. Try using: ').
+				$this->getDefaultGatewayUrl($configuredCountryCode);
+			throw new InvalidArgumentException($msg);
 		}
 
 		/**
@@ -451,23 +555,33 @@ function woocommerce_oxipay_init() {
 		 */
 		private function checkCustomerLocation($order)
 		{
+			$countryCode = null;
+			try {
+				$countryCode = $this->getMerchantCountryCode($this->getGatewayUrl());	
+			} catch (Exception $e) {
+				// theoretically this should be caught earlier during the configuration check
+				$this->logger->warning($e->getMessage());
+				$this->logValidationError($e->getMessage());
+				return false;
+			}
+
 			// The following get shipping and billing countries, and filters null or empty values
 			// Then we check to see if there is just a single unique value that is equal to AU, otherwise we 
 			// display an error message.
 
-            $countries = array($order->billing_country, $order->shipping_country);
-            $set_addresses = array_filter($countries);
-			$countryCode = $this->getCountryCode();
-			$countryName = $this->getCountryName();
-			$valid_addresses = (count(array_unique($set_addresses)) === 1 && end($set_addresses) === $countryCode);
+			$countries = array($order->billing_country, $order->shipping_country);
 
-            if (!$valid_addresses) {
-                $errorMessage = "&nbsp;Orders from outside " . $countryName . " are not supported by " . Config::DISPLAY_NAME .". Please select a different payment option.";
-                $order->cancel_order($errorMessage);
-                $this->logValidationError($errorMessage);
-                return false;
-            }
-            return true;
+			$set_addresses = array_filter($countries);
+
+			$valid_addresses = (count(array_unique($set_addresses)) === 1 && end($set_addresses) === $countryCode);
+			
+			if (!$valid_addresses) {
+			$errorMessage = "&nbsp;Orders from outside " . $this->getCountryName() . " are not supported by " . Config::DISPLAY_NAME .". Please select a different payment option.";
+				$order->cancel_order($errorMessage);
+				$this->logValidationError($errorMessage);
+				return false;
+			}
+			return true;
 		}
 
 		/**
