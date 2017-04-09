@@ -576,7 +576,7 @@ function woocommerce_oxipay_init() {
 			$valid_addresses = (count(array_unique($set_addresses)) === 1 && end($set_addresses) === $countryCode);
 			
 			if (!$valid_addresses) {
-			$errorMessage = "&nbsp;Orders from outside " . $this->getCountryName() . " are not supported by " . Config::DISPLAY_NAME .". Please select a different payment option.";
+				$errorMessage = "&nbsp;Orders from outside " . $this->getCountryName() . " are not supported by " . Config::DISPLAY_NAME .". Please select a different payment option.";
 				$order->cancel_order($errorMessage);
 				$this->logValidationError($errorMessage);
 				return false;
