@@ -34,6 +34,8 @@ function woocommerce_oxipay_init() {
 		const PLUGIN_NO_MERCHANT_ID_SET_LOG_MSG = 'Transaction attempted with no Merchant ID key. Please check oxipay plugin configuration, and provide an Merchant ID.';
 		const PLUGIN_NO_REGION_LOG_MSG = 'Transaction attemped with no Oxipay region set. Please check oxipay plugin configuration, and provide an Oxipay region.';
 
+		public $logger = null;
+
 		function __construct() {
 			$this->id = 'oxipay';
 			$this->has_fields = false;
@@ -51,11 +53,30 @@ function woocommerce_oxipay_init() {
 			$this->description   = $this->get_option( 'description' );
 			$this->icon          = plugin_dir_url( __FILE__ ) .  'images/oxipay.png';
 
+			// where available we can use logging to assist with debugging			
+			if (function_exists('wc_get_logger')) {
+				$this->logger = wc_get_logger();
+				$this->logContext = array( 'source' => 'Oxipay' );;
+			}
+			
 			add_action( 'admin_enqueue_scripts', array( $this, 'admin_scripts' ) );
 			add_action( 'woocommerce_api_wc_oxipay_gateway', array( $this, 'oxipay_callback') );
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 			add_filter( 'woocommerce_thankyou_order_id', array( $this,'payment_finalisation' ) );
 			add_filter( 'the_title', array( $this,'order_received_title' ), 11 );
+		}
+
+
+		/**
+		 * Log a message using the 2.7 logging infrastructure
+		 *
+		 * @param string $message Message log
+		 * @param string $level  WC_Log_Levels
+		 */
+		public function log( $message, $level=WC_Log_Levels::DEBUG) {	
+			if ($this->logger != null) {
+				$this->logger->log($level, $message, $this->logContext);
+			}	
 		}
 
 		/**
