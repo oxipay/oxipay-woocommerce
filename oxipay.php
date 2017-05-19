@@ -396,12 +396,25 @@ function woocommerce_oxipay_init() {
 			$parts = parse_url($full_url, PHP_URL_QUERY);
 			parse_str($parts, $params);
 
+			// we need order information in order to complete the order
+			if (empty($order)) {
+				$this->log(sprintf('unable to get order information for orderId: %s ', $order_id));
+				return $order_id;
+			}
+
+			// make sure we have an oxipay order
+			// OIR-3
+			if ($order->data['payment_method'] !== 'oxipay') {
+				// we don't care about it because it's not an oxipay order
+				// only log in debug mode
+				$this->log(sprintf('No action required orderId: %s is not an oxipay order ', $order_id));
+				return $order_id;
+			}
 
 			if (oxipay_checksign($params, $this->settings['oxipay_api_key'])) {
-
+				$this->log(sprintf('Processing orderId: %s ', $order_id));
 				// Get the status of the order from XPay and handle accordingly
 				switch ($params['x_result']) {
-
 					case "completed":
 						$order->add_order_note(__('Payment approved using ' . Config::DISPLAY_NAME . '. Reference #'. $params['x_gateway_reference'], 'woocommerce'));
 						$order->payment_complete($params['x_reference']);
