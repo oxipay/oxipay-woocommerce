@@ -11,18 +11,17 @@ artifacts:
     name: $(appveyor_build_version)
     type: zip
 deploy:
+- provider: GitHub
+  tag: release
   release: v$(appveyor_build_version)
   description: $(APPVEYOR_REPO_COMMIT_MESSAGE)
-  provider: GitHub
   auth_token:
     secure: 56NAOqpMQYkuaKqIWixuwuHbYK+1VYaGXQITooXcBLAL1b5xYAAENylYsXh029zy
   artifact: /.*\.zip/
   draft: false
   prerelease: false
-  on:
-    branch: master
-    appveyor_repo_tag: true
-    appveyor_repo_tag_name: 'release'
+  appveyor_repo_tag: true
+  appveyor_repo_tag_name: 'release'
 notifications:
   - provider: Email
     to:
