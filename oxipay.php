@@ -11,6 +11,8 @@
  * @since 0.4.8
  */
 
+if ( !defined('ABSPATH')) exit; // Exit if accessed directly
+
 // this checks that the woocommerce plugin is alive and well.
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 if(!is_plugin_active( 'woocommerce/woocommerce.php')) return;
