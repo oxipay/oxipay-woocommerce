@@ -57,7 +57,7 @@ function woocommerce_oxipay_init() {
 			// where available we can use logging to assist with debugging			
 			if (function_exists('wc_get_logger')) {
 				$this->logger = wc_get_logger();
-				$this->logContext = array( 'source' => 'Oxipay' );;
+				$this->logContext = array( 'source' => 'Oxipay' );
 			}
 			
 			add_action( 'admin_enqueue_scripts', array( $this, 'admin_scripts' ) );
@@ -176,7 +176,7 @@ function woocommerce_oxipay_init() {
                     'title'     	=> __( 'API Key', 'woocommerce' ),
 					'type' 	    	=> 'text',
                     'default'   	=> '',
-					'description'	=> 'Oxipay will have supplied you with your Oxipay API key. <a href="'.$this->getSupportUrl().'">Contact us</a> if you cannot find it.',
+					'description'	=> 'Oxipay will have supplied you with your Oxipay API key. Contact us if you cannot find it.',
 					'desc_tip'		=> true,
 					'custom_attributes' => array('required' => 'required'),
                 )
@@ -586,7 +586,11 @@ function woocommerce_oxipay_init() {
 		private function getDefaultGatewayUrl($countryCode = false){
 			//fetch the country code from settings if not passed in
 			if( !$countryCode ){
-				$countryCode = $this->getCountryCode();
+			    if ( isset($this->settings['country'])){
+				    $countryCode = $this->settings['country'];
+                }else {
+			        $countryCode = 'AU';
+                }
 			}
 
 			$tld = Config::$countries[$countryCode]['tld'];
