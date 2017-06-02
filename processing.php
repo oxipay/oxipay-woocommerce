@@ -19,11 +19,11 @@
 <script src="js/spinner.js"></script>
 
 <?php
-include_once( 'config.php' );
+include_once( 'oxipay-config.php' );
 
 parse_str($_SERVER['QUERY_STRING'], $query);
 
-function generate_processing_form($query) {
+function oxipay_generate_processing_form($query) {
     $url = htmlspecialchars( $query["gateway_url"], ENT_QUOTES );
 
     echo "<form id='oxipayload' method='post' action='$url'>";
@@ -41,7 +41,7 @@ function generate_processing_form($query) {
     echo "<script>document.getElementById('oxipayload').submit();</script>";
 }
 
-generate_processing_form($query);
+oxipay_generate_processing_form($query);
 
 ?>
 
