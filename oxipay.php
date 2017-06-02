@@ -12,7 +12,8 @@
  */
 
 // this checks that the woocommerce plugin is alive and well.
-if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) return;
+include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+if(!is_plugin_active( 'woocommerce/woocommerce.php')) return;
 
 require_once( 'crypto.php' );
 require_once( 'config.php' );
