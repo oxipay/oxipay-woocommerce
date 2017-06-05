@@ -407,7 +407,7 @@ function woocommerce_oxipay_init() {
 
 			// make sure we have an oxipay order
 			// OIR-3
-			if ($order->data['payment_method'] !== 'oxipay') {
+			if ($order->get_data()['payment_method'] !== 'oxipay') {
 				// we don't care about it because it's not an oxipay order
 				// only log in debug mode
 				$this->log(sprintf('No action required orderId: %s is not an oxipay order ', $order_id));
@@ -442,7 +442,7 @@ function woocommerce_oxipay_init() {
 			else
 			{
 				$order->add_order_note(__( Oxipay_Config::DISPLAY_NAME . ' payment response failed signature validation. Please check your Merchant Number and API key or contact Oxipay for assistance.', 0, 'woocommerce'));
-				$order->add_order_note(__( 'Payment declined using ' . Oxipay_Config::DISPLAY_NAME . '. Your Order ID is ' . $order->id, 'woocommerce'));
+				$order->add_order_note(__( 'Payment declined using ' . Oxipay_Config::DISPLAY_NAME . '. Your Order ID is ' . $order_id, 'woocommerce'));
 				$order->update_status('failed');
 			}
 		}
