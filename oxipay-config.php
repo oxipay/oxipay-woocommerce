@@ -3,7 +3,7 @@
 //define ('OXIPAY_PLATFORM_NAME', 'woocommerce');
 //define ('OXIPAY_DISPLAYNAME', 'Oxipay');
 
-class Config {
+class Oxipay_Config {
     const COUNTRY_AUSTRALIA = 'AU';
     const COUNTRY_NEW_ZEALAND = 'NZ';
 

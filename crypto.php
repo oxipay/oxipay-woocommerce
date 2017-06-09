@@ -1,4 +1,7 @@
 <?php
+
+if ( !defined('ABSPATH')) exit; // Exit if accessed directly
+
 /**
  * Created by PhpStorm.
  * User: trowri
