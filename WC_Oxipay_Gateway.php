@@ -277,9 +277,7 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
 
           	$signature = oxipay_sign($transaction_details, $this->settings['oxipay_api_key']);
 			$transaction_details['x_signature'] = $signature;
-
-            $qs = http_build_query($transaction_details);
-
+        
 			$encodedFields = array(
                 'x_url_callback',
                 'x_url_complete',
@@ -292,6 +290,8 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
 			foreach ($encodedFields as $key ) {
                 $transaction_details[$key] = base64_encode($transaction_details[$key]);
             }
+
+            $qs = http_build_query($transaction_details);
 
             return array(
                 'result' 	=>  'success',
