@@ -24,7 +24,12 @@ include_once( 'oxipay-config.php' );
 parse_str($_SERVER['QUERY_STRING'], $query);
 
 function oxipay_generate_processing_form($query) {
-    $url = htmlspecialchars( $query["gateway_url"], ENT_QUOTES );
+    if (!isset($query["gateway_url"])) {
+        error_log('gateway_url is not specified');
+        return;
+    } 
+    $url = base64_decode( $query["gateway_url"]); 
+    $url = htmlspecialchars($url, ENT_QUOTES );
 
     echo "<form id='oxipayload' method='post' action='$url'>";
 
