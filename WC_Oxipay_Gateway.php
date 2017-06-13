@@ -382,10 +382,20 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
 		function payment_finalisation($order_id)
 		{
 			$order = wc_get_order($order_id);
-			$cart = WC()->session->get('cart', null);
-			$full_url = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-			$parts = parse_url($full_url, PHP_URL_QUERY);
-			parse_str($parts, $params);
+			$cart  = WC()->session->get('cart', null);
+
+            $isJSON = ($_SERVER['CONTENT_TYPE'] === "application/json" && $_SERVER['REQUEST_METHOD'] === "POST");
+            $params;
+            $msg;
+
+            // This addresses the callback. 
+            if ($isJSON) {
+                $params = json_decode(file_get_contents('php://input'), true);
+            } else {
+                $full_url = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+			    $parts = parse_url($full_url, PHP_URL_QUERY);
+			    parse_str($parts, $params);
+            }
 
 			// we need order information in order to complete the order
 			if (empty($order)) {
@@ -402,37 +412,50 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
 				return $order_id;
 			}
 
-			if (oxipay_checksign($params, $this->settings['oxipay_api_key'])) {
-				$this->log(sprintf('Processing orderId: %s ', $order_id));
-				// Get the status of the order from XPay and handle accordingly
-				switch ($params['x_result']) {
-					case "completed":
-						$order->add_order_note(__( 'Payment approved using ' . Oxipay_Config::DISPLAY_NAME . '. Reference #' . $params['x_gateway_reference'], 'woocommerce'));
-						$order->payment_complete($params['x_reference']);
-						if (!is_null($cart)) {
-							$cart->empty_cart();
-						}
-						break;
+            if (oxipay_checksign($params, $this->settings['oxipay_api_key'])) {
+                $this->log(sprintf('Processing orderId: %s ', $order_id));
+                // Get the status of the order from XPay and handle accordingly
+                switch ($params['x_result']) {
+                    case "completed":
+                        $order->add_order_note(__( 'Payment approved using ' . Oxipay_Config::DISPLAY_NAME . '. Reference #' . $params['x_gateway_reference'], 'woocommerce'));
+                        $order->payment_complete($params['x_reference']);
+                        if (!is_null($cart)) {
+                            $cart->empty_cart();
+                        }
+                        $msg = 'complete';
+                        break;
 
-					case "failed":
-						$order->add_order_note(__( 'Payment declined using ' . Oxipay_Config::DISPLAY_NAME . '. Reference #' . $params['x_gateway_reference'], 'woocommerce'));
-						$order->update_status('failed');
-						break;
+                    case "failed":
+                        $order->add_order_note(__( 'Payment declined using ' . Oxipay_Config::DISPLAY_NAME . '. Reference #' . $params['x_gateway_reference'], 'woocommerce'));
+                        $order->update_status('failed');
+                        $msg = 'failed';
+                        break;
 
-					case "pending":
-						$order->add_order_note(__( 'Payment pending using ' . Oxipay_Config::DISPLAY_NAME . '. Reference #' . $params['x_gateway_reference'], 'woocommerce'));
-						$order->update_status('on-hold', 'Error may have occurred with ' . Oxipay_Config::DISPLAY_NAME . '. Reference #' . $params['x_gateway_reference']);
-						break;
-				}
+                    case "pending":
+                        $order->add_order_note(__( 'Payment pending using ' . Oxipay_Config::DISPLAY_NAME . '. Reference #' . $params['x_gateway_reference'], 'woocommerce'));
+                        $order->update_status('on-hold', 'Error may have occurred with ' . Oxipay_Config::DISPLAY_NAME . '. Reference #' . $params['x_gateway_reference']);
+                        $msg = 'failed';
+                        break;
+                }
 
-				return $order_id;
-			}
-			else
-			{
-				$order->add_order_note(__( Oxipay_Config::DISPLAY_NAME . ' payment response failed signature validation. Please check your Merchant Number and API key or contact Oxipay for assistance.', 0, 'woocommerce'));
-				$order->add_order_note(__( 'Payment declined using ' . Oxipay_Config::DISPLAY_NAME . '. Your Order ID is ' . $order_id, 'woocommerce'));
-				$order->update_status('failed');
-			}
+                return $order_id;
+            }
+            else
+            {
+                $order->add_order_note(__( Oxipay_Config::DISPLAY_NAME . ' payment response failed signature validation. Please check your Merchant Number and API key or contact Oxipay for assistance.', 0, 'woocommerce'));
+                $order->add_order_note(__( 'Payment declined using ' . Oxipay_Config::DISPLAY_NAME . '. Your Order ID is ' . $order_id, 'woocommerce'));
+                $order->update_status('failed');
+                $msg = 'failed';
+            }
+
+
+            if ($isJSON) {
+                $return = array(
+                    'message'	=> $msg,
+                    'id'		=> $order_id
+                );
+                wp_send_json($return);
+            }
 		}
 
 		/**
