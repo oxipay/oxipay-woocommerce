@@ -280,9 +280,22 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
 
             $qs = http_build_query($transaction_details);
 
+			$encodedFields = array(
+                'x_url_callback',
+                'x_url_complete',
+                'gateway_url',
+                'x_url_cancel'
+			);
+        
+            // before we do the redirect we base64encode the urls to hopefully get around some of the 
+			// limitations with platforms using mod_security 
+			foreach ($encodedFields as $key ) {
+                $transaction_details[$key] = base64_encode($transaction_details[$key]);
+            }
+
             return array(
-                    'result' 	=>  'success',
-                    'redirect'	=>  plugins_url("processing.php?$qs", __FILE__ )
+                'result' 	=>  'success',
+                'redirect'	=>  plugins_url("processing.php?$qs", __FILE__ )
             );
 		}
 

@@ -28,12 +28,24 @@ function oxipay_generate_processing_form($query) {
 
     echo "<form id='oxipayload' method='post' action='$url'>";
 
+    $encodedFields = array(
+       'x_url_callback',
+       'x_url_complete',
+       'gateway_url',
+       'x_url_cancel'
+    );
+
     foreach ($query as $i => $v) {
-        $item = htmlspecialchars( $i, ENT_QUOTES );
-        $value = htmlspecialchars( $v, ENT_QUOTES );
+        $item  = htmlspecialchars($i, ENT_QUOTES );
+        $value = null;
+        if (in_array($item, $encodedFields)) {
+            $value = htmlspecialchars(base64_decode($v), ENT_QUOTES);
+        } else {
+            $value = htmlspecialchars($v, ENT_QUOTES);
+        }
 
         if (substr($item, 0, 2) === "x_") {
-            echo "<input id='$item' name='$item' value='$value' type='hidden'/>";
+            echo sprintf('<input id="%s" name="%s" value="%s" type="hidden" />', $item, $item, $value);
         }
     }
 
@@ -46,5 +58,4 @@ oxipay_generate_processing_form($query);
 ?>
 
 </body>
-
 </html>
