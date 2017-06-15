@@ -1,4 +1,7 @@
 <?php
+
+if ( !defined('ABSPATH')) exit; // Exit if accessed directly
+
 /**
  * Created by PhpStorm.
  * User: trowri
@@ -33,6 +36,9 @@ function oxipay_sign($query, $api_key )
  */
 function oxipay_checksign($query, $api_key)
 {
+    if (!isset($query['x_signature'])) {
+        return;
+    }
     $actualSignature = $query['x_signature'];
     unset($query['x_signature']);
     $expectedSignature = oxipay_sign($query, $api_key);
