@@ -243,21 +243,21 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
             $callbackURL  = $this->get_return_url($order);
 
             $transaction_details = array (
-                'x_reference'     				=> $order_id,
-                'x_account_id'    				=> $this->settings['oxipay_merchant_id'],
-                'x_amount' 	    				=> $order->order_total,
-                'x_currency' 	    			=> $this->getCurrencyCode(),
-                'x_url_callback'  				=> $callbackURL,
-                'x_url_complete'  				=> $this->get_return_url( $order ),
-                'x_url_cancel'           		=> $order->get_cancel_order_url_raw(),
-                'x_test'          				=> 'false',
-                'x_shop_country'          		=> $this->getCountryCode(),
-                'x_shop_name'          			=> $this->settings['shop_name'],
-				//customer detail
-                'x_customer_first_name' 		=> $order->get_billing_first_name(),
-                'x_customer_last_name' 			=> $order->get_billing_last_name(),
-                'x_customer_email'      		=> $order->get_billing_email(),
-                'x_customer_phone'				=> $order->get_billing_phone(),
+                'x_reference'                   => $order_id,
+                'x_account_id'                  => $this->settings['oxipay_merchant_id'],
+                'x_amount'                      => $order->order_total,
+                'x_currency'                    => $this->getCurrencyCode(),
+                'x_url_callback'                => $callbackURL,
+                'x_url_complete'                => $this->get_return_url( $order ),
+                'x_url_cancel'                  => $order->get_cancel_order_url_raw(),
+                'x_test'                        => 'false',
+                'x_shop_country'                => $this->getCountryCode(),
+                'x_shop_name'                   => $this->settings['shop_name'],
+                //customer detail
+                'x_customer_first_name'         => $order->get_billing_first_name(),
+                'x_customer_last_name'          => $order->get_billing_last_name(),
+                'x_customer_email'              => $order->get_billing_email(),
+                'x_customer_phone'              => $order->get_billing_phone(),
                 //billing detail
                 'x_customer_billing_country'	=> $order->get_billing_country(),
                 'x_customer_billing_city' 	    => $order->get_billing_city(),
@@ -384,7 +384,8 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
 			$order = wc_get_order($order_id);
 			$cart  = WC()->session->get('cart', null);
 
-            $isJSON = ($_SERVER['CONTENT_TYPE'] === "application/json" && $_SERVER['REQUEST_METHOD'] === "POST");
+            $isJSON = ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_SERVER['CONTENT_TYPE']) &&
+                       $_SERVER['CONTENT_TYPE'] === "application/json");
             $params;
             $msg;
 
@@ -503,7 +504,7 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
 			// Then we check to see if there is just a single unique value that is equal to AU, otherwise we 
 			// display an error message.
 
-            $countries = array($order->billing_country, $order->shipping_country);
+            $countries = array($order->get_billing_country(), $order->get_shipping_country());
             $set_addresses = array_filter($countries);
 			$countryCode = $this->getCountryCode();
 			$countryName = $this->getCountryName();
