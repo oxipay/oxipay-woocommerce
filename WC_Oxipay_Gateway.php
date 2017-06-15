@@ -245,7 +245,7 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
             $transaction_details = array (
                 'x_reference'                   => $order_id,
                 'x_account_id'                  => $this->settings['oxipay_merchant_id'],
-                'x_amount'                      => $order->order_total,
+                'x_amount'                      => $order->get_total(),
                 'x_currency'                    => $this->getCurrencyCode(),
                 'x_url_callback'                => $callbackURL,
                 'x_url_complete'                => $this->get_return_url( $order ),
@@ -526,7 +526,7 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
 		 */
 		private function checkOrderAmount($order)
 		{
-			if($order->order_total < 20) {
+			if($order->get_total() < 20) {
 				$errorMessage = "&nbsp;Orders under " . $this->getCurrencyCode() . $this->getCurrencySymbol() . "20 are not supported by " . Oxipay_Config::DISPLAY_NAME . ". Please select a different payment option.";
 				$order->cancel_order($errorMessage);
 				$this->logValidationError($errorMessage);
