@@ -1,11 +1,6 @@
 body {
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#ddd, endColorstr=#eee);
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient (GradientType=0, startColorstr=#ddd, endColorstr=#eee)";
-    background-image: -ms-linear-gradient(top, #ddd 0%, #eee 100%);
-    background-image: -moz-linear-gradient(center top, #ddd, #eee);
-    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ddd), to(#eee));
-    background-image: linear-gradient(to bottom, #ddd 0%, #eee 100%);
-    background-color: #eee;
+    
+    background-color: #fff;
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
     font-size: 1rem;
@@ -13,33 +8,30 @@ body {
     color: #373a3c;
 }
 html {
-    background-color: #eee;
+    background-color: #fff;
 }
-#top-bar {
+
+#wrapper {
+
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: center;
+	align-items: center;
+	align-content: stretch;
     width: 100%;
-    background-color: #252525;
-    height: 35px;
-    padding: 10px 0;
-    text-align: center;
-    overflow: hidden;
-}
-#top-bar img {
     height: 100%;
+    
 }
 .card {
-    box-shadow: rgba(68, 68, 68, 0.2) 1px 5px 6px;
-    border-width: 0;
-    -moz-border-radius: 7px;
-    -webkit-border-radius: 7px;
-    border-radius: 7px;
-    background-color: #f7f7f7;
+    vertical-align: middle;
+    background-color: #fff;
     max-width: 520px;
-    min-height: 500px;
+    min-height: 300px;
     margin: 0 auto;
     position: relative;
     margin-top: 20px;
-    text-align: center;
-    
+    text-align: center;    
 }
 @media screen and (max-width: 768px) {
     .card {
@@ -57,9 +49,8 @@ html {
 .card .card-heading {
     padding: 12px;
     background-color: white;
-    border-bottom: 1px solid #ddd;
-    border-top-left-radius: 7px;
-    border-top-right-radius: 7px;
+    
+    
 }
 .card .card-heading h4 {
     color: #333;
