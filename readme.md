@@ -1,7 +1,7 @@
 # Oxipay's WooCommerce [![Gitter](https://badges.gitter.im/oxipay/oxipay-woocommerce.svg)](https://gitter.im/oxipay/oxipay-woocommerce?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![Build status](https://ci.appveyor.com/api/projects/status/jgrgyfkq3147nh8l?svg=true)](https://ci.appveyor.com/project/oxipay/oxipay-woocommerce)
 
 ## Pre-requisites
-1. We've tested this on Wordpress 4.6, but in theory is compatible with any WP instance that supports the latest version of the WooCommerce platform
+1. We've tested this on Wordpress 4.6 - 4.8, but in theory is compatible with any WP instance that supports the latest version of the WooCommerce platform
 2. A working WooCommerce plugin installation
 
 ## Other assumptions
