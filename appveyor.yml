@@ -14,7 +14,7 @@ artifacts:
     type: zip
 deploy:
   - provider: GitHub
-    tag: release
+    tag: $(tag_name)
     release: v$(APPVEYOR_REPO_TAG_NAME)
     description: $(APPVEYOR_REPO_COMMIT_MESSAGE)
     auth_token:
