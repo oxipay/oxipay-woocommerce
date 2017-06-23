@@ -385,7 +385,7 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
             $cart  = WC()->session->get('cart', null);
 
             $isJSON = ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_SERVER['CONTENT_TYPE']) &&
-                       $_SERVER['CONTENT_TYPE'] === "application/json");
+                       (strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) );
             $params;
             $msg;
 
