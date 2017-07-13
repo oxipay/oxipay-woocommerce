@@ -14,23 +14,27 @@ driver.findElement(By.css('.first')).click();
 driver.findElement(By.css('button.single_add_to_cart_button')).click();
 driver.findElement(By.linkText('View cart')).click();
 
-var cartTotal = 0;
-
 // Ensure Cart total is above $20
 checkoutBelowMinimum = driver.findElement(By.css('.order-total .woocommerce-Price-amount')).getText().then(
 	function(text) {
 		const MINIMUM_FOR_OXIPAY = 20.00;						// Minimum checkout value allowed by Oxipay
 		var checkoutS = text.toString();						// Checkout in String format
 		var checkoutF = parseFloat(checkoutS.slice(1));			// Checkout in Float format
-		return checkoutF < MINIMUM_FOR_OXIPAY;					// Is checkout in Float format below minimum for Oxipay
-	}
-);
 
-if ( checkoutBelowMinimum ) {
-	driver.navigate().back();
-	driver.findElement(By.css('button.single_add_to_cart_button')).click();
-	driver.findElement(By.linkText('View cart')).click();
-}
+		// division will be greater than one if the checkout is less that the minimum
+		while ( (MINIMUM_FOR_OXIPAY/checkoutF) > 1.00 ) {
+			driver.navigate().back();
+			driver.findElement(By.css('button.single_add_to_cart_button')).click();
+			driver.findElement(By.linkText('View cart')).click();
+			checkoutF += checkoutF;
+		}
+
+		// One last run to get the cart above the minimum
+		driver.navigate().back();
+		driver.findElement(By.css('button.single_add_to_cart_button')).click();
+		driver.findElement(By.linkText('View cart')).click();
+
+});
 
 driver.findElement(By.linkText('Proceed to checkout')).click();
 
