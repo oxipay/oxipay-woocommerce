@@ -36,12 +36,20 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
             }
             
             add_action( 'admin_enqueue_scripts', array( $this, 'admin_scripts' ) );
+            
+            // when we are on the checkout page we want to provide
+            // the checkout process through a modal dialog box
+            if (!is_admin()) {
+                add_action( 'wp_enqueue_scripts', array($this, 'oxipay_enqueue_script'));
+                
+            }
+            
             add_action( 'woocommerce_api_wc_oxipay_gateway', array( $this, 'oxipay_callback') );
             add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
             add_filter( 'woocommerce_thankyou_order_id', array( $this,'payment_finalisation' ) );
             add_filter( 'the_title', array( $this,'order_received_title' ), 11 );
+            
         }
-
 
         /**
          * Log a message using the 2.7 logging infrastructure
@@ -62,6 +70,18 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
             wp_register_script( 'oxipay_admin', plugins_url( '/js/admin.js', __FILE__ ), array( 'jquery' ), '0.4.5' );
             wp_enqueue_script( 'oxipay_admin' );
         }
+
+        /**
+         * Load JavaScript for the checkout page
+         */
+        function oxipay_enqueue_script() {
+	        wp_register_script('oxipay_modal', plugins_url( '/js/oxipay_modal.js', __FILE__ ), array( 'jquery' ), '0.4.5' );
+            wp_register_script('oxipay_gateway', plugins_url( '/js/oxipay.js', __FILE__ ), array( 'jquery' ), '0.4.5' );
+            wp_enqueue_script('oxipay_gateway');
+            wp_enqueue_script('oxipay_modal');
+            wp_enqueue_style( 'oxipay_modal_css', plugins_url('/css/oxipay-modal.css', __FILE__), null, null, true);
+        }
+
 
         /**
          * WC override to display the administration property page
@@ -267,7 +287,7 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                 'x_customer_billing_zip' 		=> $order->get_billing_postcode(),
                 //shipping detail
                 'x_customer_shipping_country'	=> $order->get_billing_country(),
-                 'x_customer_shipping_city' 	    => $order->get_shipping_city(),
+                 'x_customer_shipping_city' 	=> $order->get_shipping_city(),
                 'x_customer_shipping_address1'  => $order->get_shipping_address_1(),
                 'x_customer_shipping_address2'  => $order->get_shipping_address_2(),
                 'x_customer_shipping_state' 	=> $order->get_shipping_state(),
@@ -293,6 +313,7 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
 
             $qs = http_build_query($transaction_details);
 
+            error_log("URL : ". plugins_url("processing.php?$qs", __FILE__ ));
             return array(
                 'result' 	=>  'success',
                 'redirect'	=>  plugins_url("processing.php?$qs", __FILE__ )
