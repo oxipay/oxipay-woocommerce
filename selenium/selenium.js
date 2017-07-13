@@ -6,8 +6,6 @@ var driver = new webdriver.Builder()
     .forBrowser('opera')
     .build();
 	
-const OXIPAY_MINIMUM = 20.00f; // Minimum checkout value allowed by Oxipay
-	
 driver.get('http://54.252.165.134/?post_type=product');
 
 /* Checkout first product on WooCommerce */ 
@@ -16,45 +14,29 @@ driver.findElement(By.css('.first')).click();
 driver.findElement(By.css('button.single_add_to_cart_button')).click();
 driver.findElement(By.linkText('View cart')).click();
 
+var cartTotal = 0;
+
 // Ensure Cart total is above $20
-var cartTotal; 			// Current Checkout Total including $ sign
-
-
-
-
-cartTotal = driver.findElement(By.css('.order-total .woocommerce-Price-amount')).getText().then(
+checkoutBelowMinimum = driver.findElement(By.css('.order-total .woocommerce-Price-amount')).getText().then(
 	function(text) {
-		var priceString = text.toString();
-		var priceFloat = parseFloat(priceString.slice(1, -1)).toFixed(2);
-		priceFloat2 = priceFloat;
-		return priceFloat;
+		const MINIMUM_FOR_OXIPAY = 20.00;						// Minimum checkout value allowed by Oxipay
+		var checkoutS = text.toString();						// Checkout in String format
+		var checkoutF = parseFloat(checkoutS.slice(1));			// Checkout in Float format
+		return checkoutF < MINIMUM_FOR_OXIPAY;					// Is checkout in Float format below minimum for Oxipay
 	}
 );
 
-var priceFloat2 = cartTotal;
-
-
-	while ( priceFloat2 < OXIPAY_MINIMUM ) {
-		priceFloat++;
-		/*	
-		driver.navigate().back();
-		driver.navigate().back();
-		driver.findElement(By.css('button.single_add_to_cart_button')).click();
-		driver.findElement(By.linkText('View cart')).click();
-		priceFloat++;
-
-		driver.findElement(By.css('button.single_add_to_cart_button')).click();
-		driver.findElement(By.linkText('View cart')).click();
-		cartTotalValue = driver.findElement(By.css('.woocommerce-Price-amount')).getText();
-	*/
-	}
-
+if ( checkoutBelowMinimum ) {
+	driver.navigate().back();
+	driver.findElement(By.css('button.single_add_to_cart_button')).click();
+	driver.findElement(By.linkText('View cart')).click();
+}
 
 driver.findElement(By.linkText('Proceed to checkout')).click();
 
 
 // Filling out checkout page
-driver.findElement(By.id('billing_first_name')).sendKeys(priceFloat2);
+driver.findElement(By.id('billing_first_name')).sendKeys('Sam');
 driver.findElement(By.id('billing_last_name')).sendKeys('Al-Khalfa');
 driver.findElement(By.id('billing_company')).sendKeys('Certegy Ezi-Pay');
 
