@@ -5,6 +5,8 @@ var webdriver = require('selenium-webdriver'),
 var driver = new webdriver.Builder()
     .forBrowser('opera')
     .build();
+
+driver.manage().timeouts().implicitlyWait(5000);
 	
 driver.get('http://54.252.165.134/?post_type=product');
 
@@ -14,27 +16,32 @@ driver.findElement(By.css('.first')).click();
 driver.findElement(By.css('button.single_add_to_cart_button')).click();
 driver.findElement(By.linkText('View cart')).click();
 
-// Ensure Cart total is above $20
+// Ensure Cart total is above Oxipay minimum
 checkoutBelowMinimum = driver.findElement(By.css('.order-total .woocommerce-Price-amount')).getText().then(
 	function(text) {
 		const MINIMUM_FOR_OXIPAY = 20.00;						// Minimum checkout value allowed by Oxipay
 		var checkoutS = text.toString();						// Checkout in String format
 		var checkoutF = parseFloat(checkoutS.slice(1));			// Checkout in Float format
 
-		// division will be greater than one if the checkout is less that the minimum
-		while ( (MINIMUM_FOR_OXIPAY/checkoutF) > 1.00 ) {
-			driver.navigate().back();
-			driver.findElement(By.css('button.single_add_to_cart_button')).click();
-			driver.findElement(By.linkText('View cart')).click();
-			checkoutF += checkoutF;
+		if (checkoutF < MINIMUM_FOR_OXIPAY) {
+
+			// Greater than one if checkout total is less that the minimum
+			while ((MINIMUM_FOR_OXIPAY/checkoutF) > 1.00) {
+				driver.navigate().back();
+				driver.findElement(By.css('button.single_add_to_cart_button')).click();
+				driver.findElement(By.linkText('View cart')).click();
+				checkoutF += checkoutF;
+			}
+			// last run to get the cart above the minimum if not already
+			if (checkoutF < MINIMUM_FOR_OXIPAY) {
+				
+				driver.navigate().back();
+				driver.findElement(By.css('button.single_add_to_cart_button')).click();
+				driver.findElement(By.linkText('View cart')).click();
+			}
 		}
-
-		// One last run to get the cart above the minimum
-		driver.navigate().back();
-		driver.findElement(By.css('button.single_add_to_cart_button')).click();
-		driver.findElement(By.linkText('View cart')).click();
-
-});
+	}
+);
 
 driver.findElement(By.linkText('Proceed to checkout')).click();
 
@@ -65,33 +72,12 @@ driver.findElement(By.css('.wc_payment_method.payment_method_oxipay')).click();
 driver.findElement(By.id('place_order')).click();
 
 /* Checkout on Oxipay SPA */ 
-
-driver.wait(function () {
-	driver.findElement(By.id('identity')).sendKeys('0407229128');
-}, 3000);
-
+driver.findElement(By.id('identity')).clear();
+driver.findElement(By.id('identity')).sendKeys('0407229128');
 driver.findElement(By.id('password')).sendKeys('Password1');
+driver.findElement(By.css('.btn-primary')).click();
+driver.findElement(By.css('#confirm-modal-wrapper > div > div > div > div > button')).click();
+driver.findElement(By.css('form-input > div:nth-child(2) > input')).click();
 
 
-
-/*
-
-driver.getTitle().then(function(title) {
-  console.log('Page title is: ' + title);
-});
-
-driver.wait(function() {
-  return driver.getTitle().then(function(title) {
-    return title.toLowerCase().lastIndexOf('cheese!', 0) === 0;
-  });
-}, 3000);
-
-driver.getTitle().then(function(title) {
-  console.log('Page title is: ' + title);
-});
-
-
-
-driver.quit();
-
-*/
+//driver.quit();
