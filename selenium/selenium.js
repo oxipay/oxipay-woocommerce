@@ -6,9 +6,9 @@ var driver = new webdriver.Builder()
     .forBrowser('opera')
     .build();
 
-driver.manage().timeouts().implicitlyWait(5000);
+driver.manage().timeouts().implicitlyWait(10000);
 	
-driver.get('http://54.252.165.134/?post_type=product');
+driver.get('http://54.252.165.134/?post_type=product');			// 10 Seconds
 
 /* Checkout first product on WooCommerce */ 
 
@@ -19,25 +19,22 @@ driver.findElement(By.linkText('View cart')).click();
 // Ensure Cart total is above Oxipay minimum
 checkoutBelowMinimum = driver.findElement(By.css('.order-total .woocommerce-Price-amount')).getText().then(
 	function(text) {
-		const MINIMUM_FOR_OXIPAY = 20.00;						// Minimum checkout value allowed by Oxipay
-		var checkoutS = text.toString();						// Checkout in String format
-		var checkoutF = parseFloat(checkoutS.slice(1));			// Checkout in Float format
+		const MINIMUM_FOR_OXIPAY = 20.00;								// Minimum checkout value allowed by Oxipay
+		var checkoutS = text.toString();								// Checkout in String format
+		var previousCheckoutF = parseFloat(checkoutS.slice(1));			// Checkout total prior to logic execution below
+		var itemPriceF = previousCheckoutF;								// Price of item being added to checkout
+		var updatedCheckoutF = 0;										// Checkout total after logicexecution below
 
-		if (checkoutF < MINIMUM_FOR_OXIPAY) {
-
-			// Greater than one if checkout total is less that the minimum
-			while ((MINIMUM_FOR_OXIPAY/checkoutF) > 1.00) {
+		if (previousCheckoutF < MINIMUM_FOR_OXIPAY) {
+			// Division greater than one if checkout total is less that the minimum
+			while ((MINIMUM_FOR_OXIPAY/previousCheckoutF) > 1.00) {
+				if (updatedCheckoutF != 0) {
+					previousCheckoutF = updatedCheckoutF;
+				}
 				driver.navigate().back();
 				driver.findElement(By.css('button.single_add_to_cart_button')).click();
 				driver.findElement(By.linkText('View cart')).click();
-				checkoutF += checkoutF;
-			}
-			// last run to get the cart above the minimum if not already
-			if (checkoutF < MINIMUM_FOR_OXIPAY) {
-				
-				driver.navigate().back();
-				driver.findElement(By.css('button.single_add_to_cart_button')).click();
-				driver.findElement(By.linkText('View cart')).click();
+				updatedCheckoutF = previousCheckoutF+itemPriceF;
 			}
 		}
 	}
@@ -76,8 +73,76 @@ driver.findElement(By.id('identity')).clear();
 driver.findElement(By.id('identity')).sendKeys('0407229128');
 driver.findElement(By.id('password')).sendKeys('Password1');
 driver.findElement(By.css('.btn-primary')).click();
-driver.findElement(By.css('#confirm-modal-wrapper > div > div > div > div > button')).click();
+
+
+var user = driver.wait(until.elementLocated(By.css('.btn-default')), 10);
+user.click();
+
+
+
+/*
+agreeButtonPath = '//*[@id="confirm-modal-wrapper"]/div/div/div/div/button';
+//Following snippet is stated for making the driver wait till the element is visble.
+driver.wait(function() 
+{
+   return driver.isElementPresent(By.xpath(agreeButtonPath));
+}, 10*1000);
+driver.findElement(By.xpath(agreeButtonPath)).then(function(elem)
+{
+    elem.isDisplayed().then(function(stat){
+        driver.findElement(By.css('.btn-default')).click();
+    });
+});
+
+
+
+
+*/
+
+
+
+/*
+
+
+
+return driver.wait(until.elementLocated(By.css('#confirm-modal-wrapper > div > div > div > div > button')), 5 * 1000).then(el => {
+    return el.click();
+});
+
+driver.findElement(By.css('')).click();
 driver.findElement(By.css('form-input > div:nth-child(2) > input')).click();
+
+
+
+
+
+
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 //driver.quit();
