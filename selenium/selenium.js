@@ -21,20 +21,16 @@ checkoutBelowMinimum = driver.findElement(By.css('.order-total .woocommerce-Pric
 	function(text) {
 		const MINIMUM_FOR_OXIPAY = 20.00;								// Minimum checkout value allowed by Oxipay
 		var checkoutS = text.toString();								// Checkout in String format
-		var previousCheckoutF = parseFloat(checkoutS.slice(1));			// Checkout total prior to logic execution below
-		var itemPriceF = previousCheckoutF;								// Price of item being added to checkout
-		var updatedCheckoutF = 0;										// Checkout total after logicexecution below
+		var checkoutF = parseFloat(checkoutS.slice(1));			// Checkout total prior to logic execution below
+		var itemPriceF = checkoutF;								// Price of item being added to checkout
 
-		if (previousCheckoutF < MINIMUM_FOR_OXIPAY) {
+		if (checkoutF < MINIMUM_FOR_OXIPAY) {
 			// Division greater than one if checkout total is less that the minimum
-			while ((MINIMUM_FOR_OXIPAY/previousCheckoutF) > 1.00) {
-				if (updatedCheckoutF != 0) {
-					previousCheckoutF = updatedCheckoutF;
-				}
+			while ((MINIMUM_FOR_OXIPAY/checkoutF) > 1.00) {
 				driver.navigate().back();
 				driver.findElement(By.css('button.single_add_to_cart_button')).click();
 				driver.findElement(By.linkText('View cart')).click();
-				updatedCheckoutF = previousCheckoutF+itemPriceF;
+				checkoutF = checkoutF+itemPriceF;
 			}
 		}
 	}
