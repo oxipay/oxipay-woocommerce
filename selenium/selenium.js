@@ -6,9 +6,9 @@ var driver = new webdriver.Builder()
     .forBrowser('opera')
     .build();
 
-driver.manage().timeouts().implicitlyWait(10000);
+driver.manage().timeouts().implicitlyWait(10000);			// 10 Seconds
 	
-driver.get('http://54.252.165.134/?post_type=product');			// 10 Seconds
+driver.get('http://54.252.165.134/?post_type=product');
 
 /* Checkout first product on WooCommerce */ 
 
@@ -21,11 +21,11 @@ checkoutBelowMinimum = driver.findElement(By.css('.order-total .woocommerce-Pric
 	function(text) {
 		const MINIMUM_FOR_OXIPAY = 20.00;								// Minimum checkout value allowed by Oxipay
 		var checkoutS = text.toString();								// Checkout in String format
-		var checkoutF = parseFloat(checkoutS.slice(1));			// Checkout total prior to logic execution below
-		var itemPriceF = checkoutF;								// Price of item being added to checkout
+		var checkoutF = parseFloat(checkoutS.slice(1));					// Checkout total prior to logic execution below
+		var itemPriceF = checkoutF;										// Price of item being added to checkout
 
 		if (checkoutF < MINIMUM_FOR_OXIPAY) {
-			// Division greater than one if checkout total is less that the minimum
+			// Division result is greater than one if checkout total is less that the minimum
 			while ((MINIMUM_FOR_OXIPAY/checkoutF) > 1.00) {
 				driver.navigate().back();
 				driver.findElement(By.css('button.single_add_to_cart_button')).click();
@@ -70,75 +70,10 @@ driver.findElement(By.id('identity')).sendKeys('0407229128');
 driver.findElement(By.id('password')).sendKeys('Password1');
 driver.findElement(By.css('.btn-primary')).click();
 
+driver.wait(until.elementIsVisible(driver.findElement(By.css('.btn-default')), 10000));
+driver.findElement(By.css('.btn-default')).click();
 
-var user = driver.wait(until.elementLocated(By.css('.btn-default')), 10);
-user.click();
-
-
-
-/*
-agreeButtonPath = '//*[@id="confirm-modal-wrapper"]/div/div/div/div/button';
-//Following snippet is stated for making the driver wait till the element is visble.
-driver.wait(function() 
-{
-   return driver.isElementPresent(By.xpath(agreeButtonPath));
-}, 10*1000);
-driver.findElement(By.xpath(agreeButtonPath)).then(function(elem)
-{
-    elem.isDisplayed().then(function(stat){
-        driver.findElement(By.css('.btn-default')).click();
-    });
-});
-
-
-
-
-*/
-
-
-
-/*
-
-
-
-return driver.wait(until.elementLocated(By.css('#confirm-modal-wrapper > div > div > div > div > button')), 5 * 1000).then(el => {
-    return el.click();
-});
-
-driver.findElement(By.css('')).click();
-driver.findElement(By.css('form-input > div:nth-child(2) > input')).click();
-
-
-
-
-
-
-
-
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+driver.findElement(By.css('form-input > div:nth-child(2) > input')).sendKeys('123');
+driver.findElement(By.css('#page > div > div > div > router-view > section > div > div.card-block.p-4.p-sm-4 > router-view > section > form > section:nth-child(3) > div.text-center > button')).click();
 
 //driver.quit();
