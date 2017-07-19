@@ -72,8 +72,8 @@ driver.findElement(By.id('place_order')).click();
 
 /* Checkout on Oxipay SPA */ 
 driver.findElement(By.id('identity')).clear();
-driver.findElement(By.id('identity')).sendKeys('0407229128');
-driver.findElement(By.id('password')).sendKeys('Password1');
+driver.findElement(By.id('identity')).sendKeys('');
+driver.findElement(By.id('password')).sendKeys('');
 driver.findElement(By.css('.btn-primary')).click();
 
 driver.wait(until.elementIsVisible(driver.findElement(By.css('.btn-default')), 10000));
