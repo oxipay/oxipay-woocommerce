@@ -6,12 +6,18 @@ var driver = new webdriver.Builder()
     .forBrowser('opera')
     .build();
 
-driver.manage().timeouts().implicitlyWait(10000);			// 10 Seconds
+driver.manage().window().maximize();
+
+driver.manage().timeouts().implicitlyWait(20000);			// 10 Seconds
 	
+// to enable logging to console.log
+var logger = webdriver.logging.getLogger;
+
 driver.get('http://54.252.165.134/?post_type=product');
 
-/* Checkout first product on WooCommerce */ 
 
+
+/* Checkout first product on WooCommerce */ 
 driver.findElement(By.css('.first')).click();
 driver.findElement(By.css('button.single_add_to_cart_button')).click();
 driver.findElement(By.linkText('View cart')).click();
@@ -21,7 +27,7 @@ checkoutBelowMinimum = driver.findElement(By.css('.order-total .woocommerce-Pric
 	function(text) {
 		const MINIMUM_FOR_OXIPAY = 20.00;								// Minimum checkout value allowed by Oxipay
 		var checkoutS = text.toString();								// Checkout in String format
-		var checkoutF = parseFloat(checkoutS.slice(1));					// Checkout total prior to logic execution below
+		var checkoutF = parseFloat(checkoutS.slice(1));					// Checkout total prior to logic execution below in Floating format
 		var itemPriceF = checkoutF;										// Price of item being added to checkout
 
 		if (checkoutF < MINIMUM_FOR_OXIPAY) {
@@ -40,8 +46,8 @@ driver.findElement(By.linkText('Proceed to checkout')).click();
 
 
 // Filling out checkout page
-driver.findElement(By.id('billing_first_name')).sendKeys('Sam');
-driver.findElement(By.id('billing_last_name')).sendKeys('Al-Khalfa');
+driver.findElement(By.id('billing_first_name')).sendKeys('');
+driver.findElement(By.id('billing_last_name')).sendKeys('');
 driver.findElement(By.id('billing_company')).sendKeys('Certegy Ezi-Pay');
 
 // TO-DO: Support for NZ addresses
@@ -58,8 +64,8 @@ driver.findElement(By.css('.select2-search__field')).sendKeys(webdriver.Key.ENTE
 
 
 driver.findElement(By.id('billing_postcode')).sendKeys('5000');
-driver.findElement(By.id('billing_phone')).sendKeys('0407229128');
-driver.findElement(By.id('billing_email')).sendKeys('Sam.Al-Khalfa@certegy.com.au');
+driver.findElement(By.id('billing_phone')).sendKeys('');
+driver.findElement(By.id('billing_email')).sendKeys('');
 driver.findElement(By.css('.wc_payment_method.payment_method_oxipay')).click();
 
 driver.findElement(By.id('place_order')).click();
@@ -73,7 +79,21 @@ driver.findElement(By.css('.btn-primary')).click();
 driver.wait(until.elementIsVisible(driver.findElement(By.css('.btn-default')), 10000));
 driver.findElement(By.css('.btn-default')).click();
 
-driver.findElement(By.css('form-input > div:nth-child(2) > input')).sendKeys('123');
-driver.findElement(By.css('#page > div > div > div > router-view > section > div > div.card-block.p-4.p-sm-4 > router-view > section > form > section:nth-child(3) > div.text-center > button')).click();
 
+driver.findElement(By.css('form-input > div:nth-child(2) > input')).sendKeys('123');
+
+// Waits until the "I Agree" modal is not in the DOM
+driver.wait(until.stalenessOf(driver.findElement(By.css('.modal-backdrop')), 10000));
+
+// Select the 2 checkboxes using executeScript to avoid "Element is not clickable at point ...." errors
+var termsCheckbox 	= driver.findElement(By.css('form > section:nth-child(3) > div:nth-child(1) > checkbox > div > label > input'));
+var policyCheckbox 	= driver.findElement(By.css('form > section:nth-child(3) > div:nth-child(2) > checkbox > div > label > input'));
+
+driver.executeScript("arguments[0].click();", termsCheckbox);
+driver.executeScript("arguments[0].click();", policyCheckbox);
+
+// Click on "Confirm"
+driver.findElement(By.css('.btn-primary')).click();
+
+//Optional to end the script
 //driver.quit();
