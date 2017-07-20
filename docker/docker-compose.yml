@@ -1,0 +1,24 @@
+version: '2'
+
+services:
+  wordpress:
+    build: 
+      context: .
+      dockerfile: ./wordpress/Dockerfile
+    image: oxipay/wordpress
+    ports:
+      - 8080:80
+    env_file:
+      - ./wordpress.env
+    depends_on:
+      - mysql
+    links:
+      - mysql
+    volumes:
+      - "../../woocommerce:/var/www/html/wp-content/plugins/woocommerce"
+      - "../:/var/www/html/wp-content/plugins/oxipay-woocommerce"
+      - "../../afterpay-woocommerce:/var/www/html/wp-content/plugins/afterpay-woocommerce"
+  mysql:
+    image: mariadb
+    env_file: 
+      - ./maria.env

@@ -1,10 +1,13 @@
 ///<reference path="../typings/jquery/jquery.d.ts"/>
+
+
 function oxipay(q) {
     var iframeId = 'oxipay-iframe';
     var data;
     var form = null;
     //var stylesheetUrl = '/Modal/src/css/oxipay.css';
-    var stylesheetUrl = '/wp-content/plugins/oxipay-woocommerce/css/oxipay-modal.css';
+    // @todo fix 
+    var stylesheetUrl = 'http://localhost:8080/wp-content/plugins/oxipay-woocommerce/css/oxipay-modal.css';
     var template = '<div class="oxi-modal-overlay"></div>' +
         '<div class="oxi-modal">' +
         '<div class="oxi-modal-content">' +
@@ -38,19 +41,15 @@ function oxipay(q) {
         } else if (targetUrl.substr(0, 1) !== "/") {
             targetUrl = window.location.pathname + targetUrl;
         }
-            
         
         model.targetUrl = targetUrl;
         var baseUrl = getBaseUrl(targetUrl);
         
         model.data = keyValue;
         if (stylesheetUrl) {
-            stylesheetUrl = baseUrl + stylesheetUrl;
+            stylesheetUrl = stylesheetUrl;
             setStyle(q(document).find('head'));
-        } 
-            
-
-        
+        }
     }
     /**
      * Show the Oxipay Checkout Modal
@@ -59,9 +58,6 @@ function oxipay(q) {
         try {
             model.create(); 
             var mod = q('.oxi-modal').get(0);
-            // mod.style.top = ((window.innerHeight/2) - (model.offsetHeight/2))+'px';
-            // mod.style.left = ((window.innerWidth/2) - (model.offsetWidth/2))+'px';
-
             setTimeout(function () { return model.form.submit(); }, 100);
         }
         catch (e) {
@@ -120,7 +116,7 @@ function oxipay(q) {
         return loading + form;
     }
     function setStyle(head) {
-        head.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"" + stylesheetUrl + "\">");
+       head.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"" + stylesheetUrl + "\">");
     }
     function getBaseUrl(url) {
         var a = document.createElement('a');

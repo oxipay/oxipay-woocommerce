@@ -41,7 +41,6 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
             // the checkout process through a modal dialog box
             if (!is_admin()) {
                 add_action( 'wp_enqueue_scripts', array($this, 'oxipay_enqueue_script'));
-                
             }
             
             add_action( 'woocommerce_api_wc_oxipay_gateway', array( $this, 'oxipay_callback') );
@@ -119,7 +118,7 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                     'title' 		=> __( 'Description', 'woocommerce' ),
                     'type' 			=> 'text',
                     'description' 	=> __( 'This controls the description which the user sees during checkout.', 'woocommerce' ),
-                    'default' 		=> __( 'Breathe easy with ' . Oxipay_Config::DISPLAY_NAME . ', an interest-free installment payment plan.', 'woocommerce' ),
+                    'default' 		=> __( Oxipay_Config::DISPLAY_NAME . ', a smarter way to pay', 'woocommerce' ),
                     'desc_tip'      => true,
                 ),
                 'shop_details' 		=> array(
@@ -157,7 +156,15 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                     'desc_tip'		=> true,
                     'custom_attributes' => array('required' => 'required'),
                 ),
-                'oxipay_merchant_id'=>array(
+                'use_modal' 	=> array(
+                    'title' 		=> __( 'Modal Checkout', 'woocommerce' ),
+                    'type' 			=> 'checkbox',
+                    'label' 		=> __( 'Modal Checkout', 'woocommerce' ),
+                    'default' 		=> 'yes',
+                    'description'	=> __('The customer will be forwarded to '.Oxipay_Config::DISPLAY_NAME . ' in a modal dialog', 'woocommerce' ),
+                    'desc_tip'		=> true
+                ),
+                'oxipay_merchant_id'=> array(
                     'id'		    => 'oxipay_merchant_id',
                     'title'     	=> __( 'Merchant ID', 'woocommerce' ),
                     'type' 	    	=> 'text',
@@ -241,6 +248,26 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
             }
         }
 
+        public function get_oxipay_settings() {
+            // these are safe values to export via javascript
+            $whitelist = [
+                'enabled'          => null,
+                'display_details'  => null,
+                'title'            => null,
+                'description'      => null,
+                'shop_details'     => null,
+                'shop_name'        => null,
+                'country'          => null,
+                'use_modal'        => null
+            ];
+            foreach ($whitelist as $k=>$v) {
+                if (isset($this->settings[$k])) {
+                    $whitelist[$k] = $this->settings[$k];
+                }
+            }
+            return $whitelist;
+        }
+
         /**
          * Generates the payment gateway request parameters and signature and redirects to the
          * payment gateway through the invisible processing.php form
@@ -295,6 +322,7 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                 'gateway_url' 					=> $gatewayUrl
             );
 
+
             $signature = oxipay_sign($transaction_details, $this->settings['oxipay_api_key']);
             $transaction_details['x_signature'] = $signature;
         
@@ -302,21 +330,23 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                 'x_url_callback',
                 'x_url_complete',
                 'gateway_url',
-                'x_url_cancel'
+                'x_url_cancel',
+                'x_customer_email'
             );
         
             // before we do the redirect we base64encode the urls to hopefully get around some of the 
             // limitations with platforms using mod_security 
-            foreach ($encodedFields as $key ) {
-                $transaction_details[$key] = base64_encode($transaction_details[$key]);
-            }
+            // foreach ($encodedFields as $key ) {
+            //     $transaction_details[$key] = base64_encode($transaction_details[$key]);
+            // }
 
             $qs = http_build_query($transaction_details);
 
-            error_log("URL : ". plugins_url("processing.php?$qs", __FILE__ ));
+            
             return array(
                 'result' 	=>  'success',
-                'redirect'	=>  plugins_url("processing.php?$qs", __FILE__ )
+                // 'redirect'	=>  plugins_url("$gatewayUrl?$qs", __FILE__ )
+                'redirect'	=>  $gatewayUrl.'&'.$qs
             );
         }
 
@@ -375,7 +405,7 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
         function admin_options() { ?>
             <h2><?php _e(Oxipay_Config::DISPLAY_NAME,'woocommerce'); ?></h2>
             <p><?php _e($this->method_description, 'woocommerce' ); ?></p>
-            <p>For help setting this plugin up please contact our support team.</p>
+            <p>For help setting this plugin up please contact our integration team.</p>
             <table class="form-table">
             <?php $this->generate_settings_html(); ?>
             </table>
@@ -504,14 +534,6 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
             }
 
             return $title;
-        }
-
-
-        // USAGE:  http://myurl.com/?wc-api=WC_Oxipay_Gateway
-        function oxipay_callback()
-        {
-            //todo: provide asynchronous callback implementation for increased resilience during network disruption
-            throw new Exception("Not implemented");
         }
 
         /**
