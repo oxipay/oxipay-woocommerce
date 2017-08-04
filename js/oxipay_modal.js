@@ -1,6 +1,4 @@
 ///<reference path="../typings/jquery/jquery.d.ts"/>
-
-
 function oxipay(q) {
     var iframeId = 'oxipay-iframe';
     var data;
@@ -34,14 +32,13 @@ function oxipay(q) {
      * @param keyValue
      */
     function setup(targetUrl, keyValue) {
-
         targetUrl = targetUrl || '/';
         if (targetUrl.substr(0,4) == "http") {
             // targetUrl is fine and absolute
         } else if (targetUrl.substr(0, 1) !== "/") {
             targetUrl = window.location.pathname + targetUrl;
         }
-        
+
         model.targetUrl = targetUrl;
         var baseUrl = getBaseUrl(targetUrl);
         
@@ -57,7 +54,6 @@ function oxipay(q) {
     function show() {
         try {
             model.create(); 
-            var mod = q('.oxi-modal').get(0);
             setTimeout(function () { return model.form.submit(); }, 100);
         }
         catch (e) {
