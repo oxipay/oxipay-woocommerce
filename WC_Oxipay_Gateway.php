@@ -1,7 +1,7 @@
 <?php
 class WC_Oxipay_Gateway extends WC_Payment_Gateway {
         //current version of the plugin- used to run upgrade tasks on update
-        const PLUGIN_CURRENT_VERSION = '1.0.0';
+        const PLUGIN_CURRENT_VERSION = '1.3.0';
 
         //todo: localise these string constants
         const PLUGIN_NO_GATEWAY_LOG_MSG = 'Transaction attempted with no gateway URL set. Please check oxipay plugin configuration, and provide a gateway URL.';
@@ -228,6 +228,22 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                 }
             }
 
+            if (version_compare( $currentDbVersion, '1.3.0') < 0) {
+                if (!isset($this->settings['use_modal'])) {
+                    // default to the redirect for existing merchants
+                    // so we don't break the existing behaviour                
+                    $this->settings['use_modal'] = false;
+                    $this->updateSetting('use_modal', false);
+                }
+
+                // the description has changed 
+                if (isset($this->settings['description'])) {
+                    $newDescription = $this->form_fields['description']['default'];
+                    $this->settings['description'] = $newDescription;
+                    //$this->updateSetting( 'description', $newDescription);   
+                }
+            }
+
             return true;
         }
 
@@ -321,7 +337,6 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                 'x_customer_shipping_zip' 		=> $order->get_shipping_postcode(),
                 'gateway_url' 					=> $gatewayUrl
             );
-
 
             $signature = oxipay_sign($transaction_details, $this->settings['oxipay_api_key']);
             $transaction_details['x_signature'] = $signature;
@@ -650,7 +665,11 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                 }
             }
 
-            $tld = Oxipay_Config::$countries[$countryCode]['tld'];
+            $tld = null;
+            if (isset(Oxipay_Config::$countries[$countryCode]['tld'])){
+                $tld = Oxipay_Config::$countries[$countryCode]['tld'];
+            }
+
             //make sure we have a TLD for the country from the config
             if( $this->is_null_or_empty( $tld ) ) {
                 //fall back on the Australian TLD
