@@ -28,6 +28,7 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
             $this->title         = $this->get_option( 'title' );
             $this->description   = $this->get_option( 'description' );
             $this->icon          = plugin_dir_url( __FILE__ ) .  'images/oxipay.png';
+            
 
             // where available we can use logging to assist with debugging			
             if (function_exists('wc_get_logger')) {
@@ -233,7 +234,7 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                     // default to the redirect for existing merchants
                     // so we don't break the existing behaviour                
                     $this->settings['use_modal'] = false;
-                    $this->updateSetting('use_modal', false);
+                    $this->updateSetting('use_modal', $this->settings['use_modal']);
                 }
 
                 // the description has changed 
