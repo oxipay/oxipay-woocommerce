@@ -10,9 +10,15 @@
     // A $( document ).ready() block.
     $( document ).ready(function() {
 
-        loadSettings();
+        if (typeof wc_checkout_params != 'undefined' && wc_checkout_params.checkout_url) {
+            var checkoutUrl = wc_checkout_params.checkout_url;
+            // console.log(checkoutUrl);
+            // console.log(window.location);
+            loadSettings(checkoutUrl);
+        }
+        
 
-        $('form.checkout.woocommerce-checkout').on('checkout_place_order_oxipay', function(){
+        $('form.checkout.woocommerce-checkout').on('checkout_place_order_oxipay', function() {
             // debugger;
 
             $.ajax({
@@ -20,7 +26,8 @@
                 type    : $(this).attr('method'),
                 //dataType: 'json',
                 data    : $(this).serialize(),
-                success : function( data ) {                    
+                success : function( data ) { 
+                    // debugger;                   
                     showModal(data.redirect);
                 }
             });    
@@ -30,17 +37,17 @@
     });
     
     function loadSettings(checkoutUrl) {
-        debugger;
-        var url = wc_checkout_params.checkout_url+ "&oxi_settings=true"
+        // debugger;
+        var url = checkoutUrl + "&oxi_settings=true";
         $.ajax({
             url     : url,
             type    : 'GET',
             // dataType: 'json',
             // data    : ,
             success : function( data ) {                
-                debugger;
+                //debugger;
                 oxipay_settings = data;
-                console.log(oxipay_settings);
+                // console.log(oxipay_settings);
             },
             error   : function( xhr, err ) {
                 // @todo    
