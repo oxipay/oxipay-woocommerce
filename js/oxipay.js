@@ -92,7 +92,7 @@
         var gateway = urlString.substring(0,urlString.indexOf('&'));
         delete values.platform;
 
-        if (modal) {            
+        if (modal && modal != 'no' && modal != false) {
             var oxi = oxipay($);
             oxi.setup(gateway, values);
             oxi.show();
