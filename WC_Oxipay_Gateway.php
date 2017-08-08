@@ -46,8 +46,16 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
             
             add_action( 'woocommerce_api_wc_oxipay_gateway', array( $this, 'oxipay_callback') );
             add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
+            add_action( 'woocommerce_single_product_summary', array( $this, 'add_price_widget') );
             add_filter( 'woocommerce_thankyou_order_id', array( $this,'payment_finalisation' ) );
             add_filter( 'the_title', array( $this,'order_received_title' ), 11 );
+        }
+
+        function add_price_widget(){
+            global $product;
+            if(isset($this->settings['price_widget']) && $this->settings['price_widget']=='yes'){
+                echo '<script id="oxipay-price-info" src="https://widgets.oxipay.com.au/content/scripts/price-info.js?productPrice='.wc_get_price_to_display($product).'"></script>';
+            }
         }
 
         /**
@@ -100,6 +108,14 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                     'default' 		=> 'yes',
                     'description'	=> 'Disable oxipay services, your customers will not be able to use our easy installment plans.',
                     'desc_tip'		=> true
+                ),
+                'price_widget' 		=> array(
+	                'title' 		=> __( 'Price Widget', 'woocommerce' ),
+	                'type' 			=> 'checkbox',
+	                'label' 		=> __( 'Enable the ' . Oxipay_Config::DISPLAY_NAME . ' Price Widget', 'woocommerce' ),
+	                'default' 		=> 'yes',
+	                'description'	=> 'Display a price widget in each product page.',
+	                'desc_tip'		=> true
                 ),
                 'shop_name' 		=> array(
                     'title' 		=> __( 'Shop Name', 'woocommerce' ),
