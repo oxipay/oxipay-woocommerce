@@ -25,10 +25,10 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                 $this->init_upgrade_process();
             }
 
-            $this->title         = $this->get_option( 'title' );
-            $this->description   = $this->get_option( 'description' );
+            $this->title         = __( Oxipay_Config::DISPLAY_NAME , 'woocommerce' );
+            $this->description   = __( '<strong>'.Oxipay_Config::DISPLAY_NAME . ' the smarter way to pay.</strong><br/> Shop today, pay over time. 4 easy fortnightly payments.', 'woocommerce' );
             $this->icon          = plugin_dir_url( __FILE__ ) .  'images/oxipay.png';
-            
+            $this->shop_details  = __( Oxipay_Config::DISPLAY_NAME . ' Payment', 'woocommerce' );
 
             // where available we can use logging to assist with debugging			
             if (function_exists('wc_get_logger')) {
@@ -48,7 +48,6 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
             add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
             add_filter( 'woocommerce_thankyou_order_id', array( $this,'payment_finalisation' ) );
             add_filter( 'the_title', array( $this,'order_received_title' ), 11 );
-            
         }
 
         /**
@@ -79,7 +78,7 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
             wp_register_script('oxipay_gateway', plugins_url( '/js/oxipay.js', __FILE__ ), array( 'jquery' ), '0.4.5' );
             wp_enqueue_script('oxipay_gateway');
             wp_enqueue_script('oxipay_modal');
-            wp_enqueue_style( 'oxipay_modal_css', plugins_url('/css/oxipay-modal.css', __FILE__), null, null, true);
+            //wp_enqueue_style( 'oxipay_modal_css', plugins_url('/css/oxipay-modal.css', __FILE__), null, null, true);
         }
 
 
@@ -102,32 +101,6 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                     'description'	=> 'Disable oxipay services, your customers will not be able to use our easy installment plans.',
                     'desc_tip'		=> true
                 ),
-                'display_details' 	=> array(
-                    'title' 		=> __( Oxipay_Config::DISPLAY_NAME . ' Display Details', 'woocommerce' ),
-                    'type' 			=> 'title',
-                    'description' 	=> __( 'Enter the ' . Oxipay_Config::DISPLAY_NAME . ' display details for your site. These details will be displayed during the WooCommerce checkout process.', 'woocommerce' ),
-                    'default' 		=> __( Oxipay_Config::DISPLAY_NAME . ' Payment', 'woocommerce' ),
-                ),
-                'title' 			=> array(
-                    'title' 		=> __( 'Title', 'woocommerce' ),
-                    'type' 			=> 'text',
-                    'description' 	=> __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
-                    'default' 		=> __( Oxipay_Config::DISPLAY_NAME , 'woocommerce' ),
-                    'desc_tip'      => true,
-                ),
-                'description' 		=> array(
-                    'title' 		=> __( 'Description', 'woocommerce' ),
-                    'type' 			=> 'text',
-                    'description' 	=> __( 'This controls the description which the user sees during checkout.', 'woocommerce' ),
-                    'default' 		=> __( Oxipay_Config::DISPLAY_NAME . ', a smarter way to pay', 'woocommerce' ),
-                    'desc_tip'      => true,
-                ),
-                'shop_details' 		=> array(
-                    'title' 		=> __( Oxipay_Config::DISPLAY_NAME . ' Shop Details', 'woocommerce' ),
-                    'type' 			=> 'title',
-                    'description' 	=> __( 'Enter the ' . Oxipay_Config::DISPLAY_NAME . ' shop details for your site. These details will be displayed during the oxipay checkout process.', 'woocommerce' ),
-                    'default' 		=> __( Oxipay_Config::DISPLAY_NAME . ' Payment', 'woocommerce' ),
-                ),
                 'shop_name' 		=> array(
                     'title' 		=> __( 'Shop Name', 'woocommerce' ),
                     'type' 			=> 'text',
@@ -138,15 +111,9 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                 'country'			=> array(
                     'title'			=> __( 'Oxipay Region', 'woocommerce' ),
                     'type'			=> 'select',
-                    'description'	=> 'Select the closest region in which this store communicates with Oxipay. This will ensure your customers receive the best possible experience.',
+                    'description'	=> 'Select the option that matches your retailer agreement.',
                     'options'		=> $countryOptions,
                     'custom_attributes' => array('required' => 'required'),
-                ),
-                'gateway_details' 	=> array(
-                    'title' 		=> __( Oxipay_Config::DISPLAY_NAME . ' Gateway Settings', 'woocommerce' ),
-                    'type' 			=> 'title',
-                    'description' 	=> __( 'Enter the gateway settings that were supplied to you by ' . Oxipay_Config::DISPLAY_NAME . '.', 'woocommerce' ),
-                    'default' 		=> __( Oxipay_Config::DISPLAY_NAME . ' Payment', 'woocommerce' ),
                 ),
                 'oxipay_gateway_url'=> array(
                     'id'			=> 'oxipay_gateway_url',
@@ -235,13 +202,6 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                     // so we don't break the existing behaviour                
                     $this->settings['use_modal'] = false;
                     $this->updateSetting('use_modal', $this->settings['use_modal']);
-                }
-
-                // the description has changed 
-                if (isset($this->settings['description'])) {
-                    $newDescription = $this->form_fields['description']['default'];
-                    $this->settings['description'] = $newDescription;
-                    //$this->updateSetting( 'description', $newDescription);   
                 }
             }
 
@@ -337,7 +297,7 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                 'x_customer_shipping_state' 	=> $order->get_shipping_state(),
                 'x_customer_shipping_zip' 		=> $order->get_shipping_postcode(),
                 'gateway_url' 					=> $gatewayUrl
-            );
+            );  
 
             $signature = oxipay_sign($transaction_details, $this->settings['oxipay_api_key']);
             $transaction_details['x_signature'] = $signature;
@@ -355,13 +315,11 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
             // foreach ($encodedFields as $key ) {
             //     $transaction_details[$key] = base64_encode($transaction_details[$key]);
             // }
-
-            $qs = http_build_query($transaction_details);
-
+            // use RFC 3986 so that we can decode it correctly in js
+            $qs = http_build_query($transaction_details, null, '&', PHP_QUERY_RFC3986);
             
             return array(
                 'result' 	=>  'success',
-                // 'redirect'	=>  plugins_url("$gatewayUrl?$qs", __FILE__ )
                 'redirect'	=>  $gatewayUrl.'&'.$qs
             );
         }
@@ -420,11 +378,14 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
          */
         function admin_options() { ?>
             <h2><?php _e(Oxipay_Config::DISPLAY_NAME,'woocommerce'); ?></h2>
+            
             <p><?php _e($this->method_description, 'woocommerce' ); ?></p>
             <p>For help setting this plugin up please contact our integration team.</p>
+            
             <table class="form-table">
             <?php $this->generate_settings_html(); ?>
             </table>
+            <p>Plugin Version: <?php _e(self::PLUGIN_CURRENT_VERSION); ?></p>
             <?php
 
             $countryUrls = array();
@@ -438,6 +399,7 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                 </script>
                 <?php
             }
+            
         }
 
         /**
