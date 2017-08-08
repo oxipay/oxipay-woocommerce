@@ -3,54 +3,86 @@
  */
 (function($) {
     'use strict';
-    var oxipay_settings;
-    // @todo do we need this ?
-    // Object.defineProperty(window.navigator, 'userAgent', { get: function(){ return 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:33.0) Gecko/20120101 Firefox/33.0'; } });Object.defineProperty(window.navigator, 'vendor', { get: function(){ return 'Mozilla, Inc.'; } });Object.defineProperty(window.navigator, 'platform', { get: function(){ return 'Windows'; } });
+    var oxipay_settings;    
 
-    // A $( document ).ready() block.
     $( document ).ready(function() {
 
         if (typeof wc_checkout_params != 'undefined' && wc_checkout_params.checkout_url) {
             var checkoutUrl = wc_checkout_params.checkout_url;
-            // console.log(checkoutUrl);
-            // console.log(window.location);
             loadSettings(checkoutUrl);
-        }
+        }        
         
-
-        $('form.checkout.woocommerce-checkout').on('checkout_place_order_oxipay', function() {
-            // debugger;
+        $('form.checkout.woocommerce-checkout').on('checkout_place_order_oxipay', function(e) {
+            debugger;
+            console.log(e);
 
             $.ajax({
-                url     : wc_checkout_params.checkout_url,
-                type    : $(this).attr('method'),
-                //dataType: 'json',
+                url     : wc_checkout_params.checkout_url,                
+                type    : 'POST',
                 data    : $(this).serialize(),
-                success : function( data ) { 
-                    // debugger;                   
-                    showModal(data.redirect);
+                success : function( data ) {
+                    debugger;
+                    try {
+                        if (data && data.redirect) {
+                            showModal(data.redirect);
+                        } else {
+                            throw 'Invalid response';
+                        }
+                    } catch (err) {
+                        if (true === data.reload) {
+                            window.location.reload();
+                            return;
+                        }
+                        // Trigger update in case we need a fresh nonce
+                        if ( true === data.refresh ) {
+                            $( document.body ).trigger( 'update_checkout' );
+                        }
+
+                        // Add new errors
+                        if ( data.messages ) {
+                            submit_error( data.messages );
+                        } else {
+                            submit_error( '<div class="woocommerce-error">' + wc_checkout_params.i18n_checkout_error + '</div>' );
+                        }
+                    }
+                },
+                error:  function( jqXHR, textStatus, errorThrown ) {
+                    submit_error( '<div class="woocommerce-error">' + errorThrown + '</div>' );
                 }
-            });    
-            // @todo send off to the server to populate the signature
+            });
             return false;
         });
     });
+
+    /**
+     * This is more or less a direct copy of the woocommerce implementation
+     * since WC do not export their wc_checkout_form and I can't see a way to re-use 
+     * their error handling. 
+     * 
+     */
+    function submit_error( error_message ) {
+        var wc_checkout_form = $('form.checkout.woocommerce-checkout');
+
+        $( '.woocommerce-NoticeGroup-checkout, .woocommerce-error, .woocommerce-message' ).remove();
+        wc_checkout_form.prepend( '<div class="woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout">' + error_message + '</div>' );
+        wc_checkout_form.removeClass( 'processing' ).unblock();
+        wc_checkout_form.find( '.input-text, select, input:checkbox' ).blur();
+        $( 'html, body' ).animate({
+                    scrollTop: ( $( 'form.checkout' ).offset().top - 100 )
+        }, 1000 );
+        $( document.body ).trigger( 'checkout_error' );
+    }
+
     
     function loadSettings(checkoutUrl) {
-        // debugger;
-        var url = checkoutUrl + "&oxi_settings=true";
         $.ajax({
-            url     : url,
+            url     : checkoutUrl + "&oxi_settings=true",
             type    : 'GET',
-            // dataType: 'json',
-            // data    : ,
-            success : function( data ) {                
-                //debugger;
+            success : function( data ) {
                 oxipay_settings = data;
-                // console.log(oxipay_settings);
             },
             error   : function( xhr, err ) {
-                // @todo    
+                // we have failed to load the settings for some reason.    
             }
         });    
     };
@@ -65,41 +97,41 @@
         return keys;
     };
 
-   
-
     function showModal(urlString) {
-        debugger;
-        var modal       = oxipay_settings.use_modal;
-        var form        = $('form.checkout.woocommerce-checkout');
-        var keyStartPos = urlString.indexOf('?')+1    
-        var values      = extractKeys(urlString.substring(keyStartPos));
         
-        var encodedFields = [
-            'x_url_callback',
-            'x_url_complete',
-            'gateway_url',
-            'x_url_cancel',
-            'x_customer_email'
-        ];
+        var modal = false;
+        
+            var form        = $('form.checkout.woocommerce-checkout');
+            var keyStartPos = urlString.indexOf('?')+1    
+            var values      = extractKeys(urlString.substring(keyStartPos));
+            modal           = oxipay_settings.use_modal;
 
-        $.each(encodedFields, function(index, key){
-            
-            if (values[key]) {
-                values[key] = decodeURIComponent(values[key]);
+            var encodedFields = [
+                'x_url_callback',
+                'x_url_complete',
+                'gateway_url',
+                'x_url_cancel',
+                'x_customer_email'
+            ];
+
+            $.each(encodedFields, function(index, key){
+                
+                if (values[key]) {
+                    values[key] = decodeURIComponent(values[key]);
+                }
+            });
+        
+            var gateway = urlString.substring(0,urlString.indexOf('&'));
+            delete values.platform;
+
+            if (modal && modal != 'no' && modal != false) {
+                var oxi = oxipay($);
+                oxi.setup(gateway, values);
+                oxi.show();
+
+            } else {
+                post(gateway, values);
             }
-        });
-    
-        var gateway = urlString.substring(0,urlString.indexOf('&'));
-        delete values.platform;
-
-        if (modal && modal != 'no' && modal != false) {
-            var oxi = oxipay($);
-            oxi.setup(gateway, values);
-            oxi.show();
-        } else {
-            post(gateway, values);
-        }
-        
     };
 
     function post(path, params) {
