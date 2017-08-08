@@ -13,15 +13,11 @@
         }        
         
         $('form.checkout.woocommerce-checkout').on('checkout_place_order_oxipay', function(e) {
-            debugger;
-            console.log(e);
-
             $.ajax({
                 url     : wc_checkout_params.checkout_url,                
                 type    : 'POST',
                 data    : $(this).serialize(),
                 success : function( data ) {
-                    debugger;
                     try {
                         if (data && data.redirect) {
                             showModal(data.redirect);
@@ -92,36 +88,22 @@
         var keys = {};
         for (var i = 0; i < keyArr.length; i++) {
             var split = keyArr[i].split('=');
-            keys[split[0].trim()] = split[1].trim();
+            keys[split[0].trim()] = decodeURIComponent((split[1]).trim());
         }
         return keys;
     };
 
     function showModal(urlString) {
-        
+
         var modal = false;
     
         var form        = $('form.checkout.woocommerce-checkout');
         var keyStartPos = urlString.indexOf('?')+1    
         var values      = extractKeys(urlString.substring(keyStartPos));
         modal           = oxipay_settings.use_modal;
-
-        var encodedFields = [
-            'x_url_callback',
-            'x_url_complete',
-            'gateway_url',
-            'x_url_cancel',
-            'x_customer_email'
-        ];
-
-        $.each(encodedFields, function(index, key){
-            
-            if (values[key]) {
-                values[key] = decodeURIComponent(values[key]);
-            }
-        });
     
         var gateway = urlString.substring(0,urlString.indexOf('&'));
+        // we already include the platform as part of the gateway URL so remove it
         delete values.platform;
 
         if (modal && modal != 'no' && modal != false) {
@@ -135,8 +117,6 @@
     };
 
     function post(path, params) {
-                
-
         // The rest of this code assumes you are not using a library.
         // It can be made less wordy if you use one.
         var form = document.createElement("form");
