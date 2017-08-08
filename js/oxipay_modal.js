@@ -10,13 +10,14 @@ function oxipay(q) {
         '<div class="oxi-modal">' +
         '<div class="oxi-modal-content">' +
         '<div class="oxi-modal-header">' +
-        '<img src="//securetest.oxipay.com.au/Client/skins/img/logo-orange.svg" alt="Oxipay"/>' +
+        '<img src="/wp-content/plugins/oxipay-woocommerce/images/oxipay.svg" alt="Oxipay"/>' +
         '<button id="oxi-modal-close" type="button">&times;</button>' +
         '</div>' +
         '<div class="oxi-modal-body"></div>' +
         '</div>' +
         '</div>';
-    var model = {
+
+        var model = {
         targetUrl: '',
         data: data,
         create: create,
@@ -25,7 +26,9 @@ function oxipay(q) {
         setup: setup,
         form: form
     };
+
     return model;
+
     /**
      * Setup Oxipay Checkout
      * @param targetUrl
