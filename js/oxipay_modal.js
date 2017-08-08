@@ -5,7 +5,7 @@ function oxipay(q) {
     var form = null;
     //var stylesheetUrl = '/Modal/src/css/oxipay.css';
     // @todo fix 
-    var stylesheetUrl = 'http://localhost:8080/wp-content/plugins/oxipay-woocommerce/css/oxipay-modal.css';
+    var stylesheetUrl = '/wp-content/plugins/oxipay-woocommerce/css/oxipay-modal.css';
     var template = '<div class="oxi-modal-overlay"></div>' +
         '<div class="oxi-modal">' +
         '<div class="oxi-modal-content">' +
