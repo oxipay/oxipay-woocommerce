@@ -100,38 +100,38 @@
     function showModal(urlString) {
         
         var modal = false;
-        
-            var form        = $('form.checkout.woocommerce-checkout');
-            var keyStartPos = urlString.indexOf('?')+1    
-            var values      = extractKeys(urlString.substring(keyStartPos));
-            modal           = oxipay_settings.use_modal;
+    
+        var form        = $('form.checkout.woocommerce-checkout');
+        var keyStartPos = urlString.indexOf('?')+1    
+        var values      = extractKeys(urlString.substring(keyStartPos));
+        modal           = oxipay_settings.use_modal;
 
-            var encodedFields = [
-                'x_url_callback',
-                'x_url_complete',
-                'gateway_url',
-                'x_url_cancel',
-                'x_customer_email'
-            ];
+        var encodedFields = [
+            'x_url_callback',
+            'x_url_complete',
+            'gateway_url',
+            'x_url_cancel',
+            'x_customer_email'
+        ];
 
-            $.each(encodedFields, function(index, key){
-                
-                if (values[key]) {
-                    values[key] = decodeURIComponent(values[key]);
-                }
-            });
-        
-            var gateway = urlString.substring(0,urlString.indexOf('&'));
-            delete values.platform;
-
-            if (modal && modal != 'no' && modal != false) {
-                var oxi = oxipay($);
-                oxi.setup(gateway, values);
-                oxi.show();
-
-            } else {
-                post(gateway, values);
+        $.each(encodedFields, function(index, key){
+            
+            if (values[key]) {
+                values[key] = decodeURIComponent(values[key]);
             }
+        });
+    
+        var gateway = urlString.substring(0,urlString.indexOf('&'));
+        delete values.platform;
+
+        if (modal && modal != 'no' && modal != false) {
+            var oxi = oxipay($);
+            oxi.setup(gateway, values);
+            oxi.show();
+
+        } else {
+            post(gateway, values);
+        }
     };
 
     function post(path, params) {
