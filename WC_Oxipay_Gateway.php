@@ -108,18 +108,12 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                     'description'	=> 'Disable oxipay services, your customers will not be able to use our easy installment plans.',
                     'desc_tip'		=> true
                 ),
-//                'widget' 	        => array(
-//                    'title' 		=> __( Oxipay_Config::DISPLAY_NAME . ' Price Widget', 'woocommerce' ),
-//                    'type' 			=> 'title',
-//                    'description' 	=> __( 'In each product page, under the price, display a price widget of "4 payments of xxx with Oxipay".', 'woocommerce' ),
-//                    'default' 		=> __( Oxipay_Config::DISPLAY_NAME . ' Payment', 'woocommerce' ),
-//                ),
                 'price_widget' 		=> array(
 	                'title' 		=> __( 'Price Widget', 'woocommerce' ),
 	                'type' 			=> 'checkbox',
 	                'label' 		=> __( 'Enable the ' . Oxipay_Config::DISPLAY_NAME . ' Price Widget', 'woocommerce' ),
 	                'default' 		=> 'yes',
-	                'description'	=> 'In each product page, under the price, display a price widget of "4 payments of xxx with Oxipay".',
+	                'description'	=> 'Display a price widget in each product page.',
 	                'desc_tip'		=> true
                 ),
                 'display_details' 	=> array(
