@@ -1,7 +1,7 @@
 <?php
 class WC_Oxipay_Gateway extends WC_Payment_Gateway {
         //current version of the plugin- used to run upgrade tasks on update
-        const PLUGIN_CURRENT_VERSION = '1.3.0';
+        public $plugin_current_version;
 
         //todo: localise these string constants
         const PLUGIN_NO_GATEWAY_LOG_MSG = 'Transaction attempted with no gateway URL set. Please check oxipay plugin configuration, and provide a gateway URL.';
@@ -13,11 +13,12 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
         public $logger = null;
 
         function __construct() {
-            $this->id = 'oxipay';
-            $this->has_fields = false;
-            $this->order_button_text = __( 'Proceed to ' . Oxipay_Config::DISPLAY_NAME, 'woocommerce' );
-            $this->method_title      = __( Oxipay_Config::DISPLAY_NAME, 'woocommerce' );
-            $this->method_descripton = __( 'Easy to setup installment payment plans from ' . Oxipay_Config::DISPLAY_NAME );
+            $this->id                     = 'oxipay';
+            $this->has_fields             = false;
+            $this->order_button_text      = __( 'Proceed to ' . Oxipay_Config::DISPLAY_NAME, 'woocommerce' );
+            $this->method_title           = __( Oxipay_Config::DISPLAY_NAME, 'woocommerce' );
+            $this->method_description     = __( 'Easy to setup installment payment plans from ' . Oxipay_Config::DISPLAY_NAME );
+	        $this->plugin_current_version = get_plugin_data( plugin_dir_path(__FILE__) . 'oxipay.php', false, false)['Version'];
 
             $this->init_form_fields();
             $this->init_settings();
@@ -180,11 +181,11 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
             //get the current upgrade version. This will default to 0 before version 0.4.5 of the plugin
             $currentDbVersion = isset( $this->settings['db_plugin_version'] ) ? $this->settings['db_plugin_version'] : 0;
             //see if the current upgrade version is lower than the latest version
-            if ( version_compare( $currentDbVersion, self::PLUGIN_CURRENT_VERSION ) < 0 ) {
+            if ( version_compare( $currentDbVersion, $this->plugin_current_version ) < 0 ) {
                 //run the upgrade process
                 if($this->upgrade( $currentDbVersion )){
                     //update the stored upgrade version if the upgrade process was successful
-                    $this->updateSetting( 'db_plugin_version', self::PLUGIN_CURRENT_VERSION );
+                    $this->updateSetting( 'db_plugin_version', $this->plugin_current_version );
                 }
             }
         }
@@ -405,7 +406,7 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
             <table class="form-table">
             <?php $this->generate_settings_html(); ?>
             </table>
-            <p>Plugin Version: <?php _e(self::PLUGIN_CURRENT_VERSION); ?></p>
+            <p>Plugin Version: <?php echo $this->plugin_current_version ; ?></p>
             <?php
 
             $countryUrls = array();
