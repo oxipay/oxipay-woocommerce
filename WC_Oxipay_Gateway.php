@@ -53,7 +53,11 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
         function add_price_widget(){
             global $product;
             if(isset($this->settings['price_widget']) && $this->settings['price_widget']=='yes'){
-                echo '<script id="oxipay-price-info" src="https://widgets.oxipay.com.au/content/scripts/price-info.js?productPrice='.wc_get_price_to_display($product).'"></script>';
+                $country_domain = 'com.au';
+                if(isset($this->settings['country']) && $this->settings['country']=='NZ'){
+                    $country_domain = 'co.nz';
+                }
+                echo '<script id="oxipay-price-info" src="https://widgets.oxipay.'.$country_domain.'/content/scripts/price-info.js?productPrice='.wc_get_price_to_display($product).'"></script>';
             }
         }
 
