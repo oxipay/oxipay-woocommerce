@@ -134,6 +134,7 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                     'type'			=> 'select',
                     'description'	=> 'Select the option that matches your retailer agreement.',
                     'options'		=> $countryOptions,
+                    'desc_tip'		=> true,
                     'custom_attributes' => array('required' => 'required'),
                 ),
                 'oxipay_gateway_url'=> array(
@@ -149,7 +150,7 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                     'title' 		=> __( 'Modal Checkout', 'woocommerce' ),
                     'type' 			=> 'checkbox',
                     'label' 		=> __( 'Modal Checkout', 'woocommerce' ),
-                    'default' 		=> 'yes',
+                    'default' 		=> 'no',
                     'description'	=> __('The customer will be forwarded to '.Oxipay_Config::DISPLAY_NAME . ' in a modal dialog', 'woocommerce' ),
                     'desc_tip'		=> true
                 ),
@@ -436,8 +437,6 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
 
             $isJSON = ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_SERVER['CONTENT_TYPE']) &&
                        (strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) );
-            $params;
-            $msg;
 
             // This addresses the callback. 
             if ($isJSON) {
