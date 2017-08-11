@@ -8,7 +8,7 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
         const PLUGIN_MISCONFIGURATION_CLIENT_MSG = 'There is an issue with the site configuration, which has been logged. We apologize for any inconvenience. Please try again later. ';
         const PLUGIN_NO_API_KEY_LOG_MSG = 'Transaction attempted with no API key set. Please check oxipay plugin configuration, and provide an API Key';
         const PLUGIN_NO_MERCHANT_ID_SET_LOG_MSG = 'Transaction attempted with no Merchant ID key. Please check oxipay plugin configuration, and provide an Merchant ID.';
-        const PLUGIN_NO_REGION_LOG_MSG = 'Transaction attemped with no Oxipay region set. Please check oxipay plugin configuration, and provide an Oxipay region.';
+        const PLUGIN_NO_REGION_LOG_MSG = 'Transaction attempted with no Oxipay region set. Please check oxipay plugin configuration, and provide an Oxipay region.';
 
         public $logger = null;
 
@@ -50,6 +50,10 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
             add_action( 'woocommerce_single_product_summary', array( $this, 'add_price_widget') );
             add_filter( 'woocommerce_thankyou_order_id', array( $this,'payment_finalisation' ) );
             add_filter( 'the_title', array( $this,'order_received_title' ), 11 );
+
+            add_action( 'woocommerce_before_checkout_form', array($this, 'oxipay_min_max_notice'));
+            add_action( 'woocommerce_before_cart', array($this, 'oxipay_min_max_notice'));
+            add_filter( 'woocommerce_available_payment_gateways', array($this,'oxipay_min_max_filter'));
         }
 
         function add_price_widget(){
@@ -61,6 +65,41 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                 }
                 echo '<script id="oxipay-price-info" src="https://widgets.oxipay.'.$country_domain.'/content/scripts/price-info.js?productPrice='.wc_get_price_to_display($product).'"></script>';
             }
+        }
+
+        function oxipay_min_max_notice(){
+	        $minimum = $this->settings['oxipay_minimum'];
+	        $maximum = $this->settings['oxipay_maximum'];
+            if ( $minimum != 0 && WC()->cart->total < $minimum ){
+                if(is_checkout()){
+	                wc_print_notice(
+		                sprintf("You must have an order with a minimum of %s to use Oxipay. Your current order total is %s.",
+			                wc_price($minimum),
+                            wc_price(WC()->cart->total)
+		                ), 'notice'
+	                );
+                }
+            } elseif ( $maximum !=0 && WC()->cart->total > $maximum ){
+	            if(is_checkout()){
+		            wc_print_notice(
+			            sprintf("You must have an order with a maximum of %s to use Oxipay. Your current order total is %s.",
+				            wc_price($maximum),
+				            wc_price(WC()->cart->total)
+			            ), 'notice'
+		            );
+	            }
+            }
+        }
+
+        function oxipay_min_max_filter($available_gateways){
+	        $minimum = $this->settings['oxipay_minimum'];
+	        $maximum = $this->settings['oxipay_maximum'];
+	        if ( ( $minimum != 0 && WC()->cart->total < $minimum) || ($maximum != 0 && WC()->cart->total > $maximum) ){
+		        if(isset($available_gateways['oxipay'])){
+			        unset($available_gateways['oxipay']);
+		        }
+            }
+	        return $available_gateways;
         }
 
         /**
@@ -171,6 +210,22 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                     'description'	=> 'Oxipay will have supplied you with your Oxipay API key. Contact us if you cannot find it.',
                     'desc_tip'		=> true,
                     'custom_attributes' => array('required' => 'required'),
+                ),
+                'oxipay_minimum'=> array(
+	                'id'		    => 'oxipay_minimum',
+	                'title'     	=> __( 'Minimum Order Total', 'woocommerce' ),
+	                'type' 	    	=> 'text',
+	                'default'   	=> '0',
+	                'description'	=> 'Minimum order total to use Oxipay. Empty for unlimited',
+	                'desc_tip'		=> true,
+                ),
+                'oxipay_maximum'=> array(
+	                'id'		    => 'oxipay_maximum',
+	                'title'     	=> __( 'Maximum Order Total', 'woocommerce' ),
+	                'type' 	    	=> 'text',
+	                'default'   	=> '0',
+	                'description'	=> 'Maximum order total to use Oxipay. Empty for unlimited',
+	                'desc_tip'		=> true,
                 )
             );
         }
