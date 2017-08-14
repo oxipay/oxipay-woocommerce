@@ -7,7 +7,7 @@ environment:
 before_build:
   - ps: (Get-Content oxipay.php).replace("oxipay_plugin_version_placeholder", $env:APPVEYOR_REPO_TAG_NAME ) | Set-Content oxipay.php
 build_script:
-  - ps: Invoke-Expression "7z a $env:release_name -x!appveyor.yml -x!.gitignore -x!js/oxitest.js"
+  - ps: Invoke-Expression "7z a -x!'appveyor.yml' -x!'.gitignore' -x!'js/oxitest.js' $env:release_name"
 artifacts:
   - path: $(release_name)
     name: $(tag_name)
