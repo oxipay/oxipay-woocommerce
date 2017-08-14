@@ -275,7 +275,7 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                 }
             }
 
-            if (version_compare( $currentDbVersion, '1.3.0') < 0) {
+            if (version_compare( $currentDbVersion, '1.2.0') < 0) {
                 if (!isset($this->settings['use_modal'])) {
                     // default to the redirect for existing merchants
                     // so we don't break the existing behaviour                
