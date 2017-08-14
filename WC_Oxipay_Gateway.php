@@ -127,6 +127,8 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
          */
         function oxipay_enqueue_script() {
 	        wp_register_script('oxipay_modal', plugins_url( '/js/oxipay_modal.js', __FILE__ ), array( 'jquery' ), '0.4.5' );
+	        $pass_to_oxipay_modal_js = array( 'plugin_url' => plugins_url("", __FILE__) );
+	        wp_localize_script( 'oxipay_modal', 'php_vars', $pass_to_oxipay_modal_js);
             wp_register_script('oxipay_gateway', plugins_url( '/js/oxipay.js', __FILE__ ), array( 'jquery' ), '0.4.5' );
             wp_enqueue_script('oxipay_gateway');
             wp_enqueue_script('oxipay_modal');

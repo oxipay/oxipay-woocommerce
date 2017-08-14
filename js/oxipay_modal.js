@@ -5,12 +5,14 @@ function oxipay(q) {
     var form = null;
     //var stylesheetUrl = '/Modal/src/css/oxipay.css';
     // @todo fix 
-    var stylesheetUrl = '/wp-content/plugins/oxipay-woocommerce/css/oxipay-modal.css';
+    var stylesheetUrl = php_vars.plugin_url+'/css/oxipay-modal.css';
     var template = '<div class="oxi-modal-overlay"></div>' +
         '<div class="oxi-modal">' +
         '<div class="oxi-modal-content">' +
         '<div class="oxi-modal-header">' +
-        '<img src="/wp-content/plugins/oxipay-woocommerce/images/oxipay.svg" alt="Oxipay"/>' +
+        '<img src="'+
+        php_vars.plugin_url+
+        '/images/oxipay.svg" alt="Oxipay"/>' +
         '<button id="oxi-modal-close" type="button">&times;</button>' +
         '</div>' +
         '<div class="oxi-modal-body"></div>' +
