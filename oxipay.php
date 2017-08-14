@@ -21,6 +21,7 @@ require_once( 'oxipay-config.php' );
 
 add_action('plugins_loaded', 'woocommerce_oxipay_init', 0);
 
+add_action('parse_request', 'get_oxipay_settings');
 /**
  * Hook for WC plugin subsystem to initialise the Oxipay plugin
  */
@@ -33,4 +34,37 @@ function add_oxipay_payment_gateway($methods) {
 	return $methods;
 }
 
+function add_oxipay_query_vars_filter( $vars ){
+    $vars[] = "oxi_settings";
+    return $vars;
+}
+/**
+* Look for an ajax request that wants settings
+*/
+function get_oxipay_settings($query) {
+    
+    $gateways = WC_Payment_Gateways::instance();
+    if (!$gateways) {
+
+        // oxipay not installed properly
+        return; 
+    }
+
+    $list = $gateways->payment_gateways();
+    if (!$list || !isset($list['oxipay'])) {
+        // abort
+    }
+
+    $oxipay = $list['oxipay'];
+
+    // 
+    if (isset($query->query_vars['oxi_settings'])) {
+        $settings = $oxipay->get_oxipay_settings();
+        wp_send_json($settings);
+    }
+}
+
+
+
 add_filter('woocommerce_payment_gateways', 'add_oxipay_payment_gateway');
+add_filter( 'query_vars', 'add_oxipay_query_vars_filter' );
