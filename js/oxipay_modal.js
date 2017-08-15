@@ -82,8 +82,8 @@ function oxipay(q) {
     }
     function message(e) {
         try {
-            $('.oxi-modal-splash').addClass('animated fadeOut');
-            setTimeout(function () { return $('.oxi-modal-splash').remove(); }, 2000);
+            q('.oxi-modal-splash').addClass('animated fadeOut');
+            setTimeout(function () { return q('.oxi-modal-splash').remove(); }, 2000);
         }
         catch (e) {
             console.error(e);
