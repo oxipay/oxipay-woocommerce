@@ -68,8 +68,8 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
         }
 
         function oxipay_min_max_notice(){
-	        $minimum = $this->settings['oxipay_minimum'];
-	        $maximum = $this->settings['oxipay_maximum'];
+	        $minimum = $this->getMinPrice();
+	        $maximum = $this->getMaxPrice();
             if ( $minimum != 0 && WC()->cart->total < $minimum ){
                 if(is_checkout()){
 	                wc_print_notice(
@@ -91,9 +91,19 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
             }
         }
 
+        protected function getMinPrice()
+        {
+            return isset($this->settings['oxipay_minimum'])? $this->settings['oxipay_minimum']:0;
+        }
+
+        protected function getMaxPrice()
+        {
+            return isset($this->settings['oxipay_maximum'])? $this->settings['oxipay_maximum']:0;
+        }
+
         function oxipay_min_max_filter($available_gateways){
-	        $minimum = $this->settings['oxipay_minimum'];
-	        $maximum = $this->settings['oxipay_maximum'];
+	        $minimum = $this->getMinPrice();
+	        $maximum = $this->getMaxPrice();
 	        if ( ( $minimum != 0 && WC()->cart->total < $minimum) || ($maximum != 0 && WC()->cart->total > $maximum) ){
 		        if(isset($available_gateways['oxipay'])){
 			        unset($available_gateways['oxipay']);
@@ -266,6 +276,14 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
                     $this->settings['use_modal'] = false;
                     $this->updateSetting('use_modal', $this->settings['use_modal']);
                 }
+
+                if (!isset($this->settings['oxipay_minimum'])) {
+                    $this->updateSetting('use_modal', $this->settings['oxipay_minimum']);
+                }
+
+                if (!isset($this->settings['oxipay_maximum'])) {
+                    $this->updateSetting('use_modal', $this->settings['oxipay_maximum']);
+                }
             }
 
             return true;
@@ -428,10 +446,12 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
 		            $countryCode = 'AU';
 	            }
             }
-            if($this->settings['use_test']=='yes'){
+            
+            $secure = 'secure';
+            $x = $this->isTesting();
+
+            if($this->isTesting() == 'yes'){
                 $secure='securesandbox';
-            } elseif ($this->settings['use_test']=='no'){
-                $secure='secure';
             }
 
             $tld = null;
@@ -633,6 +653,15 @@ class WC_Oxipay_Gateway extends WC_Payment_Gateway {
             wc_add_notice(__('Payment error: ', 'woothemes') . $message, 'error');
         }
 
+        /**
+         * @return string
+         */
+        public function isTesting()
+        {
+            return isset($this->settings['use_test'])? $this->settings['use_test']: 'no';
+        }
+
+        
         /**
          * @return string
          */
