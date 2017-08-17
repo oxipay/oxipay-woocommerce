@@ -1,20 +1,20 @@
-/** 
+/**
  * This is used to switch on the modal dialog for Oxipay transactions
  */
 (function($) {
     'use strict';
-    var oxipay_settings;    
+    var oxipay_settings;
 
     $( document ).ready(function() {
 
         if (typeof wc_checkout_params != 'undefined' && wc_checkout_params.checkout_url) {
             var checkoutUrl = wc_checkout_params.checkout_url;
             loadSettings(checkoutUrl);
-        }        
-        
+        }
+
         $('form.checkout.woocommerce-checkout').on('checkout_place_order_oxipay', function(e) {
             $.ajax({
-                url     : wc_checkout_params.checkout_url,                
+                url     : wc_checkout_params.checkout_url,
                 type    : 'POST',
                 data    : $(this).serialize(),
                 success : function( data ) {
@@ -52,9 +52,9 @@
 
     /**
      * This is more or less a direct copy of the woocommerce implementation
-     * since WC do not export their wc_checkout_form and I can't see a way to re-use 
-     * their error handling. 
-     * 
+     * since WC do not export their wc_checkout_form and I can't see a way to re-use
+     * their error handling.
+     *
      */
     function submit_error( error_message ) {
         var wc_checkout_form = $('form.checkout.woocommerce-checkout');
@@ -69,7 +69,7 @@
         $( document.body ).trigger( 'checkout_error' );
     }
 
-    
+
     function loadSettings(checkoutUrl) {
         $.ajax({
             url     : checkoutUrl + "&oxi_settings=true",
@@ -78,9 +78,9 @@
                 oxipay_settings = data;
             },
             error   : function( xhr, err ) {
-                // we have failed to load the settings for some reason.    
+                // we have failed to load the settings for some reason.
             }
-        });    
+        });
     };
 
     function extractKeys(redirectUrl) {
@@ -96,19 +96,20 @@
     function showModal(urlString) {
 
         var modal = false;
-    
+
         var form        = $('form.checkout.woocommerce-checkout');
-        var keyStartPos = urlString.indexOf('?')+1    
+        var keyStartPos = urlString.indexOf('?')+1
         var values      = extractKeys(urlString.substring(keyStartPos));
         modal           = oxipay_settings.use_modal;
-    
+
         var gateway = urlString.substring(0,urlString.indexOf('&'));
         // we already include the platform as part of the gateway URL so remove it
         delete values.platform;
 
         if (modal && modal != 'no' && modal != false) {
             var oxi = oxipay($);
-            oxi.setup(gateway, values);
+            var modalCSS = php_vars.plugin_url+'/css/oxipay-modal.css';
+            oxi.setup(gateway, values, modalCSS);
             oxi.show();
 
         } else {
