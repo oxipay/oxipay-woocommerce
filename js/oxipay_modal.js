@@ -4,7 +4,7 @@ function oxipay(q) {
     var iframeId = 'oxipay-iframe';
     var data;
     var form = null;
-    var stylesheetUrl = '/wp-content/plugins/oxipay-woocommerce1.3.0/css/oxipay-modal.css';
+    var stylesheetUrl = '/Modal/src/css/oxipay.css';
     var template = '<div class="oxi-modal-overlay"></div>' +
         '<div class="oxi-modal">' +
         '<div class="oxi-modal-content">' +
@@ -43,19 +43,26 @@ function oxipay(q) {
      * @param targetUrl
      * @param keyValue
      */
-    function setup(targetUrl, keyValue) {
+    function setup(targetUrl, keyValue, stylesheetURL) {
         targetUrl = targetUrl || '/';
-        if (targetUrl.substr(0, 1) !== "/")
+        if (targetUrl.substr(0,4) == "http") {
+            // targetUrl is fine and absolute
+        } else if (targetUrl.substr(0, 1) !== "/") {
             targetUrl = window.location.pathname + targetUrl;
+        }
+
         model.targetUrl = targetUrl;
         var baseUrl = getBaseUrl(targetUrl);
-        stylesheetUrl = baseUrl + stylesheetUrl;
+        
         model.data = keyValue;
-        if (!initialised) {
-            initialised = true;
-            setStyle(q(document).find('head'));
+
+        stylesheetUrl = baseUrl + stylesheetUrl;
+        if (stylesheetURL) {
+            stylesheetUrl = stylesheetURL;
         }
+        setStyle(q(document).find('head'));
     }
+    
     /**
      * Show the Oxipay Checkout Modal
      */

@@ -108,7 +108,8 @@
 
         if (modal && modal != 'no' && modal != false) {
             var oxi = oxipay($);
-            oxi.setup(gateway, values);
+            var modalCSS = php_vars.plugin_url+'/css/oxipay-modal.css';
+            oxi.setup(gateway, values, modalCSS);
             oxi.show();
 
         } else {
