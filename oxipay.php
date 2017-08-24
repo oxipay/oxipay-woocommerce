@@ -26,6 +26,7 @@ add_action('parse_request', 'get_oxipay_settings');
  * Hook for WC plugin subsystem to initialise the Oxipay plugin
  */
 function woocommerce_oxipay_init() {
+
     require_once('WC_Oxipay_Gateway.php');	
 }
 
@@ -59,7 +60,7 @@ function get_oxipay_settings($query) {
 
     // 
     if (isset($query->query_vars['oxi_settings'])) {
-        $settings = $oxipay->get_oxipay_settings();
+        $settings = $oxipay->get_settings();
         wp_send_json($settings);
     }
 }
