@@ -20,13 +20,19 @@ require_once( 'crypto.php' );
 require_once( 'oxipay-config.php' );
 
 add_action('plugins_loaded', 'woocommerce_oxipay_init', 0);
-
 add_action('parse_request', 'get_oxipay_settings');
+add_action('widgets_init', 'init_oxipay_widgets');
+
+function init_oxipay_widgets(){
+	require_once ('widgets/more-info.php');
+	oxiapy_load_widget();
+}
+
 /**
  * Hook for WC plugin subsystem to initialise the Oxipay plugin
  */
 function woocommerce_oxipay_init() {
-    require_once('WC_Oxipay_Gateway.php');	
+    require_once('WC_Oxipay_Gateway.php');
 }
 
 function add_oxipay_payment_gateway($methods) {
@@ -63,8 +69,6 @@ function get_oxipay_settings($query) {
         wp_send_json($settings);
     }
 }
-
-
 
 add_filter('woocommerce_payment_gateways', 'add_oxipay_payment_gateway');
 add_filter( 'query_vars', 'add_oxipay_query_vars_filter' );
