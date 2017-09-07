@@ -1,6 +1,5 @@
 <?php
 abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
-
         //current version of the plugin- used to run upgrade tasks on update
         public $plugin_current_version;
         
@@ -126,8 +125,6 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
          */
         abstract protected function flexi_enqueue_script();
 
-            
-
         /**
          * WC override to display the administration property page
          */
@@ -140,7 +137,6 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                  $countryOptions[$countryCode] = __( $country['name'], 'woocommerce' );
             }
 
-          
             $this->form_fields = array(
                 'enabled' 			=> array(
                     'title' 		=> __( 'Enabled', 'woocommerce' ),
@@ -280,7 +276,6 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
          */
         private function updateSetting($key, $value) {
             $this->settings[$key] = $value;
-
             update_option( $this->get_option_key(), $this->settings );
         }
 
@@ -324,8 +319,6 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             if(!$isValid) return;
 
             $callbackURL  = $this->get_return_url($order);
-
-
 
             $transaction_details = array (
                 'x_reference'                   => $order_id,
@@ -460,7 +453,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             <?php
 
             $countryUrls = array();
-            foreach($this->currentConfig->$countries as $countryCode => $country){
+            foreach($this->currentConfig->countries as $countryCode => $country){
                 $countryUrls[$countryCode] = array('gateway' => $this->getGatewayUrl($countryCode));
             }
             if( count( $countryUrls ) > 0 ) {
@@ -470,7 +463,6 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                 </script>
                 <?php
             }
-            
         }
 
         /**
@@ -556,7 +548,6 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                 $order->update_status('failed');
                 $msg = 'failed';
             }
-
 
             if ($isJSON) {
                 $return = array(
