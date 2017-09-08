@@ -57,7 +57,7 @@ function get_oxipay_settings($query) {
     $oxipay = $list['oxipay'];
 
     if (isset($query->query_vars['oxi_settings'])) {
-        $settings = $oxipay->get_oxipay_settings();
+        $settings = $oxipay->get_settings();
         wp_send_json($settings);
     }
 }
@@ -66,6 +66,7 @@ function oxipay_settings_link($links){
 	$settings_link = array('<a href="'.admin_url('admin.php?page=wc-settings&tab=checkout&section=oxipay').'">Settings</a>');
 	return array_merge($settings_link, $links);
 }
+
 add_filter( 'plugin_action_links_'.plugin_basename(__FILE__), 'oxipay_settings_link' );
 add_filter('woocommerce_payment_gateways', 'add_oxipay_payment_gateway');
 add_filter( 'query_vars', 'add_oxipay_query_vars_filter' );
