@@ -16,7 +16,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             // where available we can use logging to assist with debugging			
             if (function_exists('wc_get_logger')) {
                 $this->logger = wc_get_logger();
-                $this->logContext = array( 'source' => 'Oxipay' );
+                $this->logContext = array( 'source' => $this->pluginName );
             }
 
             $this->logger->debug('Product Name: '. $config->getDisplayName());
@@ -40,8 +40,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             if (!is_admin()) {
                 add_action( 'wp_enqueue_scripts', array($this, 'flexi_enqueue_script'));
             }
-            
-            add_action('woocommerce_api_wc_oxipay_gateway', array($this, 'oxipay_callback'));
+
             add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options' ) );
             add_action('woocommerce_single_product_summary', array($this, 'add_price_widget'));
             add_filter('woocommerce_thankyou_order_id', array($this,'payment_finalisation' ));
@@ -143,7 +142,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                     'type' 			=> 'checkbox',
                     'label' 		=> __( 'Enable the ' . $this->currentConfig->getDisplayName() . ' Payment Gateway', 'woocommerce' ),
                     'default' 		=> 'yes',
-                    'description'	=> 'Disable oxipay services, your customers will not be able to use our easy installment plans.',
+                    'description'	=> 'Disable '.$this->pluginName.' services, your customers will not be able to use our easy installment plans.',
                     'desc_tip'		=> true
                 ),
                 'price_widget' 		=> array(
@@ -162,7 +161,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                     'desc_tip'      => true,
                 ),
                 'country'			=> array(
-                    'title'			=> __( 'Oxipay Region', 'woocommerce' ),
+                    'title'			=> __( $this->pluginName.' Region', 'woocommerce' ),
                     'type'			=> 'select',
                     'description'	=> 'Select the option that matches your retailer agreement.',
                     'options'		=> $countryOptions,
@@ -186,33 +185,33 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                     'desc_tip'		=> true
                 ),
                 "{$this->pluginName}_merchant_id"=> array(
-                    'id'		    => 'oxipay_merchant_id',
+                    'id'		    => $this->pluginName.'_merchant_id',
                     'title'     	=> __( 'Merchant ID', 'woocommerce' ),
                     'type' 	    	=> 'text',
                     'default'   	=> '',
-                    'description'	=> 'Oxipay will have supplied you with your Oxipay Merchant ID. Contact us if you cannot find it.',
+                    'description'	=> $this->pluginName.' will have supplied you with your '.$this->pluginName.' Merchant ID. Contact us if you cannot find it.',
                     'desc_tip'		=> true,
                     'custom_attributes' => array('required' => 'required'),
                 ),
                 $this->pluginName.'_api_key'    => array(
-                    'id'        	=> 'oxipay_api_key',
+                    'id'        	=> $this->pluginName.'_api_key',
                     'title'     	=> __( 'API Key', 'woocommerce' ),
                     'type' 	    	=> 'text',
                     'default'   	=> '',
-                    'description'	=> 'Oxipay will have supplied you with your Oxipay API key. Contact us if you cannot find it.',
+                    'description'	=> $this->pluginName.' will have supplied you with your '.$this->pluginName.' API key. Contact us if you cannot find it.',
                     'desc_tip'		=> true,
                     'custom_attributes' => array('required' => 'required'),
                 ),
                 $this->pluginName.'_minimum'=> array(
-	                'id'		    => 'oxipay_minimum',
+	                'id'		    => $this->pluginName.'_minimum',
 	                'title'     	=> __( 'Minimum Order Total', 'woocommerce' ),
 	                'type' 	    	=> 'text',
 	                'default'   	=> '0',
-	                'description'	=> 'Minimum order total to use Oxipay. Empty for unlimited',
+	                'description'	=> 'Minimum order total to use '.$this->pluginName.'. Empty for unlimited',
 	                'desc_tip'		=> true,
                 ),
                 $this->pluginName.'_maximum'=> array(
-	                'id'		    => 'oxipay_maximum',
+	                'id'		    => $this->pluginName.'_maximum',
 	                'title'     	=> __( 'Maximum Order Total', 'woocommerce' ),
 	                'type' 	    	=> 'text',
 	                'default'   	=> '0',
@@ -322,7 +321,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 
             $transaction_details = array (
                 'x_reference'                   => $order_id,
-                'x_account_id'                  => $this->settings['oxipay_merchant_id'],
+                'x_account_id'                  => $this->settings[$this->pluginName.'_merchant_id'],
                 'x_amount'                      => $order->get_total(),
                 'x_currency'                    => $this->getCurrencyCode(),
                 'x_url_callback'                => $callbackURL,
@@ -353,7 +352,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                 'gateway_url' 					=> $gatewayUrl
             );  
 
-            $signature = oxipay_sign($transaction_details, $this->settings['oxipay_api_key']);
+            $signature = flexi_sign($transaction_details, $this->settings[$this->pluginName.'_api_key']);
             $transaction_details['x_signature'] = $signature;
         
             $encodedFields = array(
@@ -466,7 +465,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         }
 
         /**
-         * This is a filter setup to receive the results from the Oxipay services to show the required
+         * This is a filter setup to receive the results from the flexi services to show the required
          * outcome for the order based on the 'x_result' property
          * @param $order_id
          * @return mixed
@@ -504,16 +503,16 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                 return $order_id;
             }
 
-            // make sure we have an oxipay order
+            // make sure we have an flexi order
             // OIR-3
             if ($order->get_data()['payment_method'] !== $this->pluginName) {
-                // we don't care about it because it's not an oxipay order
+                // we don't care about it because it's not an flexi order
                 // only log in debug mode
-                $this->log(sprintf('No action required orderId: %s is not an oxipay order ', $order_id));
+                $this->log(sprintf('No action required orderId: %s is not an '.$this->pluginName.' order ', $order_id));
                 return $order_id;
             }
 
-            if (oxipay_checksign($params, $this->settings[$this->pluginName.'_api_key'])) {
+            if (flexi_checksign($params, $this->settings[ $this->pluginName . '_api_key'])) {
                 $this->log(sprintf('Processing orderId: %s ', $order_id));
                 // Get the status of the order from XPay and handle accordingly
                 switch ($params['x_result']) {
@@ -543,7 +542,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             }
             else
             {
-                $order->add_order_note(__( $this->currentConfig->getDisplayName() . ' payment response failed signature validation. Please check your Merchant Number and API key or contact Oxipay for assistance.', 0, 'woocommerce'));
+                $order->add_order_note(__( $this->currentConfig->getDisplayName() . ' payment response failed signature validation. Please check your Merchant Number and API key or contact '.$this->pluginName.' for assistance.', 0, 'woocommerce'));
                 $order->add_order_note(__( 'Payment declined using ' . $this->currentConfig->getDisplayName() . '. Your Order ID is ' . $order_id, 'woocommerce'));
                 $order->update_status('failed');
                 $msg = 'failed';
@@ -637,7 +636,6 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         {
             return isset($this->settings['use_test'])? $this->settings['use_test']: 'no';
         }
-
         
         /**
          * @return string
@@ -698,7 +696,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
          * @return string
          */
         private function getDefaultGatewayUrl($countryCode = false){
-            $this->getGatewayUrl($his->getCountryCode());
+            $this->getGatewayUrl($this->getCountryCode());
         }
 
         /**

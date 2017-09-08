@@ -15,7 +15,7 @@ if ( !defined('ABSPATH')) exit; // Exit if accessed directly
  * @param $api_key
  * @return mixed
  */
-function oxipay_sign($query, $api_key )
+function flexi_sign($query, $api_key )
 {
     $clear_text = '';
     ksort($query);
@@ -34,14 +34,14 @@ function oxipay_sign($query, $api_key )
  * @param $api_key string
  * @return bool
  */
-function oxipay_checksign($query, $api_key)
+function flexi_checksign($query, $api_key)
 {
     if (!isset($query['x_signature'])) {
         return;
     }
     $actualSignature = $query['x_signature'];
     unset($query['x_signature']);
-    $expectedSignature = oxipay_sign($query, $api_key);
+    $expectedSignature = flexi_sign($query, $api_key);
     return $actualSignature == $expectedSignature;
 }
 ?>
