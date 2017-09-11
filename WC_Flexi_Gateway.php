@@ -21,11 +21,11 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                 $this->logContext = array( 'source' => $this->pluginDisplayName );
             }
 
-            $this->logger->debug('Product Name: '. $config->getDisplayName());
+            $this->logger->debug('Product Name: '. $this->pluginDisplayName);
 
             $this->id                     = $this->pluginFileName;
             $this->has_fields             = false;
-            $this->method_title           = __($config->getDisplayName(), 'woocommerce');
+            $this->method_title           = __($this->pluginDisplayName, 'woocommerce');
             
 	        $this->plugin_current_version = get_plugin_data( plugin_dir_path(__FILE__) . $this->pluginFileName.'.php', false, false)['Version'];
 
@@ -63,7 +63,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 	                wc_print_notice(
 		                sprintf("You must have an order with a minimum of %s to use %s. Your current order total is %s.",
                             wc_price($minimum),
-                            $this->config->getDisplayName(),
+                            $this->pluginDisplayName,
                             wc_price(WC()->cart->total)
 		                ), 'notice'
 	                );
@@ -73,7 +73,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 		            wc_print_notice(
 			            sprintf("You must have an order with a maximum of %s to use %s. Your current order total is %s.",
                             wc_price($maximum),
-                            $this->config->getDisplayName(),
+                            $this->pluginDisplayName,
 				            wc_price(WC()->cart->total)
 			            ), 'notice'
 		            );
@@ -142,7 +142,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                 'enabled'                                => array(
                     'title' 		=> __( 'Enabled', 'woocommerce' ),
                     'type' 			=> 'checkbox',
-                    'label' 		=> __( 'Enable the ' . $this->currentConfig->getDisplayName() . ' Payment Gateway', 'woocommerce' ),
+                    'label' 		=> __( 'Enable the ' . $this->pluginDisplayName . ' Payment Gateway', 'woocommerce' ),
                     'default' 		=> 'yes',
                     'description'	=> 'Disable '.$this->pluginDisplayName . ' services, your customers will not be able to use our easy installment plans.',
                     'desc_tip'		=> true
@@ -150,7 +150,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                 'price_widget'                           => array(
 	                'title' 		=> __( 'Price Widget', 'woocommerce' ),
 	                'type' 			=> 'checkbox',
-	                'label' 		=> __( 'Enable the ' . $this->currentConfig->getDisplayName() . ' Price Widget', 'woocommerce' ),
+	                'label' 		=> __( 'Enable the ' . $this->pluginDisplayName . ' Price Widget', 'woocommerce' ),
 	                'default' 		=> 'yes',
 	                'description'	=> 'Display a price widget in each product page.',
 	                'desc_tip'		=> true
@@ -158,7 +158,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                 'shop_name'                              => array(
                     'title' 		=> __( 'Shop Name', 'woocommerce' ),
                     'type' 			=> 'text',
-                    'description' 	=> __( 'The name of the shop that will be displayed in ' . $this->currentConfig->getDisplayName(), 'woocommerce' ),
+                    'description' 	=> __( 'The name of the shop that will be displayed in ' . $this->pluginDisplayName, 'woocommerce' ),
                     'default' 		=> __( '', 'woocommerce' ),
                     'desc_tip'      => true,
                 ),
@@ -183,7 +183,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                     'type' 			=> 'checkbox',
                     'label' 		=> __( 'Modal Checkout', 'woocommerce' ),
                     'default' 		=> 'no',
-                    'description'	=> __('The customer will be forwarded to '.$this->currentConfig->getDisplayName() . ' in a modal dialog', 'woocommerce' ),
+                    'description'	=> __('The customer will be forwarded to '.$this->pluginDisplayName . ' in a modal dialog', 'woocommerce' ),
                     'desc_tip'		=> true
                 ),
                 "{$this->pluginFileName}_merchant_id" => array(
@@ -217,7 +217,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 	                'title'     	=> __( 'Maximum Order Total', 'woocommerce' ),
 	                'type' 	    	=> 'text',
 	                'default'   	=> '0',
-	                'description'	=> 'Maximum order total to use '.$this->currentConfig->getDisplayName().'. Empty for unlimited',
+	                'description'	=> 'Maximum order total to use '.$this->pluginDisplayName.'. Empty for unlimited',
 	                'desc_tip'		=> true,
                 )
             );
@@ -323,7 +323,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 
             $transaction_details = array (
                 'x_reference'                   => $order_id,
-                'x_account_id'                  => $this->settings[ $this->pluginDisplayName . '_merchant_id'],
+                'x_account_id'                  => $this->settings[ $this->pluginFileName . '_merchant_id'],
                 'x_amount'                      => $order->get_total(),
                 'x_currency'                    => $this->getCurrencyCode(),
                 'x_url_callback'                => $callbackURL,
@@ -354,7 +354,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                 'gateway_url' 					=> $gatewayUrl
             );  
 
-            $signature = flexi_sign($transaction_details, $this->settings[ $this->pluginDisplayName . '_api_key']);
+            $signature = flexi_sign($transaction_details, $this->settings[ $this->pluginFileName . '_api_key']);
             $transaction_details['x_signature'] = $signature;
         
             $encodedFields = array(
@@ -386,8 +386,8 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         private function verifyConfiguration($order)
         {
             
-            $apiKey     = $this->settings[ $this->pluginDisplayName . '_api_key' ];
-            $merchantId = $this->settings[ $this->pluginDisplayName . '_merchant_id' ];
+            $apiKey     = $this->settings[ $this->pluginFileName . '_api_key' ];
+            $merchantId = $this->settings[ $this->pluginFileName . '_merchant_id' ];
             $region     = $this->settings['country'];
 
             $isValid   = true;
@@ -442,7 +442,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
          * Renders plugin configuration markup
          */
         function admin_options() { ?>
-            <h2><?php _e($this->currentConfig->getDisplayName(),'woocommerce'); ?></h2>
+            <h2><?php _e($this->pluginDisplayName,'woocommerce'); ?></h2>
             
             <p><?php _e($this->method_description, 'woocommerce' ); ?></p>
             <p>For help setting this plugin up please contact our integration team.</p>
@@ -514,12 +514,12 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                 return $order_id;
             }
 
-            if (flexi_checksign($params, $this->settings[ $this->pluginDisplayName . '_api_key'])) {
+            if (flexi_checksign($params, $this->settings[ $this->pluginFileName . '_api_key'])) {
                 $this->log(sprintf('Processing orderId: %s ', $order_id));
                 // Get the status of the order from XPay and handle accordingly
                 switch ($params['x_result']) {
                     case "completed":
-                        $order->add_order_note(__( 'Payment approved using ' . $this->currentConfig->getDisplayName() . '. Reference #' . $params['x_gateway_reference'], 'woocommerce'));
+                        $order->add_order_note(__( 'Payment approved using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce'));
                         $order->payment_complete($params['x_reference']);
                         if (!is_null($cart)) {
                             $cart->empty_cart();
@@ -528,14 +528,14 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                         break;
 
                     case "failed":
-                        $order->add_order_note(__( 'Payment declined using ' . $this->currentConfig->getDisplayName() . '. Reference #' . $params['x_gateway_reference'], 'woocommerce'));
+                        $order->add_order_note(__( 'Payment declined using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce'));
                         $order->update_status('failed');
                         $msg = 'failed';
                         break;
 
                     case "pending":
-                        $order->add_order_note(__( 'Payment pending using ' . $this->currentConfig->getDisplayName() . '. Reference #' . $params['x_gateway_reference'], 'woocommerce'));
-                        $order->update_status('on-hold', 'Error may have occurred with ' . $this->currentConfig->getDisplayName() . '. Reference #' . $params['x_gateway_reference']);
+                        $order->add_order_note(__( 'Payment pending using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce'));
+                        $order->update_status('on-hold', 'Error may have occurred with ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference']);
                         $msg = 'failed';
                         break;
                 }
@@ -544,8 +544,8 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             }
             else
             {
-                $order->add_order_note(__( $this->currentConfig->getDisplayName() . ' payment response failed signature validation. Please check your Merchant Number and API key or contact '.$this->pluginDisplayName . ' for assistance.', 0, 'woocommerce'));
-                $order->add_order_note(__( 'Payment declined using ' . $this->currentConfig->getDisplayName() . '. Your Order ID is ' . $order_id, 'woocommerce'));
+                $order->add_order_note(__( $this->pluginDisplayName . ' payment response failed signature validation. Please check your Merchant Number and API key or contact '.$this->pluginDisplayName . ' for assistance.', 0, 'woocommerce'));
+                $order->add_order_note(__( 'Payment declined using ' . $this->pluginDisplayName . '. Your Order ID is ' . $order_id, 'woocommerce'));
                 $order->update_status('failed');
                 $msg = 'failed';
             }
@@ -603,7 +603,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             $valid_addresses = (count(array_unique($set_addresses)) === 1 && end($set_addresses) === $countryCode);
 
             if (!$valid_addresses) {
-                $errorMessage = "&nbsp;Orders from outside " . $countryName . " are not supported by " . $this->currentConfig->getDisplayName() . ". Please select a different payment option.";
+                $errorMessage = "&nbsp;Orders from outside " . $countryName . " are not supported by " . $this->pluginDisplayName . ". Please select a different payment option.";
                 $order->cancel_order($errorMessage);
                 $this->logValidationError($errorMessage);
                 return false;
@@ -619,7 +619,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         private function checkOrderAmount($order)
         {
             if($order->get_total() < 20) {
-                $errorMessage = "&nbsp;Orders under " . $this->getCurrencyCode() . $this->getCurrencySymbol() . "20 are not supported by " . $this->currentConfig->getDisplayName() . ". Please select a different payment option.";
+                $errorMessage = "&nbsp;Orders under " . $this->getCurrencyCode() . $this->getCurrencySymbol() . "20 are not supported by " . $this->pluginDisplayName . ". Please select a different payment option.";
                 $order->cancel_order($errorMessage);
                 $this->logValidationError($errorMessage);
                 return false;
@@ -671,24 +671,24 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         /**
          * @return string
          */
-        private function getBaseUrl() {
-            $tld = $this->currentConfig->countries[$this->getCountryCode()]['tld'];
-            $displayName = strtolower($this->currentConfig->getDisplayName());
-            if($this->is_null_or_empty($tld)) {
-                $tld = ".com.au";
-            }
-
-            return "https://{$displayName}{$tld}";
-        }
-
-        /**
-         * @return string
-         */
-        private function getSupportUrl() {
-            $baseUrl = $this->getBaseUrl();
-
-            return "$baseUrl/contact";
-        }
+//        private function getBaseUrl() {
+//            $tld = $this->currentConfig->countries[$this->getCountryCode()]['tld'];
+//            $displayName = $this->pluginDisplayName;
+//            if($this->is_null_or_empty($tld)) {
+//                $tld = ".com.au";
+//            }
+//
+//            return "https://{$displayName}{$tld}";
+//        }
+//
+//        /**
+//         * @return string
+//         */
+//        private function getSupportUrl() {
+//            $baseUrl = $this->getBaseUrl();
+//
+//            return "$baseUrl/contact";
+//        }
 
         /**
          * Return the default gateway URL for the given country code.
