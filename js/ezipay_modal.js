@@ -4,7 +4,7 @@ function oxipay(q) {
     var iframeId = 'oxipay-iframe';
     var data;
     var form = null;
-    var stylesheetUrl = '/Modal/src/css/oxipay.css';
+    var stylesheetUrl = '/Modal/src/css/ezipay.css';
     var template = '<div class="oxi-modal-overlay"></div>' +
         '<div class="oxi-modal">' +
         '<div class="oxi-modal-content">' +

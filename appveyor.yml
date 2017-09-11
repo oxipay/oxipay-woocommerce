@@ -3,11 +3,11 @@ branches:
     - master
 environment:
   tag_name: "%APPVEYOR_REPO_TAG_NAME%"
-  release_name: "oxipay-woocommerce_v%appveyor_repo_tag_name%.zip"
+  release_name: "certegy_ezipay_woocommerce_v%appveyor_repo_tag_name%.zip"
 before_build:
-  - ps: (Get-Content oxipay.php).replace("plugin_version_placeholder", $env:APPVEYOR_REPO_TAG_NAME ) | Set-Content oxipay.php
+  - ps: (Get-Content ezipay.php).replace("plugin_version_placeholder", $env:APPVEYOR_REPO_TAG_NAME ) | Set-Content ezipay.php
 build_script:
-  - ps: Invoke-Expression "7z a $env:release_name -xr'!.git' -x'!appveyor.yml' -x'!.gitignore' -x'!js/oxitest.js' -xr'!.vscode' -xr'!docker'"
+  - ps: Invoke-Expression "7z a $env:release_name -xr'!.git' -x'!appveyor.yml' -x'!.gitignore' -x'!js/ezitest.js' -xr'!.vscode' -xr'!docker'"
 artifacts:
   - path: $(release_name)
     name: $(tag_name)
