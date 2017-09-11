@@ -12,7 +12,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         function __construct($config) {
 
             $this->currentConfig     = $config;
-            $this->pluginDisplayName = strtolower($config->getDisplayName());
+            $this->pluginDisplayName = $config->getDisplayName();
 	        $this->pluginFileName    = strtolower($config->getPluginFileName());
             
             // where available we can use logging to assist with debugging			
