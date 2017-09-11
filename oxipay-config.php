@@ -5,6 +5,7 @@ class Oxipay_Config {
 
     const PLATFORM_NAME = 'woocommerce';
     const DISPLAY_NAME  = 'Oxipay';
+    const PLUGIN_FILE_NAME = 'oxipay';
 
     public $countries = array(
         self::COUNTRY_AUSTRALIA => array (
@@ -32,4 +33,8 @@ class Oxipay_Config {
     public function getPlatformName() {
         return self::PLATFORM_NAME;
     }
+
+	public function getPluginFileName() {
+		return self::PLUGIN_FILE_NAME;
+	}
 }

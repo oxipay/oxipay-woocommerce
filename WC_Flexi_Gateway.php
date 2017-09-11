@@ -6,26 +6,28 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         public $logger = null;
 
         protected $currentConfig = null;
-        protected $pluginName    = null;
+        protected $pluginDisplayName    = null;
+        protected $pluginFileName= null;
         
         function __construct($config) {
 
-            $this->currentConfig = $config;
-            $this->pluginName    = strtolower($config->getDisplayName());
+            $this->currentConfig     = $config;
+            $this->pluginDisplayName = strtolower($config->getDisplayName());
+	        $this->pluginFileName    = strtolower($config->getPluginFileName());
             
             // where available we can use logging to assist with debugging			
             if (function_exists('wc_get_logger')) {
                 $this->logger = wc_get_logger();
-                $this->logContext = array( 'source' => $this->pluginName );
+                $this->logContext = array( 'source' => $this->pluginDisplayName );
             }
 
             $this->logger->debug('Product Name: '. $config->getDisplayName());
 
-            $this->id                     = $this->pluginName;
+            $this->id                     = $this->pluginFileName;
             $this->has_fields             = false;
             $this->method_title           = __($config->getDisplayName(), 'woocommerce');
             
-	        $this->plugin_current_version = get_plugin_data( plugin_dir_path(__FILE__) . $this->pluginName.'.php', false, false)['Version'];
+	        $this->plugin_current_version = get_plugin_data( plugin_dir_path(__FILE__) . $this->pluginFileName.'.php', false, false)['Version'];
 
             $this->init_form_fields();
             $this->init_settings();
@@ -81,13 +83,13 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 
         protected function getMinPrice()
         {
-            $field = sprintf('%s_minimum', $this->pluginName);
+            $field = sprintf('%s_minimum', $this->pluginFileName);
             return isset($this->settings[$field])? $this->settings[$field]:0;
         }
 
         protected function getMaxPrice()
         {
-            $field = sprintf('%s_maximum', $this->pluginName);
+            $field = sprintf('%s_maximum', $this->pluginFileName);
             return isset($this->settings[$field])? $this->settings[$field]:0;
         }
 
@@ -95,8 +97,8 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 	        $minimum = $this->getMinPrice();
 	        $maximum = $this->getMaxPrice();
 	        if ( ( $minimum != 0 && WC()->cart->total < $minimum) || ($maximum != 0 && WC()->cart->total > $maximum) ){
-		        if(isset($available_gateways[$this->productName])){
-			        unset($available_gateways[$this->productName]);
+		        if(isset($available_gateways[$this->pluginFileName])){
+			        unset($available_gateways[$this->pluginFileName]);
 		        }
             }
 	        return $available_gateways;
@@ -137,15 +139,15 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             }
 
             $this->form_fields = array(
-                'enabled' 			=> array(
+                'enabled'                                => array(
                     'title' 		=> __( 'Enabled', 'woocommerce' ),
                     'type' 			=> 'checkbox',
                     'label' 		=> __( 'Enable the ' . $this->currentConfig->getDisplayName() . ' Payment Gateway', 'woocommerce' ),
                     'default' 		=> 'yes',
-                    'description'	=> 'Disable '.$this->pluginName.' services, your customers will not be able to use our easy installment plans.',
+                    'description'	=> 'Disable '.$this->pluginDisplayName . ' services, your customers will not be able to use our easy installment plans.',
                     'desc_tip'		=> true
                 ),
-                'price_widget' 		=> array(
+                'price_widget'                           => array(
 	                'title' 		=> __( 'Price Widget', 'woocommerce' ),
 	                'type' 			=> 'checkbox',
 	                'label' 		=> __( 'Enable the ' . $this->currentConfig->getDisplayName() . ' Price Widget', 'woocommerce' ),
@@ -153,22 +155,22 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 	                'description'	=> 'Display a price widget in each product page.',
 	                'desc_tip'		=> true
                 ),
-                'shop_name' 		=> array(
+                'shop_name'                              => array(
                     'title' 		=> __( 'Shop Name', 'woocommerce' ),
                     'type' 			=> 'text',
                     'description' 	=> __( 'The name of the shop that will be displayed in ' . $this->currentConfig->getDisplayName(), 'woocommerce' ),
                     'default' 		=> __( '', 'woocommerce' ),
                     'desc_tip'      => true,
                 ),
-                'country'			=> array(
-                    'title'			=> __( $this->pluginName.' Region', 'woocommerce' ),
+                'country'                                => array(
+                    'title'			=> __( $this->pluginDisplayName . ' Region', 'woocommerce' ),
                     'type'			=> 'select',
                     'description'	=> 'Select the option that matches your retailer agreement.',
                     'options'		=> $countryOptions,
                     'desc_tip'		=> true,
                     'custom_attributes' => array('required' => 'required'),
                 ),
-                'use_test' 	=> array(
+                'use_test'                               => array(
 	                'title' 		=> __( 'Test Mode', 'woocommerce' ),
 	                'type' 			=> 'checkbox',
 	                'label' 		=> __( 'Use Test Mode', 'woocommerce' ),
@@ -176,7 +178,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 	                'description'	=> __('While test mode is enabled, transactions will be simulated and cards will not be charged', 'woocommerce' ),
 	                'desc_tip'		=> true
                 ),
-                'use_modal' 	=> array(
+                'use_modal'                              => array(
                     'title' 		=> __( 'Modal Checkout', 'woocommerce' ),
                     'type' 			=> 'checkbox',
                     'label' 		=> __( 'Modal Checkout', 'woocommerce' ),
@@ -184,34 +186,34 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                     'description'	=> __('The customer will be forwarded to '.$this->currentConfig->getDisplayName() . ' in a modal dialog', 'woocommerce' ),
                     'desc_tip'		=> true
                 ),
-                "{$this->pluginName}_merchant_id"=> array(
-                    'id'		    => $this->pluginName.'_merchant_id',
+                "{$this->pluginFileName}_merchant_id" => array(
+                    'id'		    => $this->pluginFileName . '_merchant_id',
                     'title'     	=> __( 'Merchant ID', 'woocommerce' ),
                     'type' 	    	=> 'text',
                     'default'   	=> '',
-                    'description'	=> $this->pluginName.' will have supplied you with your '.$this->pluginName.' Merchant ID. Contact us if you cannot find it.',
+                    'description'	=> $this->pluginDisplayName . ' will have supplied you with your ' . $this->pluginDisplayName . ' Merchant ID. Contact us if you cannot find it.',
                     'desc_tip'		=> true,
                     'custom_attributes' => array('required' => 'required'),
                 ),
-                $this->pluginName.'_api_key'    => array(
-                    'id'        	=> $this->pluginName.'_api_key',
+                $this->pluginFileName . '_api_key'    => array(
+                    'id'        	=> $this->pluginFileName . '_api_key',
                     'title'     	=> __( 'API Key', 'woocommerce' ),
                     'type' 	    	=> 'text',
                     'default'   	=> '',
-                    'description'	=> $this->pluginName.' will have supplied you with your '.$this->pluginName.' API key. Contact us if you cannot find it.',
+                    'description'	=> $this->pluginDisplayName . ' will have supplied you with your ' . $this->pluginDisplayName . ' API key. Contact us if you cannot find it.',
                     'desc_tip'		=> true,
                     'custom_attributes' => array('required' => 'required'),
                 ),
-                $this->pluginName.'_minimum'=> array(
-	                'id'		    => $this->pluginName.'_minimum',
+                $this->pluginFileName . '_minimum'    => array(
+	                'id'		    => $this->pluginFileName . '_minimum',
 	                'title'     	=> __( 'Minimum Order Total', 'woocommerce' ),
 	                'type' 	    	=> 'text',
 	                'default'   	=> '0',
-	                'description'	=> 'Minimum order total to use '.$this->pluginName.'. Empty for unlimited',
+	                'description'	=> 'Minimum order total to use '.$this->pluginDisplayName . '. Empty for unlimited',
 	                'desc_tip'		=> true,
                 ),
-                $this->pluginName.'_maximum'=> array(
-	                'id'		    => $this->pluginName.'_maximum',
+                $this->pluginFileName . '_maximum'    => array(
+	                'id'		    => $this->pluginFileName . '_maximum',
 	                'title'     	=> __( 'Maximum Order Total', 'woocommerce' ),
 	                'type' 	    	=> 'text',
 	                'default'   	=> '0',
@@ -256,8 +258,8 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                     $this->updateSetting('use_modal', $this->settings['use_modal']);
                 }
 
-                $minField = sprintf('%s_minimum', $this->productName);
-                $maxField = sprintf('%s_maximum', $this->productName);
+                $minField = sprintf('%s_minimum', $this->pluginFileName);
+                $maxField = sprintf('%s_maximum', $this->pluginFileName);
                 if (!isset($this->settings[$minField])) {
                     $this->updateSetting('use_modal', $this->settings[$minField]);
                 }
@@ -321,7 +323,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 
             $transaction_details = array (
                 'x_reference'                   => $order_id,
-                'x_account_id'                  => $this->settings[$this->pluginName.'_merchant_id'],
+                'x_account_id'                  => $this->settings[ $this->pluginDisplayName . '_merchant_id'],
                 'x_amount'                      => $order->get_total(),
                 'x_currency'                    => $this->getCurrencyCode(),
                 'x_url_callback'                => $callbackURL,
@@ -352,7 +354,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                 'gateway_url' 					=> $gatewayUrl
             );  
 
-            $signature = flexi_sign($transaction_details, $this->settings[$this->pluginName.'_api_key']);
+            $signature = flexi_sign($transaction_details, $this->settings[ $this->pluginDisplayName . '_api_key']);
             $transaction_details['x_signature'] = $signature;
         
             $encodedFields = array(
@@ -384,8 +386,8 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         private function verifyConfiguration($order)
         {
             
-            $apiKey     = $this->settings[ $this->pluginName.'_api_key' ];
-            $merchantId = $this->settings[ $this->pluginName.'_merchant_id' ];
+            $apiKey     = $this->settings[ $this->pluginDisplayName . '_api_key' ];
+            $merchantId = $this->settings[ $this->pluginDisplayName . '_merchant_id' ];
             $region     = $this->settings['country'];
 
             $isValid   = true;
@@ -505,14 +507,14 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 
             // make sure we have an flexi order
             // OIR-3
-            if ($order->get_data()['payment_method'] !== $this->pluginName) {
+            if ($order->get_data()['payment_method'] !== $this->pluginDisplayName) {
                 // we don't care about it because it's not an flexi order
                 // only log in debug mode
-                $this->log(sprintf('No action required orderId: %s is not an '.$this->pluginName.' order ', $order_id));
+                $this->log(sprintf('No action required orderId: %s is not an '.$this->pluginDisplayName . ' order ', $order_id));
                 return $order_id;
             }
 
-            if (flexi_checksign($params, $this->settings[ $this->pluginName . '_api_key'])) {
+            if (flexi_checksign($params, $this->settings[ $this->pluginDisplayName . '_api_key'])) {
                 $this->log(sprintf('Processing orderId: %s ', $order_id));
                 // Get the status of the order from XPay and handle accordingly
                 switch ($params['x_result']) {
@@ -542,7 +544,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             }
             else
             {
-                $order->add_order_note(__( $this->currentConfig->getDisplayName() . ' payment response failed signature validation. Please check your Merchant Number and API key or contact '.$this->pluginName.' for assistance.', 0, 'woocommerce'));
+                $order->add_order_note(__( $this->currentConfig->getDisplayName() . ' payment response failed signature validation. Please check your Merchant Number and API key or contact '.$this->pluginDisplayName . ' for assistance.', 0, 'woocommerce'));
                 $order->add_order_note(__( 'Payment declined using ' . $this->currentConfig->getDisplayName() . '. Your Order ID is ' . $order_id, 'woocommerce'));
                 $order->update_status('failed');
                 $msg = 'failed';
