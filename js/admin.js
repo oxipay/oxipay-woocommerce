@@ -4,9 +4,9 @@
     'use strict';
     
     $(function() {
-        var $countrySelect = $('#woocommerce_oxipay_country'),
-            $gatewayUrl = $('#woocommerce_oxipay_oxipay_gateway_url'),
-            $sandboxUrl = $('#woocommerce_oxipay_oxipay_sandbox_gateway_url');
+        var $countrySelect = $('#woocommerce_ezipay_country'),
+            $gatewayUrl = $('#woocommerce_ezipay_ezipay_gateway_url'),
+            $sandboxUrl = $('#woocommerce_ezipay_ezipay_sandbox_gateway_url');
 
         //if we are on the settings page
         if($countrySelect.length > 0 && $gatewayUrl.length > 0 && $sandboxUrl.length > 0 && typeof(countryUrls) == 'object'){

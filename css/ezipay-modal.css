@@ -1,8 +1,12 @@
-﻿.iframe-body {
+﻿#masthead {
+  z-index: 0;
+}
+
+.iframe-body {
   background-color: #fff;
   overflow: hidden; }
 
-.oxi-modal-overlay {
+.ezi-modal-overlay {
   position: fixed;
   top: 0;
   right: 0;
@@ -11,7 +15,7 @@
   z-index: 100;
   background-color: rgba(0, 0, 0, 0.2); }
 
-.oxi-modal {
+.ezi-modal {
   position: absolute;
   top: 50px;
   left: 4rem;
@@ -21,66 +25,67 @@
   margin-right: auto;
   z-index: 200; }
 
-.oxi-modal-header {
+.ezi-modal-header {
   padding: 15px;
-  background-color: #515565;
+  background-color: #4EB0E6;
   min-height: 45px;
   padding-left: 0.9rem;
   padding-right: 0.9rem; }
-.oxi-modal-header > .oxi-modal-logo {
-  background-image: url(https://secure.oxipay.com.au/Client/skins/img/logo-orange.svg);
+.ezi-modal-header > .ezi-modal-logo {
+  background-image: url(../images/ezipay.svg);
   background-repeat: no-repeat;
   background-position: left;
-  height: 30px;
-  margin: 5px; }
+  background-size: contain;
+  height: 36px;
+  margin: 2px 5px; }
 
-.oxi-modal-body {
+.ezi-modal-body {
   background-color: #fff;
   -webkit-box-shadow: 0px 5px 15px 3px rgba(0, 0, 0, 0.1);
   -moz-box-shadow: 0px 5px 15px 3px rgba(0, 0, 0, 0.1);
   box-shadow: 0px 5px 15px 3px rgba(0, 0, 0, 0.1); }
-.oxi-modal-body iframe {
+.ezi-modal-body iframe {
   display: block;
   margin: 0 auto;
   width: 450px;
   border: none; }
-.oxi-modal-body > div {
+.ezi-modal-body > div {
   position: absolute;
   width: 450px;
   border: none; }
-.oxi-modal-body .oxi-modal-iframe {
+.ezi-modal-body .ezi-modal-iframe {
   z-index: 101; }
-.oxi-modal-body .oxi-modal-splash {
+.ezi-modal-body .ezi-modal-splash {
   z-index: 102;
   height: 496px;
   background-color: #fff; }
-.oxi-modal-body .oxi-modal-splash.fadeOut {
+.ezi-modal-body .ezi-modal-splash.fadeOut {
   -webkit-animation-name: fadeOut;
   animation-name: fadeOut; }
-.oxi-modal-body .oxi-modal-splash.animated {
+.ezi-modal-body .ezi-modal-splash.animated {
   -webkit-animation-duration: 0.5s;
   animation-duration: 0.5s;
   -webkit-animation-fill-mode: both;
   animation-fill-mode: both; }
 
-.oxi-modal-splash .splash {
+.ezi-modal-splash .splash {
   height: 100%;
   width: 100%;
   z-index: 1050;
   position: relative;
   left: 0px;
   top: 50px; }
-.oxi-modal-splash .splash .fa-spin {
+.ezi-modal-splash .splash .fa-spin {
   color: #FA8B23; }
-.oxi-modal-splash .splash h2 {
+.ezi-modal-splash .splash h2 {
   color: #444; }
 
-.oxi-modal-splash .splashText {
+.ezi-modal-splash .splashText {
   color: #FA8B23;
   margin-top: 40px;
   text-align: center; }
 
-.oxi-modal-splash .splashFrame {
+.ezi-modal-splash .splashFrame {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -88,16 +93,16 @@
   right: 0;
   padding: 5%; }
 
-.oxi-modal-splash .splashGraphic {
+.ezi-modal-splash .splashGraphic {
   position: relative;
   margin: 0 auto;
   width: 100px; }
-.oxi-modal-splash .splashGraphic:before {
+.ezi-modal-splash .splashGraphic:before {
   content: '';
   display: block;
   padding-top: 100%; }
 
-.oxi-modal-splash .circular {
+.ezi-modal-splash .circular {
   animation: rotate 1s linear infinite;
   height: 100%;
   transform-origin: center center;
@@ -109,14 +114,14 @@
   right: 0;
   margin: auto; }
 
-.oxi-modal-splash .path {
+.ezi-modal-splash .path {
   stroke-dasharray: 1, 200;
   stroke-dashoffset: 0;
   animation: dash 1.5s ease-in-out infinite, color 6s ease-in-out infinite;
   stroke-linecap: round; }
 
 @media screen and (max-width: 650px) {
-  .oxi-modal, .oxi-modal-splash, .oxi-modal-iframe, .oxipay-iframe, .oxi-modal-body iframe {
+  .ezi-modal, .ezi-modal-splash, .ezi-modal-iframe, .ezipay-iframe, .ezi-modal-body iframe {
     position: absolute;
     top: 0 !important;
     left: 0 !important;
