@@ -1,17 +1,17 @@
 ///<reference path="../typings/jquery/jquery.d.ts"/>
-function oxipay(q) {
+function ezipay(q) {
     var initialised = false;
-    var iframeId = 'oxipay-iframe';
+    var iframeId = 'ezipay-iframe';
     var data;
     var form = null;
     var stylesheetUrl = '/Modal/src/css/ezipay.css';
-    var template = '<div class="oxi-modal-overlay"></div>' +
-        '<div class="oxi-modal">' +
-        '<div class="oxi-modal-content">' +
-        '<div class="oxi-modal-body">' +
-        '<div class="oxi-modal-splash">' +
-        '<div class="oxi-modal-header">' +
-        '<div class="oxi-modal-logo"></div>' +
+    var template = '<div class="ezi-modal-overlay"></div>' +
+        '<div class="ezi-modal">' +
+        '<div class="ezi-modal-content">' +
+        '<div class="ezi-modal-body">' +
+        '<div class="ezi-modal-splash">' +
+        '<div class="ezi-modal-header">' +
+        '<div class="ezi-modal-logo"></div>' +
         '</div>' +
         '<div class="splash">' +
         '<div class="splashFrame">' +
@@ -24,7 +24,7 @@ function oxipay(q) {
         '</div>' +
         '</div>' +
         '</div>' +
-        '<div class="oxi-modal-iframe"></div>' +
+        '<div class="ezi-modal-iframe"></div>' +
         '</div>' +
         '</div>' +
         '</div>';
@@ -39,7 +39,7 @@ function oxipay(q) {
     };
     return model;
     /**
-     * Setup Oxipay Checkout
+     * Setup Ezipay Checkout
      * @param targetUrl
      * @param keyValue
      */
@@ -64,7 +64,7 @@ function oxipay(q) {
     }
     
     /**
-     * Show the Oxipay Checkout Modal
+     * Show the Ezipay Checkout Modal
      */
     function show() {
         try {
@@ -79,8 +79,8 @@ function oxipay(q) {
     function hide() {
         try {
             q("#" + iframeId).remove();
-            q(".oxi-modal").remove();
-            q(".oxi-modal-overlay").remove();
+            q(".ezi-modal").remove();
+            q(".ezi-modal-overlay").remove();
             model.form.remove();
         }
         catch (e) {
@@ -89,8 +89,8 @@ function oxipay(q) {
     }
     function message(e) {
         try {
-            q('.oxi-modal-splash').addClass('animated fadeOut');
-            setTimeout(function () { return q('.oxi-modal-splash').remove(); }, 2000);
+            q('.ezi-modal-splash').addClass('animated fadeOut');
+            setTimeout(function () { return q('.ezi-modal-splash').remove(); }, 2000);
         }
         catch (e) {
             console.error(e);
@@ -104,7 +104,7 @@ function oxipay(q) {
             body.append(modal);
             // Insert iframe inside modal body
             var iframe = q("<iframe id=\"" + iframeId + "\"/>");
-            q('.oxi-modal-iframe').append(iframe);
+            q('.ezi-modal-iframe').append(iframe);
             var form_1 = q(getForm());
             var iframeBody = iframe.contents().find('body');
             iframeBody.append(form_1);
@@ -117,7 +117,7 @@ function oxipay(q) {
     }
     function getForm() {
         var target = window.innerWidth <= 650 ? "_top" : "_self";
-        var form = "<form id=\"oxi-form\" action='" + model.targetUrl + "' method='POST' style=\"display:none;\" target=\"" + target + "\">";
+        var form = "<form id=\"ezi-form\" action='" + model.targetUrl + "' method='POST' style=\"display:none;\" target=\"" + target + "\">";
         for (var key in model.data) {
             var val = model.data[key] || "";
             form += "<input type=\"hidden\" name=\"" + key + "\" value=\"" + val + "\"/>";

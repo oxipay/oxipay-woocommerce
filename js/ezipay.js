@@ -1,9 +1,9 @@
 /**
- * This is used to switch on the modal dialog for Oxipay transactions
+ * This is used to switch on the modal dialog for Ezipay transactions
  */
 (function($) {
     'use strict';
-    var oxipay_settings;
+    var ezipay_settings;
 
     $( document ).ready(function() {
 
@@ -12,7 +12,7 @@
             loadSettings(checkoutUrl);
         }
 
-        $('form.checkout.woocommerce-checkout').on('checkout_place_order_oxipay', function(e) {
+        $('form.checkout.woocommerce-checkout').on('checkout_place_order_ezipay', function(e) {
             $.ajax({
                 url     : wc_checkout_params.checkout_url,
                 type    : 'POST',
@@ -72,10 +72,10 @@
 
     function loadSettings(checkoutUrl) {
         $.ajax({
-            url     : checkoutUrl + "&oxi_settings=true",
+            url     : checkoutUrl + "&ezi_settings=true",
             type    : 'GET',
             success : function( data ) {
-                oxipay_settings = data;
+                ezipay_settings = data;
             },
             error   : function( xhr, err ) {
                 // we have failed to load the settings for some reason.
@@ -100,17 +100,18 @@
         var form        = $('form.checkout.woocommerce-checkout');
         var keyStartPos = urlString.indexOf('?')+1
         var values      = extractKeys(urlString.substring(keyStartPos));
-        modal           = oxipay_settings.use_modal;
+        modal           = ezipay_settings.use_modal;
 
         var gateway = urlString.substring(0,urlString.indexOf('&'));
         // we already include the platform as part of the gateway URL so remove it
         delete values.platform;
 
         if (modal && modal != 'no' && modal != false) {
-            var oxi = oxipay($);
+            var ezi = ezipay($);
             var modalCSS = php_vars.plugin_url+'/css/ezipay-modal.css';
-            oxi.setup(gateway, values, modalCSS);
-            oxi.show();
+
+            ezi.setup(gateway, values, modalCSS);
+            ezi.show();
 
         } else {
             post(gateway, values);
@@ -123,7 +124,7 @@
         var form = document.createElement("form");
         form.setAttribute("method", "post");
         form.setAttribute("action", path);
-        form.setAttribute('id', 'oxipay-submission')
+        form.setAttribute('id', 'ezipay-submission')
 
         for(var key in params) {
             if(params.hasOwnProperty(key)) {

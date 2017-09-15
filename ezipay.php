@@ -35,7 +35,7 @@ function add_ezipay_payment_gateway($methods) {
 }
 
 function add_ezipay_query_vars_filter( $vars ){
-    $vars[] = "oxi_settings";
+    $vars[] = "ezi_settings";
     return $vars;
 }
 /**
@@ -56,7 +56,7 @@ function get_ezipay_settings($query) {
 
     $ezipay = $list['ezipay'];
 
-    if (isset($query->query_vars['oxi_settings'])) {
+    if (isset($query->query_vars['ezi_settings'])) {
         $settings = $ezipay->get_settings();
         wp_send_json($settings);
     }
