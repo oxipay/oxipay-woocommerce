@@ -1,8 +1,9 @@
 <?php
-require_once('WC_Flexi_Gateway.php');
+if(!class_exists('WC_Flexi_Gateway')) {
+	require_once( 'WC_Flexi_Gateway.php' );
+}
 
 class WC_Oxipay_Gateway extends WC_Flexi_Gateway {
-       
 
         //todo: localise these string constants
         const PLUGIN_NO_GATEWAY_LOG_MSG = 'Transaction attempted with no gateway URL set. Please check oxipay plugin configuration, and provide a gateway URL.';
@@ -23,6 +24,8 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway {
 
             parent::__construct($config);
         }
+
+
 
         /**
          * Load JavaScript for the checkout page

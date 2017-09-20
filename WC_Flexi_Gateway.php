@@ -27,7 +27,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             $this->has_fields             = false;
             $this->method_title           = __($this->pluginDisplayName, 'woocommerce');
             
-	        $this->plugin_current_version = get_plugin_data( plugin_dir_path(__FILE__) . $this->pluginFileName.'.php', false, false)['Version'];
+	        $this->plugin_current_version = $config->getPluginVersion();
 
             $this->init_form_fields();
             $this->init_settings();
