@@ -17,7 +17,6 @@ if ( !defined('ABSPATH')) exit; // Exit if accessed directly
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 if(!is_plugin_active( 'woocommerce/woocommerce.php')) return;
 
-require_once( 'crypto.php' );
 require_once( 'oxipay-config.php' );
 
 add_action('plugins_loaded', 'woocommerce_oxipay_init', 0);
