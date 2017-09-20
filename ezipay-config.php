@@ -37,4 +37,7 @@ class Ezipay_Config {
     public function getPluginFileName() {
     	return self::PLUGIN_FILE_NAME;
     }
+	public function getPluginVersion() {
+		return get_plugin_data( plugin_dir_path(__FILE__) . Ezipay_Config::PLUGIN_FILE_NAME.'.php', false, false)['Version'];
+	}
 }
