@@ -5,6 +5,7 @@
  * Description: Easy to setup installment payment plans from <a href="https://certegyezipay.com.au">Certegy EziPay</a>.
  * Version: plugin_version_placeholder
  * Author: FlexiGroup
+ * Author URI: https://www.certegyezipay.com.au
  * @package WordPress
  * @author FlexiGroup
  * @since 0.4.8
@@ -16,7 +17,6 @@ if ( !defined('ABSPATH')) exit; // Exit if accessed directly
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 if(!is_plugin_active( 'woocommerce/woocommerce.php')) return;
 
-require_once( 'crypto.php' );
 require_once( 'ezipay-config.php' );
 
 add_action('plugins_loaded', 'woocommerce_ezipay_init', 0);

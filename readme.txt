@@ -6,19 +6,28 @@ License: GNU General Public License v3.0
 
 Shop now and pay over time
 
-Certegy EziPay is a smarter way to pay.
-Shop online or in-store, and pay for your purchase by four, easy interest free instalments.
+Shop today, pay over time with Certegy Ezi-Pay. No Interest Ever!
+You can shop online or instore at any Certegy Ezi-Pay retailer and instead of having to pay up front, you can arrange your purchase today and spread the cost over time in convenient fortnightly repayments.
 
 == Description ==
-Certegy EziPay is a flexible payment solution backed by FlexiGroup, an ASX 200 financial services company with over 14,000 partners, 20,000 distribution points, and $2 billion in assets.
+Shop today, pay over time with Certegy Ezi-Pay
 
-Certegy EziPay is simply the easier way to pay. You can shop online or in-store at any Certegy EziPay retail partner and we’ll spread the cost of your purchase over 4 payments. It’s just that little bit extra breathing space to make buying easier.
+You can shop online or instore at any Certegy Ezi-Pay retailer and instead of having to pay up front, you can arrange your purchase today and spread the cost over time in convenient fortnightly repayments.
 
+No Interest Ever!
+
+One of the great benefits of a Certegy Ezi-Pay payment plan is that you never pay interest on the amount that you owe. You know exactly how much you will get charged as long as you stick with your payment schedule.
+
+Checkout with Certegy Ezi-Pay
+
+Select Certegy Ezi-Pay at the checkout when shopping online to make your purchase today and repay it over time. Simply nominate your credit card during the checkout process to make your purchase. Certegy Ezi-Pay gives you the flexibility of making a purchase today by not having to pay the full cost upfront.
+
+For more information please visit:
 https://certegyezipay.com.au
 
 == Installation ==
 = Pre-requisites -
-A working WooCommerce plugin installation
+A working WooCommerce (version >= 3.0) plugin installation
 
 = Other assumptions -
 You have received a Merchant ID and API key for use from Certegy EziPay's support team. You will also have received a payment gateway URL and a testing 'Sandbox' URL
@@ -34,7 +43,11 @@ Go to WooCommerce -> Settings -> Checkout -> Certegy EziPay
 https://certegyezipay.com.au
 
 == Changelog ==
-= 1.1.1 =
-*Release Date - 20 Jun 2017*
+= 1.3.0 =
+*Release Date - 28 Sep 2017*
 
-* Added readme.txt file
+Initial release to WordPress.org
+
+= 1.3.1 =
+*Release Date - 22 Nov 2017*
+
