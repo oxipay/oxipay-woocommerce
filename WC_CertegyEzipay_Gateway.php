@@ -17,7 +17,7 @@ class WC_CertegyEzipay_Gateway extends WC_Flexi_Gateway {
 
             $this->method_description = __( 'Easy to setup installment payment plans from ' . $config::DISPLAY_NAME );
             $this->title              = __( $config::DISPLAY_NAME , 'woocommerce' );
-            $this->description        = __( '<strong>'.$config::DISPLAY_NAME . ' the smarter way to pay.</strong><br/> Shop today, pay over time. 4 easy fortnightly payments.', 'woocommerce' );
+            $this->description        = __( 'No Interest Ever!.</strong><br/> Shop today, pay over time with Certegy Ezi-Pay', 'woocommerce' );
             $this->icon               = plugin_dir_url( __FILE__ ) .  'images/ezipay.png';
             $this->shop_details       = __($config::DISPLAY_NAME . ' Payment', 'woocommerce' );
             $this->order_button_text      = __( 'Proceed to ' . $config::DISPLAY_NAME, 'woocommerce' );

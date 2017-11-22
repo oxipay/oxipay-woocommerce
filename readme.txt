@@ -43,7 +43,11 @@ Go to WooCommerce -> Settings -> Checkout -> Certegy EziPay
 https://certegyezipay.com.au
 
 == Changelog ==
-= 1.2.0 =
+= 1.3.0 =
 *Release Date - 28 Sep 2017*
 
 Initial release to WordPress.org
+
+= 1.3.1 =
+*Release Date - 22 Nov 2017*
+
