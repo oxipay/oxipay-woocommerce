@@ -165,6 +165,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                 'country'                                => array(
                     'title'			=> __( $this->pluginDisplayName . ' Region', 'woocommerce' ),
                     'type'			=> 'select',
+                    'class'         => 'wc-enhanced-select',
                     'description'	=> 'Select the option that matches your retailer agreement.',
                     'options'		=> $countryOptions,
                     'desc_tip'		=> true,
