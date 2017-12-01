@@ -522,6 +522,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                     case "completed":
                         $order->add_order_note(__( 'Payment approved using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce'));
                         $order->payment_complete($params['x_reference']);
+
                         if (!is_null($cart)) {
                             $cart->empty_cart();
                         }
