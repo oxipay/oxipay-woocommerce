@@ -1,7 +1,7 @@
 === Oxipay Payment Gateway for WooCommerce ===
 Tags: Oxipay
 Requires at least: 4.0
-Tested up to: 4.8
+Tested up to: 4.9.1
 License: GNU General Public License v3.0
 
 Shop now and pay over time
@@ -34,7 +34,20 @@ Go to WooCommerce -> Settings -> Checkout -> Oxipay
 https://oxipay.com.au
 
 == Changelog ==
+
+= 1.2.1 =
+*Release Date – 18 Aug 2017*
+* Improve modal design.
+* Remove Gateway URL input from settings.
+* First version hosted on wordpress.org
+
+= 1.2.0 =
+*Release Date – 14 Aug 2017*
+* Add minimum/maximum limit option.
+* Add modal mode. User can choose between modal and redirect mode.
+* Integrate price-info widget.
+* Changes to comply with WordPress guidelines.
+
 = 1.1.1 =
 *Release Date - 20 Jun 2017*
-
 * Added readme.txt file
