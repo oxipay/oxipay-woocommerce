@@ -508,20 +508,21 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 
             // make sure we have an flexi order
             // OIR-3
-            if ($order->get_data()['payment_method'] !== $this->pluginDisplayName) {
+            if ($order->get_data()['payment_method'] !== $this->pluginFileName) {
                 // we don't care about it because it's not an flexi order
                 // only log in debug mode
                 $this->log(sprintf('No action required orderId: %s is not an '.$this->pluginDisplayName . ' order ', $order_id));
                 return $order_id;
             }
 
-            if (flexi_checksign($params, $this->settings[ $this->pluginFileName . '_api_key'])) {
+            if ($this->checksign($params, $this->settings[ $this->pluginFileName . '_api_key'])) {
                 $this->log(sprintf('Processing orderId: %s ', $order_id));
                 // Get the status of the order from XPay and handle accordingly
                 switch ($params['x_result']) {
                     case "completed":
                         $order->add_order_note(__( 'Payment approved using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce'));
                         $order->payment_complete($params['x_reference']);
+
                         if (!is_null($cart)) {
                             $cart->empty_cart();
                         }
@@ -742,7 +743,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
          * @param $api_key string
          * @return bool
          */
-        function flexi_checksign($query, $api_key)
+        function checksign($query, $api_key)
         {
             if (!isset($query['x_signature'])) {
                 return;
