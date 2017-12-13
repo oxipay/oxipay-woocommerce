@@ -3,23 +3,16 @@ var webdriver = require('selenium-webdriver'),
     until = webdriver.until;
 
 var driver = new webdriver.Builder()
-    .forBrowser('opera')
+    .forBrowser('firefox')
     .build();
 
 driver.manage().window().maximize();
-
-driver.manage().timeouts().implicitlyWait(20000);			// 10 Seconds
-	
-// to enable logging to console.log
-var logger = webdriver.logging.getLogger;
-
-driver.get('http://54.252.165.134/?post_type=product');
-
-
+driver.navigate().to("http://54.252.164.59/");
+driver.manage().timeouts().implicitlyWait(5000);			// 5 Seconds
 
 /* Checkout first product on WooCommerce */ 
 driver.findElement(By.css('.first')).click();
-driver.findElement(By.css('button.single_add_to_cart_button')).click();
+driver.findElement(By.linkText("Add to cart")).click();
 driver.findElement(By.linkText('View cart')).click();
 
 // Ensure Cart total is above Oxipay minimum
@@ -56,6 +49,12 @@ var woocommerceCheckout = [
 	['#billing_email', 'Sam.Al-Khalfa@certegy.com.au']
 ]
 
+for (var i = 0; i < woocommerceCheckout.length; i++) {
+	for (var j = 0; j < woocommerceCheckout[i].length; j++) {
+		console.log(woocommerceCheckout[i][j]);
+	}
+}
+
 function sendKeysBySelector (selector, value) {
 	driver.findElement(By.cssSelector(selector).sendKeys(value));
 }
@@ -69,7 +68,6 @@ function dropdownSelector (selector, value) {
 ['.select2-search__field', 'Queensland'],
 ['.select2-search__field', 'webdriver.Key.ENTER'],
 
-
 driver.findElement(By.linkText('Proceed to checkout')).click();
 
 // Filling out checkout page
@@ -82,6 +80,8 @@ driver.findElement(By.id('billing_company')).sendKeys('Certegy Ezi-Pay');
 driver.findElement(By.id('billing_address_1')).sendKeys('97 Pirie St');
 driver.findElement(By.id('billing_address_2')).sendKeys('Level 6');
 driver.findElement(By.id('billing_city')).sendKeys('Certegy Ezi-Pay');
+
+
 
 driver.findElement(By.id('select2-billing_state-container')).click();
 driver.findElement(By.css('.select2-search__field')).sendKeys('Queensland');
