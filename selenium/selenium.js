@@ -42,8 +42,35 @@ checkoutBelowMinimum = driver.findElement(By.css('.order-total .woocommerce-Pric
 	}
 );
 
-driver.findElement(By.linkText('Proceed to checkout')).click();
+var woocommerceCheckout = [
+	['#billing_first_name', 'Sameer'],
+	['#billing_last_name', 'Al-Khalfa'],
+	['#billing_company', 'Certegy Ezi-Pay'],
+	['#billing_address_1', '97 Pirie St'],
+	['#billing_address_2', 'Level 6'],
+	['#billing_city', 'Certegy Ezi-Pay'],
+	['.select2-search__field', 'Queensland'],
+	['.select2-search__field', 'webdriver.Key.ENTER'],
+	['#billing_postcode','5000'],
+	['#billing_phone','0407229128'],
+	['#billing_email', 'Sam.Al-Khalfa@certegy.com.au']
+]
 
+function sendKeysBySelector (selector, value) {
+	driver.findElement(By.cssSelector(selector).sendKeys(value));
+}
+
+function dropdownSelector (selector, value) {
+	driver.findElement(By.id('select2-billing_state-container')).click();
+	driver.findElement(By.css('.select2-search__field')).sendKeys('Queensland');
+	driver.findElement(By.css('.select2-search__field')).sendKeys(webdriver.Key.ENTER);
+}
+
+['.select2-search__field', 'Queensland'],
+['.select2-search__field', 'webdriver.Key.ENTER'],
+
+
+driver.findElement(By.linkText('Proceed to checkout')).click();
 
 // Filling out checkout page
 driver.findElement(By.id('billing_first_name')).sendKeys('');
@@ -55,8 +82,6 @@ driver.findElement(By.id('billing_company')).sendKeys('Certegy Ezi-Pay');
 driver.findElement(By.id('billing_address_1')).sendKeys('97 Pirie St');
 driver.findElement(By.id('billing_address_2')).sendKeys('Level 6');
 driver.findElement(By.id('billing_city')).sendKeys('Certegy Ezi-Pay');
-
-
 
 driver.findElement(By.id('select2-billing_state-container')).click();
 driver.findElement(By.css('.select2-search__field')).sendKeys('Queensland');
