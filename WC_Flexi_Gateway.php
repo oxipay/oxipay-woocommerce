@@ -300,6 +300,17 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                     $this->settings['use_modal'] = false;
                     $this->updateSetting('use_modal', $this->settings['use_modal']);
                 }
+                if (!isset($this->settings['preselect_button_enabled'])) {
+	                // default to the disable the pre-select checkout button for existing merchants
+	                // so we don't break the existing behaviour
+	                $this->settings['preselect_button_enabled'] = "no";
+	                $this->updateSetting( 'preselect_button_enabled', $this->settings['preselect_button_enabled'] );
+                }
+                if (!isset($this->settings['preselect_button_sequence'])){
+	                // set default to 20 for pre-select button sequence
+                    $this->settings['preselect_button_sequence'] = "20";
+                    $this->updateSetting('preselect_button_sequence', $this->settings['preselect_button_sequence']);
+                }
 
                 $minField = sprintf('%s_minimum', $this->pluginFileName);
                 $maxField = sprintf('%s_maximum', $this->pluginFileName);
