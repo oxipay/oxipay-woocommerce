@@ -52,7 +52,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             add_action('woocommerce_before_cart', array($this, 'display_min_max_notice'));
             add_filter('woocommerce_available_payment_gateways', array($this,'display_min_max_filter'));
             add_filter('woocommerce_available_payment_gateways', array($this, 'preselect_oxipay'));
-            add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), $this->settings["preselect_button_sequence"]);
+            add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), $this->settings["preselect_button_order"]);
         }
 
         abstract public function add_price_widget();
@@ -213,7 +213,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                     'description'	=> __('The customer will be forwarded to '.$this->pluginDisplayName . ' in a modal dialog', 'woocommerce' ),
                     'desc_tip'		=> true
                 ),
-                'preselect_button_enabled'             => array(
+                'preselect_button_enabled'            => array(
                     'title' 		=> __( 'Pre-select Checkout Button', 'woocommerce' ),
                     'type' 			=> 'checkbox',
                     'label' 		=> __( 'Add a "Checkout with '.$this->pluginDisplayName.'" button in Cart page', 'woocommerce' ),
@@ -221,10 +221,10 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                     'description'	=> __('Add a "Checkout with '.$this->pluginDisplayName.'" button in Cart page that takes customer to Checkout page and have '. $this->pluginDisplayName . ' pre-selected', 'woocommerce' ),
                     'desc_tip'		=> true
                 ),
-                'preselect_button_sequence'             => array(
-                    'title' 		=> __( 'Pre-select Button Sequence', 'woocommerce' ),
+                'preselect_button_order'              => array(
+                    'title' 		=> __( 'Pre-select Button Order', 'woocommerce' ),
                     'type' 			=> 'text',
-                    'label' 		=> __( 'Pre-select Button Sequence', 'woocommerce' ),
+                    'label' 		=> __( 'Pre-select Button Order', 'woocommerce' ),
                     'default' 		=> '20',
                     'description'	=> __('Position the "checkout with '.$this->pluginDisplayName.' button" in Cart page if there are multiple checkout buttons. Default is 20. Smaller number moves the button ahead and larger number moves it lower in the list of checkout buttons.', 'woocommerce' ),
                     'desc_tip'		=> true
@@ -306,10 +306,10 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 	                $this->settings['preselect_button_enabled'] = "no";
 	                $this->updateSetting( 'preselect_button_enabled', $this->settings['preselect_button_enabled'] );
                 }
-                if (!isset($this->settings['preselect_button_sequence'])){
+                if (!isset($this->settings['preselect_button_order'])){
 	                // set default to 20 for pre-select button sequence
-                    $this->settings['preselect_button_sequence'] = "20";
-                    $this->updateSetting('preselect_button_sequence', $this->settings['preselect_button_sequence']);
+                    $this->settings['preselect_button_order'] = "20";
+                    $this->updateSetting('preselect_button_order', $this->settings['preselect_button_order']);
                 }
 
                 $minField = sprintf('%s_minimum', $this->pluginFileName);
