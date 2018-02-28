@@ -51,14 +51,14 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             add_action('woocommerce_before_checkout_form', array($this, 'display_min_max_notice'));
             add_action('woocommerce_before_cart', array($this, 'display_min_max_notice'));
             add_filter('woocommerce_available_payment_gateways', array($this,'display_min_max_filter'));
-    		add_filter('woocommerce_available_payment_gateways', array($this, 'preselect_oxipay'));
-            add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), 20);
+            add_filter('woocommerce_available_payment_gateways', array($this, 'preselect_oxipay'));
+            add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), $this->settings["preselect_button_sequence"]);
         }
 
         abstract public function add_price_widget();
 
         function flexi_checkout_button(){
-            if($this->settings["use_direct_checkout_button"]=="yes"){
+            if($this->settings["preselect_button_enabled"] == "yes"){
                 echo '<div><a href="'.esc_url( wc_get_checkout_url() ).'?oxipay_preselected=true" class="checkout-button button" style="font-size: 1.2em; padding-top: 0.4em; padding-bottom: 0.4em; background-color: #e68821; color: #FFF;">Check out with '.$this->pluginDisplayName.'</a></div>';
             }
         }
@@ -213,12 +213,20 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                     'description'	=> __('The customer will be forwarded to '.$this->pluginDisplayName . ' in a modal dialog', 'woocommerce' ),
                     'desc_tip'		=> true
                 ),
-                'use_direct_checkout_button'             => array(
-                    'title' 		=> __( 'Direct Checkout Button', 'woocommerce' ),
+                'preselect_button_enabled'             => array(
+                    'title' 		=> __( 'Pre-select Checkout Button', 'woocommerce' ),
                     'type' 			=> 'checkbox',
-                    'label' 		=> __( 'Direct Checkout Button', 'woocommerce' ),
-                    'default' 		=> 'no',
-                    'description'	=> __('An additional button in Cart page that takes customer to Checkout page and have '.$this->pluginDisplayName . ' pre-selected', 'woocommerce' ),
+                    'label' 		=> __( 'Add a "Checkout with '.$this->pluginDisplayName.'" button in Cart page', 'woocommerce' ),
+                    'default' 		=> 'yes',
+                    'description'	=> __('Add a "Checkout with '.$this->pluginDisplayName.'" button in Cart page that takes customer to Checkout page and have '. $this->pluginDisplayName . ' pre-selected', 'woocommerce' ),
+                    'desc_tip'		=> true
+                ),
+                'preselect_button_sequence'             => array(
+                    'title' 		=> __( 'Pre-select Button Sequence', 'woocommerce' ),
+                    'type' 			=> 'text',
+                    'label' 		=> __( 'Pre-select Button Sequence', 'woocommerce' ),
+                    'default' 		=> '20',
+                    'description'	=> __('Position the "checkout with '.$this->pluginDisplayName.' button" in Cart page if there are multiple checkout buttons. Default is 20. Smaller number moves the button ahead and larger number moves it lower in the list of checkout buttons.', 'woocommerce' ),
                     'desc_tip'		=> true
                 ),
                 "{$this->pluginFileName}_merchant_id" => array(
