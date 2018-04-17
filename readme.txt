@@ -21,7 +21,7 @@ https://oxipay.com.au
 A working WooCommerce plugin (version >=3.0) installation
 
 = Other assumptions -
-You have received a Merchant ID and API key for use from Oxipay's support team. You will also have received a payment gateway URL and a testing 'Sandbox' URL
+You have received a Merchant ID and API key for use from Oxipay's support team.
 
 = Installation =
 Upload the Oxipay plugin to your blog, Activate it.
