@@ -59,7 +59,12 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway {
                     $country_domain = 'co.nz';
                 }
                 
-                echo '<script id="oxipay-price-info" src="https://widgets.oxipay.'.$country_domain.'/content/scripts/price-info.js?productPrice='.wc_get_price_to_display($product).'"></script>';
+                $minimum = $this->getMinPrice();
+                $maximum = $this->getMaxPrice();
+                $price = wc_get_price_to_display($product);
+                if(($minimum == 0 || $price >= $minimum) && ($maximum == 0 || $price <= $maximum)) {
+                    echo '<script id="oxipay-price-info" src="https://widgets.oxipay.'.$country_domain.'/content/scripts/price-info.js?productPrice='.$price.'"></script>';
+                }
             }
         }
     }
