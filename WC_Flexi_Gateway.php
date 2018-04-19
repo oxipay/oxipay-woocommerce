@@ -300,6 +300,15 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                     $this->settings['use_modal'] = false;
                     $this->updateSetting('use_modal', $this->settings['use_modal']);
                 }
+                $minField = sprintf('%s_minimum', $this->pluginFileName);
+                $maxField = sprintf('%s_maximum', $this->pluginFileName);
+                if (!isset($this->settings[$minField])) {
+                    $this->updateSetting('use_modal', $this->settings[$minField]);
+                }
+                if (!isset($this->settings[$maxField])) {
+                    $this->updateSetting('use_modal', $this->settings[$maxField]);
+                }
+            } elseif (version_compare( $currentDbVersion, '1.3.5') < 0) {
                 if (!isset($this->settings['preselect_button_enabled'])) {
 	                // default to the disable the pre-select checkout button for existing merchants
 	                // so we don't break the existing behaviour
@@ -310,16 +319,6 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 	                // set default to 20 for pre-select button sequence
                     $this->settings['preselect_button_order'] = "20";
                     $this->updateSetting('preselect_button_order', $this->settings['preselect_button_order']);
-                }
-
-                $minField = sprintf('%s_minimum', $this->pluginFileName);
-                $maxField = sprintf('%s_maximum', $this->pluginFileName);
-                if (!isset($this->settings[$minField])) {
-                    $this->updateSetting('use_modal', $this->settings[$minField]);
-                }
-
-                if (!isset($this->settings[$maxField])) {
-                    $this->updateSetting('use_modal', $this->settings[$maxField]);
                 }
             }
 
