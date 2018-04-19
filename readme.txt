@@ -1,7 +1,7 @@
 === Oxipay Payment Gateway for WooCommerce ===
 Tags: Oxipay
 Requires at least: 4.0
-Tested up to: 4.9.1
+Tested up to: 4.9.5
 License: GNU General Public License v3.0
 
 Shop now and pay over time
@@ -34,6 +34,11 @@ Go to WooCommerce -> Settings -> Checkout -> Oxipay
 https://oxipay.com.au
 
 == Changelog ==
+
+= 1.3.5 =
+*Release Date - 19 April 2018*
+* Add 'preselect checkout button' in the checkout page. 
+* Disable price-widget when product price is outside of the specified price range.
 
 = 1.2.1 =
 *Release Date – 18 Aug 2017*
