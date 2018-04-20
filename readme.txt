@@ -37,6 +37,7 @@ https://oxipay.com.au
 
 = 1.3.7 =
 *Release Date - 20 April 2018*
+* Add 'preselect checkout button' in the checkout page.  
 * Disable price-widget when product price is outside of the specified price range.
 * Add defer to payments.js tag so that it does not block loading of the page.
 
