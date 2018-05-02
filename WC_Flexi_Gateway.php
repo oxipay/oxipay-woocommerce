@@ -6,7 +6,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         public $logger = null;
 
         protected $currentConfig = null;
-        protected $pluginDisplayName    = null;
+        protected $pluginDisplayName = null;
         protected $pluginFileName= null;
         protected $flexi_payment_preselected = false;
 
@@ -52,7 +52,10 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             add_action('woocommerce_before_cart', array($this, 'display_min_max_notice'));
             add_filter('woocommerce_available_payment_gateways', array($this,'display_min_max_filter'));
             add_filter('woocommerce_available_payment_gateways', array($this, 'preselect_oxipay'));
-            add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), $this->settings["preselect_button_order"]);
+
+            $preselect_button_order = $this->settings["preselect_button_order"]? $this->settings["preselect_button_order"] : '20';
+            add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), $preselect_button_order);
+            // add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), $this->settings["preselect_button_order"]);
         }
 
         abstract public function add_price_widget();
@@ -357,7 +360,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
          * Generates the payment gateway request parameters and signature and redirects to the
          * payment gateway through the invisible processing.php form
          * @param int $order_id
-         * @return next view array
+         * @return array
          */
         function process_payment( $order_id ) {
             global $woocommerce;
@@ -593,15 +596,11 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                         $msg = 'failed';
                         break;
                 }
-
-                return $order_id;
             }
             else
             {
                 $order->add_order_note(__( $this->pluginDisplayName . ' payment response failed signature validation. Please check your Merchant Number and API key or contact '.$this->pluginDisplayName . ' for assistance.', 0, 'woocommerce'));
-                $order->add_order_note(__( 'Payment declined using ' . $this->pluginDisplayName . '. Your Order ID is ' . $order_id, 'woocommerce'));
-                $order->update_status('failed');
-                $msg = 'failed';
+                $msg = 'signature not match';
             }
 
             if ($isJSON) {
@@ -611,6 +610,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                 );
                 wp_send_json($return);
             }
+	        return $order_id;
         }
 
         /**
