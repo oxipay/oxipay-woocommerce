@@ -52,6 +52,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             add_action('woocommerce_before_cart', array($this, 'display_min_max_notice'));
             add_filter('woocommerce_available_payment_gateways', array($this,'display_min_max_filter'));
             add_filter('woocommerce_available_payment_gateways', array($this, 'preselect_flexi'));
+            add_filter('woocommerce_thankyou_order_received_text', array($this, 'thankyou_page_message'));
 
             $preselect_button_order = $this->settings["preselect_button_order"]? $this->settings["preselect_button_order"] : '20';
             add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), $preselect_button_order);
@@ -573,34 +574,42 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             if ($this->checksign($params, $this->settings[ $this->pluginFileName . '_api_key'])) {
                 $this->log(sprintf('Processing orderId: %s ', $order_id));
                 // Get the status of the order from XPay and handle accordingly
+                $flexi_result_note = '';
                 switch ($params['x_result']) {
                     case "completed":
-                        $order->add_order_note(__( 'Payment approved using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce'));
+                        $flexi_result_note = __( 'Payment approved using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce');
+                        $order->add_order_note($flexi_result_note);
                         $order->payment_complete($params['x_reference']);
-
-                        if (!is_null($cart)) {
+                        
+                        if (!is_null($cart) && !empty($cart)) {
                             $cart->empty_cart();
                         }
                         $msg = 'complete';
                         break;
 
                     case "failed":
-                        $order->add_order_note(__( 'Payment declined using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce'));
+                    $flexi_result_note = __( 'Payment declined using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce');
+                        $order->add_order_note($flexi_result_note);
                         $order->update_status('failed');
                         $msg = 'failed';
+                        $_SESSION['flexi_result'] = 'failed';
                         break;
 
-                    case "pending":
-                        $order->add_order_note(__( 'Payment pending using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce'));
+                    case "error":
+                    $flexi_result_note = __( 'Payment error using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce');
+                        $order->add_order_note($flexi_result_note);
                         $order->update_status('on-hold', 'Error may have occurred with ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference']);
-                        $msg = 'failed';
+                        $msg = 'error';
+                        $_SESSION['flexi_result'] = 'error';
                         break;
                 }
+                $_SESSION['flexi_result_note'] = $flexi_result_note;
             }
             else
             {
                 $order->add_order_note(__( $this->pluginDisplayName . ' payment response failed signature validation. Please check your Merchant Number and API key or contact '.$this->pluginDisplayName . ' for assistance.', 0, 'woocommerce'));
-                $msg = 'signature not match';
+                $msg = "signature error";
+                $_SESSION['flexi_result_note'] = $this->pluginDisplayName . ' signature error';
             }
 
             if ($isJSON) {
@@ -611,6 +620,14 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                 wp_send_json($return);
             }
 	        return $order_id;
+        }
+
+        function thankyou_page_message($original_message){
+            if ($_SESSION['flexi_result_note'] == ''){
+                return $this->pluginDisplayName. " unknown error";
+            }else{
+                return $_SESSION['flexi_result_note'];
+            }
         }
 
         /**
