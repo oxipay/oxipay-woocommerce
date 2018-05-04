@@ -51,7 +51,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             add_action('woocommerce_before_checkout_form', array($this, 'display_min_max_notice'));
             add_action('woocommerce_before_cart', array($this, 'display_min_max_notice'));
             add_filter('woocommerce_available_payment_gateways', array($this,'display_min_max_filter'));
-            add_filter('woocommerce_available_payment_gateways', array($this, 'preselect_oxipay'));
+            add_filter('woocommerce_available_payment_gateways', array($this, 'preselect_flexi'));
 
             $preselect_button_order = $this->settings["preselect_button_order"]? $this->settings["preselect_button_order"] : '20';
             add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), $preselect_button_order);
@@ -62,7 +62,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 
         function flexi_checkout_button(){
             if($this->settings["preselect_button_enabled"] == "yes"){
-                echo '<div><a href="'.esc_url( wc_get_checkout_url() ).'?oxipay_preselected=true" class="checkout-button button" style="font-size: 1.2em; padding-top: 0.4em; padding-bottom: 0.4em; background-color: #e68821; color: #FFF;">Check out with '.$this->pluginDisplayName.'</a></div>';
+                echo '<div><a href="'.esc_url( wc_get_checkout_url() ).'?'.$this->pluginDisplayName.'_preselected=true" class="checkout-button button" style="font-size: 1.2em; padding-top: 0.4em; padding-bottom: 0.4em; background-color: #e68821; color: #FFF;">Check out with '.$this->pluginDisplayName.'</a></div>';
             }
         }
 
@@ -116,9 +116,9 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             return $available_gateways;
         }
 
-        function preselect_oxipay($available_gateways){
-            if( isset( $_GET["oxipay_preselected"] ) ) {
-                $this->flexi_payment_preselected = $_GET["oxipay_preselected"];
+        function preselect_flexi($available_gateways){
+            if( isset( $_GET[$this->pluginDisplayName."_preselected"] ) ) {
+                $this->flexi_payment_preselected = $_GET[$this->pluginDisplayName."_preselected"];
             }
 
             if ( ! empty( $available_gateways ) ) {
@@ -656,7 +656,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             $countryName = $this->getCountryName();
 
 //            valid address is either:
-//                1. only have billing country or only ship country, or both have same country, and that country is the supported country in Oxipay setting;
+//                1. only have billing country or only ship country, or both have same country, and that country is the supported country in flexi setting;
 //                2. have no country at all in both billing and shipping address
             $valid_addresses = ( (count(array_unique($set_addresses)) === 1 && end($set_addresses) === $countryCode) || count($set_addresses)===0 );
 
