@@ -6,7 +6,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         public $logger = null;
 
         protected $currentConfig = null;
-        protected $pluginDisplayName    = null;
+        protected $pluginDisplayName = null;
         protected $pluginFileName= null;
         protected $flexi_payment_preselected = false;
 
@@ -51,15 +51,19 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             add_action('woocommerce_before_checkout_form', array($this, 'display_min_max_notice'));
             add_action('woocommerce_before_cart', array($this, 'display_min_max_notice'));
             add_filter('woocommerce_available_payment_gateways', array($this,'display_min_max_filter'));
-            add_filter('woocommerce_available_payment_gateways', array($this, 'preselect_oxipay'));
-            add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), $this->settings["preselect_button_order"]);
+            add_filter('woocommerce_available_payment_gateways', array($this, 'preselect_flexi'));
+            add_filter('woocommerce_thankyou_order_received_text', array($this, 'thankyou_page_message'));
+
+            $preselect_button_order = $this->settings["preselect_button_order"]? $this->settings["preselect_button_order"] : '20';
+            add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), $preselect_button_order);
+            // add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), $this->settings["preselect_button_order"]);
         }
 
         abstract public function add_price_widget();
 
         function flexi_checkout_button(){
             if($this->settings["preselect_button_enabled"] == "yes"){
-                echo '<div><a href="'.esc_url( wc_get_checkout_url() ).'?oxipay_preselected=true" class="checkout-button button" style="font-size: 1.2em; padding-top: 0.4em; padding-bottom: 0.4em; background-color: #e68821; color: #FFF;">Check out with '.$this->pluginDisplayName.'</a></div>';
+                echo '<div><a href="'.esc_url( wc_get_checkout_url() ).'?'.$this->pluginDisplayName.'_preselected=true" class="checkout-button button" style="font-size: 1.2em; padding-top: 0.4em; padding-bottom: 0.4em; background-color: #e68821; color: #FFF;">Check out with '.$this->pluginDisplayName.'</a></div>';
             }
         }
 
@@ -113,9 +117,9 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             return $available_gateways;
         }
 
-        function preselect_oxipay($available_gateways){
-            if( isset( $_GET["oxipay_preselected"] ) ) {
-                $this->flexi_payment_preselected = $_GET["oxipay_preselected"];
+        function preselect_flexi($available_gateways){
+            if( isset( $_GET[$this->pluginDisplayName."_preselected"] ) ) {
+                $this->flexi_payment_preselected = $_GET[$this->pluginDisplayName."_preselected"];
             }
 
             if ( ! empty( $available_gateways ) ) {
@@ -357,7 +361,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
          * Generates the payment gateway request parameters and signature and redirects to the
          * payment gateway through the invisible processing.php form
          * @param int $order_id
-         * @return next view array
+         * @return array
          */
         function process_payment( $order_id ) {
             global $woocommerce;
@@ -570,38 +574,42 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             if ($this->checksign($params, $this->settings[ $this->pluginFileName . '_api_key'])) {
                 $this->log(sprintf('Processing orderId: %s ', $order_id));
                 // Get the status of the order from XPay and handle accordingly
+                $flexi_result_note = '';
                 switch ($params['x_result']) {
                     case "completed":
-                        $order->add_order_note(__( 'Payment approved using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce'));
+                        $flexi_result_note = __( 'Payment approved using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce');
+                        $order->add_order_note($flexi_result_note);
                         $order->payment_complete($params['x_reference']);
-
-                        if (!is_null($cart)) {
+                        
+                        if (!is_null($cart) && !empty($cart)) {
                             $cart->empty_cart();
                         }
                         $msg = 'complete';
                         break;
 
                     case "failed":
-                        $order->add_order_note(__( 'Payment declined using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce'));
+                    $flexi_result_note = __( 'Payment declined using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce');
+                        $order->add_order_note($flexi_result_note);
                         $order->update_status('failed');
                         $msg = 'failed';
+                        $_SESSION['flexi_result'] = 'failed';
                         break;
 
-                    case "pending":
-                        $order->add_order_note(__( 'Payment pending using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce'));
+                    case "error":
+                    $flexi_result_note = __( 'Payment error using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce');
+                        $order->add_order_note($flexi_result_note);
                         $order->update_status('on-hold', 'Error may have occurred with ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference']);
-                        $msg = 'failed';
+                        $msg = 'error';
+                        $_SESSION['flexi_result'] = 'error';
                         break;
                 }
-
-                return $order_id;
+                $_SESSION['flexi_result_note'] = $flexi_result_note;
             }
             else
             {
                 $order->add_order_note(__( $this->pluginDisplayName . ' payment response failed signature validation. Please check your Merchant Number and API key or contact '.$this->pluginDisplayName . ' for assistance.', 0, 'woocommerce'));
-                $order->add_order_note(__( 'Payment declined using ' . $this->pluginDisplayName . '. Your Order ID is ' . $order_id, 'woocommerce'));
-                $order->update_status('failed');
-                $msg = 'failed';
+                $msg = "signature error";
+                $_SESSION['flexi_result_note'] = $this->pluginDisplayName . ' signature error';
             }
 
             if ($isJSON) {
@@ -610,6 +618,15 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                     'id'		=> $order_id
                 );
                 wp_send_json($return);
+            }
+	        return $order_id;
+        }
+
+        function thankyou_page_message($original_message){
+            if ($_SESSION['flexi_result_note'] == ''){
+                return $this->pluginDisplayName. " unknown error";
+            }else{
+                return $_SESSION['flexi_result_note'];
             }
         }
 
@@ -656,7 +673,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             $countryName = $this->getCountryName();
 
 //            valid address is either:
-//                1. only have billing country or only ship country, or both have same country, and that country is the supported country in Oxipay setting;
+//                1. only have billing country or only ship country, or both have same country, and that country is the supported country in flexi setting;
 //                2. have no country at all in both billing and shipping address
             $valid_addresses = ( (count(array_unique($set_addresses)) === 1 && end($set_addresses) === $countryCode) || count($set_addresses)===0 );
 
