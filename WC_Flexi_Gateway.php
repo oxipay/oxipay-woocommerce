@@ -414,19 +414,6 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             $signature = $this->flexi_sign($transaction_details, $this->settings[ $this->pluginFileName . '_api_key']);
             $transaction_details['x_signature'] = $signature;
 
-            $encodedFields = array(
-                'x_url_callback',
-                'x_url_complete',
-                'gateway_url',
-                'x_url_cancel',
-                'x_customer_email'
-            );
-
-            // before we do the redirect we base64encode the urls to hopefully get around some of the
-            // limitations with platforms using mod_security
-            // foreach ($encodedFields as $key ) {
-            //     $transaction_details[$key] = base64_encode($transaction_details[$key]);
-            // }
             // use RFC 3986 so that we can decode it correctly in js
             $qs = http_build_query($transaction_details, null, '&', PHP_QUERY_RFC3986);
 
