@@ -40,6 +40,8 @@ function add_oxipay_query_vars_filter( $vars ){
 }
 /**
 * Look for an ajax request that wants settings
+ * @param @query
+ * @return null
 */
 function get_oxipay_settings($query) {
 
@@ -52,6 +54,7 @@ function get_oxipay_settings($query) {
     $list = $gateways->payment_gateways();
     if (!$list || !isset($list['oxipay'])) {
         // abort
+	    return;
     }
 
     $oxipay = $list['oxipay'];
@@ -60,6 +63,7 @@ function get_oxipay_settings($query) {
         $settings = $oxipay->get_settings();
         wp_send_json($settings);
     }
+    return;
 }
 
 function oxipay_settings_link($links){
