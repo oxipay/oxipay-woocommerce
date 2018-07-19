@@ -519,7 +519,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         function payment_finalisation($order_id)
         {
             $order = wc_get_order($order_id);
-            $cart  = WC()->session->get('cart', null);
+            $cart = WC()->cart;
 
             $isJSON = ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_SERVER['CONTENT_TYPE']) &&
                        (strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) );
