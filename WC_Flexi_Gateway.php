@@ -374,7 +374,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             $isValid = $isValid && $this->checkOrderAmount($order);
             $isValid = $isValid && !is_null($gatewayUrl) && $gatewayUrl != '';
 
-            if(!$isValid) return Array();
+            if(!$isValid) return array();
 
             $callbackURL  = $this->get_return_url($order);
 
