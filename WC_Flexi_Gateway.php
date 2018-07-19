@@ -4,6 +4,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         public $plugin_current_version;
         
         public $logger = null;
+        private $logContext;
 
         protected $currentConfig = null;
         protected $pluginDisplayName = null;
@@ -364,7 +365,6 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
          * @return array
          */
         function process_payment( $order_id ) {
-            global $woocommerce;
             $order = new WC_Order( $order_id );
             $gatewayUrl = $this->getGatewayUrl();
 
@@ -374,7 +374,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             $isValid = $isValid && $this->checkOrderAmount($order);
             $isValid = $isValid && !is_null($gatewayUrl) && $gatewayUrl != '';
 
-            if(!$isValid) return;
+            if(!$isValid) return Array();
 
             $callbackURL  = $this->get_return_url($order);
 
@@ -414,19 +414,6 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             $signature = $this->flexi_sign($transaction_details, $this->settings[ $this->pluginFileName . '_api_key']);
             $transaction_details['x_signature'] = $signature;
 
-            $encodedFields = array(
-                'x_url_callback',
-                'x_url_complete',
-                'gateway_url',
-                'x_url_cancel',
-                'x_customer_email'
-            );
-
-            // before we do the redirect we base64encode the urls to hopefully get around some of the
-            // limitations with platforms using mod_security
-            // foreach ($encodedFields as $key ) {
-            //     $transaction_details[$key] = base64_encode($transaction_details[$key]);
-            // }
             // use RFC 3986 so that we can decode it correctly in js
             $qs = http_build_query($transaction_details, null, '&', PHP_QUERY_RFC3986);
 
@@ -476,6 +463,8 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 
         /**
          * returns the gateway URL
+         * @param $countryCode
+         * @return string
          */
         private function getGatewayUrl($countryCode='') {
             //if no countryCode passed in
@@ -532,7 +521,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         function payment_finalisation($order_id)
         {
             $order = wc_get_order($order_id);
-            $cart  = WC()->session->get('cart', null);
+            $cart = WC()->cart;
 
             $isJSON = ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_SERVER['CONTENT_TYPE']) &&
                        (strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) );
@@ -588,7 +577,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                         break;
 
                     case "failed":
-                    $flexi_result_note = __( 'Payment declined using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce');
+                        $flexi_result_note = __( 'Payment declined using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce');
                         $order->add_order_note($flexi_result_note);
                         $order->update_status('failed');
                         $msg = 'failed';
@@ -596,7 +585,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                         break;
 
                     case "error":
-                    $flexi_result_note = __( 'Payment error using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce');
+                        $flexi_result_note = __( 'Payment error using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce');
                         $order->add_order_note($flexi_result_note);
                         $order->update_status('on-hold', 'Error may have occurred with ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference']);
                         $msg = 'error';
@@ -744,39 +733,6 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         }
 
         /**
-         * @return string
-         */
-//        private function getBaseUrl() {
-//            $tld = $this->currentConfig->countries[$this->getCountryCode()]['tld'];
-//            $displayName = $this->pluginDisplayName;
-//            if($this->is_null_or_empty($tld)) {
-//                $tld = ".com.au";
-//            }
-//
-//            return "https://{$displayName}{$tld}";
-//        }
-//
-//        /**
-//         * @return string
-//         */
-//        private function getSupportUrl() {
-//            $baseUrl = $this->getBaseUrl();
-//
-//            return "$baseUrl/contact";
-//        }
-
-        /**
-         * Return the default gateway URL for the given country code.
-         * If no country code is provided, use the currently set country.
-         * Default to Australia if no country or an invalid country is set.
-         * @param $str
-         * @return string
-         */
-        private function getDefaultGatewayUrl($countryCode = false){
-            $this->getGatewayUrl($this->getCountryCode());
-        }
-
-        /**
          * @param $str
          * @return bool
          */
@@ -819,7 +775,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         function checksign($query, $api_key)
         {
             if (!isset($query['x_signature'])) {
-                return;
+                return false;
             }
             $actualSignature = $query['x_signature'];
             unset($query['x_signature']);

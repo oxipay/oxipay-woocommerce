@@ -12,6 +12,8 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway {
         const PLUGIN_NO_MERCHANT_ID_SET_LOG_MSG = 'Transaction attempted with no Merchant ID key. Please check oxipay plugin configuration, and provide an Merchant ID.';
         const PLUGIN_NO_REGION_LOG_MSG = 'Transaction attempted with no Oxipay region set. Please check oxipay plugin configuration, and provide an Oxipay region.';
 
+        public $shop_details;
+
         function __construct() {
             $config = new Oxipay_Config();
 
