@@ -612,9 +612,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         }
 
         function thankyou_page_message($original_message){
-            if ($_SESSION['flexi_result_note'] == ''){
-                return $this->pluginDisplayName. " unknown error";
-            }else{
+            if ($_SESSION['flexi_result_note'] != ''){
                 return $_SESSION['flexi_result_note'];
             }
         }
