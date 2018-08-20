@@ -12,7 +12,7 @@
             loadSettings(checkoutUrl);
         }
 
-        $('form.checkout.woocommerce-checkout').on('checkout_place_order_oxipay', function(e) {
+        function submit_post() {
             $.ajax({
                 url     : wc_checkout_params.checkout_url,
                 type    : 'POST',
@@ -47,7 +47,9 @@
                 }
             });
             return false;
-        });
+        }
+
+        $('form.checkout').on('checkout_place_order_oxipay', submit_post);
     });
 
     /**
