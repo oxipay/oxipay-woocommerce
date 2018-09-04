@@ -46,6 +46,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             }
 
             add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options' ) );
+	        add_action('wp_footer', array($this,'add_top_banner_widget' ));
             add_action('woocommerce_single_product_summary', array($this, 'add_price_widget'));
             add_filter('woocommerce_thankyou_order_id', array($this,'payment_finalisation' ));
             add_filter('the_title', array( $this,'order_received_title'), 11 );
@@ -178,14 +179,6 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                     'description'	=> 'Disable '.$this->pluginDisplayName . ' services, your customers will not be able to use our easy installment plans.',
                     'desc_tip'		=> true
                 ),
-                'price_widget'                           => array(
-	                'title' 		=> __( 'Price Widget', 'woocommerce' ),
-	                'type' 			=> 'checkbox',
-	                'label' 		=> __( 'Enable the ' . $this->pluginDisplayName . ' Price Widget', 'woocommerce' ),
-	                'default' 		=> 'yes',
-	                'description'	=> 'Display a price widget in each product page.',
-	                'desc_tip'		=> true
-                ),
                 'shop_name'                              => array(
                     'title' 		=> __( 'Shop Name', 'woocommerce' ),
                     'type' 			=> 'text',
@@ -207,7 +200,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 	                'type' 			=> 'checkbox',
 	                'label' 		=> __( 'Use Test Mode', 'woocommerce' ),
 	                'default' 		=> 'yes',
-	                'description'	=> __('While test mode is enabled, transactions will be simulated and cards will not be charged', 'woocommerce' ),
+	                'description'	=> __( 'While test mode is enabled, transactions will be simulated and cards will not be charged', 'woocommerce' ),
 	                'desc_tip'		=> true
                 ),
                 'use_modal'                              => array(
@@ -215,15 +208,39 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                     'type' 			=> 'checkbox',
                     'label' 		=> __( 'Modal Checkout', 'woocommerce' ),
                     'default' 		=> 'no',
-                    'description'	=> __('The customer will be forwarded to '.$this->pluginDisplayName . ' in a modal dialog', 'woocommerce' ),
+                    'description'	=> __( 'The customer will be forwarded to '.$this->pluginDisplayName . ' in a modal dialog', 'woocommerce' ),
                     'desc_tip'		=> true
+                ),
+                'price_widget'                           => array(
+	                'title' 		=> __( 'Price Widget', 'woocommerce' ),
+	                'type' 			=> 'checkbox',
+	                'label' 		=> __( 'Enable the ' . $this->pluginDisplayName . ' Price Widget', 'woocommerce' ),
+	                'default' 		=> 'yes',
+	                'description'	=> 'Display a price widget in each product page.',
+	                'desc_tip'		=> true
+                ),
+                'top_banner_widget' => array(
+	                'title' 		=> __( 'Top Banner Widget', 'woocommerce' ),
+	                'type' 			=> 'checkbox',
+	                'label' 		=> __( 'Enable the ' . $this->pluginDisplayName . ' Top Banner Widget', 'woocommerce' ),
+	                'default' 		=> 'no',
+	                'description'	=> 'Display a top banner.',
+	                'desc_tip'		=> true
+                ),
+                'top_banner_widget_homepage_only'     => array(
+	                'title' 		=> __( 'Top Banner on FrontPage Only', 'woocommerce' ),
+	                'type' 			=> 'checkbox',
+	                'label' 		=> __( $this->pluginDisplayName . ' Top Banner Widget Shows on FrontPage Only', 'woocommerce' ),
+	                'default' 		=> 'yes',
+	                'description'	=> 'The top banner shows in homepage only (if checked), or shows in every page (if unchecked)',
+	                'desc_tip'		=> true
                 ),
                 'preselect_button_enabled'            => array(
                     'title' 		=> __( 'Pre-select Checkout Button', 'woocommerce' ),
                     'type' 			=> 'checkbox',
                     'label' 		=> __( 'Add a "Checkout with '.$this->pluginDisplayName.'" button in Cart page', 'woocommerce' ),
                     'default' 		=> 'yes',
-                    'description'	=> __('Add a "Checkout with '.$this->pluginDisplayName.'" button in Cart page that takes customer to Checkout page and have '. $this->pluginDisplayName . ' pre-selected', 'woocommerce' ),
+                    'description'	=> __( 'Add a "Checkout with '.$this->pluginDisplayName.'" button in Cart page that takes customer to Checkout page and have '. $this->pluginDisplayName . ' pre-selected', 'woocommerce' ),
                     'desc_tip'		=> true
                 ),
                 'preselect_button_order'              => array(
@@ -231,7 +248,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                     'type' 			=> 'text',
                     'label' 		=> __( 'Pre-select Button Order', 'woocommerce' ),
                     'default' 		=> '20',
-                    'description'	=> __('Position the "checkout with '.$this->pluginDisplayName.' button" in Cart page if there are multiple checkout buttons. Default is 20. Smaller number moves the button ahead and larger number moves it lower in the list of checkout buttons.', 'woocommerce' ),
+                    'description'	=> __( 'Position the "checkout with '.$this->pluginDisplayName.' button" in Cart page if there are multiple checkout buttons. Default is 20. Smaller number moves the button ahead and larger number moves it lower in the list of checkout buttons.', 'woocommerce' ),
                     'desc_tip'		=> true
                 ),
                 "{$this->pluginFileName}_merchant_id" => array(
@@ -325,6 +342,18 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                     $this->settings['preselect_button_order'] = "20";
                     $this->updateSetting('preselect_button_order', $this->settings['preselect_button_order']);
                 }
+            } elseif (version_compare( $currentDbVersion, '1.3.14') < 0) {
+	            if (!isset($this->settings['top_banner_widget'])) {
+		            // default to the disable the pre-select checkout button for existing merchants
+		            // so we don't break the existing behaviour
+		            $this->settings['top_banner_widget'] = "no";
+		            $this->updateSetting( 'top_banner_widget', $this->settings['top_banner_widget'] );
+	            }
+	            if (!isset($this->settings['top_banner_widget_homepage_only'])){
+		            // set default to 20 for pre-select button sequence
+		            $this->settings['top_banner_widget_homepage_only'] = "20";
+		            $this->updateSetting('top_banner_widget_homepage_only', $this->settings['top_banner_widget_homepage_only']);
+	            }
             }
 
             return true;
@@ -384,7 +413,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                 'x_amount'                      => $order->get_total(),
                 'x_currency'                    => $this->getCurrencyCode(),
                 'x_url_callback'                => $callbackURL,
-                'x_url_complete'                => $this->get_return_url( $order ),
+                'x_url_complete'                => $callbackURL,
                 'x_url_cancel'                  => $order->get_cancel_order_url_raw(),
                 'x_test'                        => 'false',
                 'x_shop_country'                => $this->getCountryCode(),
