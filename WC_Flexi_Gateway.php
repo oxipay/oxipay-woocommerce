@@ -817,14 +817,13 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         }
 
 	    function can_refund_order( $order ) {
-            return true;
+            return ($order->get_status() ==  "processing" || $order->get_status() ==  "on-hold" || $order->get_status() ==  "completed");
         }
 
 	    function process_refund( $order_id, $amount = null, $reason = '' ) {
             $reason = $reason? $reason : "not provided";
 
 		    $order = wc_get_order($order_id);
-//		    $order_notes = wc_get_order_notes(["order_id" => $order_id]);
 
 		    if ( isset( $this->settings['country'] ) ) {
 			    $countryCode = $this->settings['country'];
