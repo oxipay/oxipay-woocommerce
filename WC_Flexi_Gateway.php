@@ -2,7 +2,7 @@
 abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         //current version of the plugin- used to run upgrade tasks on update
         public $plugin_current_version;
-        
+
         public $logger = null;
         private $logContext;
 
@@ -28,7 +28,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             $this->id                     = $this->pluginFileName;
             $this->has_fields             = false;
             $this->method_title           = __($this->pluginDisplayName, 'woocommerce');
-            
+
 	        $this->plugin_current_version = $config->getPluginVersion();
 
             $this->init_form_fields();
@@ -36,9 +36,9 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             if( is_admin() ){
                 $this->init_upgrade_process();
             }
-            
+
             add_action( 'admin_enqueue_scripts', array( $this, 'admin_scripts' ) );
-            
+
             // when we are on the checkout page we want to provide
             // the checkout process through a modal dialog box
             if (!is_admin()) {
@@ -72,7 +72,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         function display_min_max_notice(){
 	        $minimum = $this->getMinPrice();
             $maximum = $this->getMaxPrice();
-            
+
             if ( $minimum != 0 && WC()->cart->total < $minimum ){
                 if(is_checkout()){
 	                wc_print_notice(
@@ -432,7 +432,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                 'x_customer_billing_zip' 		=> $order->get_billing_postcode(),
                 //shipping detail
                 'x_customer_shipping_country'	=> $order->get_billing_country(),
-                 'x_customer_shipping_city' 	=> $order->get_shipping_city(),
+                'x_customer_shipping_city' 	    => $order->get_shipping_city(),
                 'x_customer_shipping_address1'  => $order->get_shipping_address_1(),
                 'x_customer_shipping_address2'  => $order->get_shipping_address_2(),
                 'x_customer_shipping_state' 	=> $order->get_shipping_state(),
@@ -591,14 +591,14 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 
             if ($this->checksign($params, $this->settings[ $this->pluginFileName . '_api_key'])) {
                 $this->log(sprintf('Processing orderId: %s ', $order_id));
-                // Get the status of the order from XPay and handle accordingly
+                // Get the status of the order and handle accordingly
                 $flexi_result_note = '';
                 switch ($params['x_result']) {
                     case "completed":
-                        $flexi_result_note = __( 'Payment approved using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce');
+                        $flexi_result_note = __( 'Payment approved using ' . $this->pluginDisplayName . '. Gateway_Reference #' . $params['x_gateway_reference'], 'woocommerce');
                         $order->add_order_note($flexi_result_note);
                         $order->payment_complete($params['x_reference']);
-                        
+
                         if (!is_null($cart) && !empty($cart)) {
                             $cart->empty_cart();
                         }
@@ -606,7 +606,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                         break;
 
                     case "failed":
-                        $flexi_result_note = __( 'Payment declined using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce');
+                        $flexi_result_note = __( 'Payment declined using ' . $this->pluginDisplayName . '. Gateway Reference #' . $params['x_gateway_reference'], 'woocommerce');
                         $order->add_order_note($flexi_result_note);
                         $order->update_status('failed');
                         $msg = 'failed';
@@ -614,9 +614,9 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                         break;
 
                     case "error":
-                        $flexi_result_note = __( 'Payment error using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce');
+                        $flexi_result_note = __( 'Payment error using ' . $this->pluginDisplayName . '. Gateway Reference #' . $params['x_gateway_reference'], 'woocommerce');
                         $order->add_order_note($flexi_result_note);
-                        $order->update_status('on-hold', 'Error may have occurred with ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference']);
+                        $order->update_status('on-hold', 'Error may have occurred with ' . $this->pluginDisplayName . '. Gateway Reference #' . $params['x_gateway_reference']);
                         $msg = 'error';
                         $_SESSION['flexi_result'] = 'error';
                         break;
@@ -808,5 +808,70 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             unset($query['x_signature']);
             $expectedSignature = $this->flexi_sign($query, $api_key);
             return $actualSignature == $expectedSignature;
+        }
+
+        function supports( $feature ) {
+            if( in_array($feature, array("products", "refunds"))){
+                return true;
+            }
+        }
+
+	    function can_refund_order( $order ) {
+            return true;
+        }
+
+	    function process_refund( $order_id, $amount = null, $reason = '' ) {
+            $reason = $reason? $reason : "not provided";
+
+		    $order = wc_get_order($order_id);
+//		    $order_notes = wc_get_order_notes(["order_id" => $order_id]);
+
+		    if ( isset( $this->settings['country'] ) ) {
+			    $countryCode = $this->settings['country'];
+		    } else {
+			    $countryCode = 'AU';
+		    }
+
+            $environment = ($this->isTesting() == 'no')? "live" : "sandbox";
+            $refund_address = $this->currentConfig->countries[$countryCode][$environment.'_refund_address'];
+
+		    $refund_details = array(
+			    "x_merchant_number" => $this->settings[ $this->pluginFileName . '_merchant_id' ],
+			    "x_purchase_number" => $order_id,
+			    "x_amount"          => $amount,
+			    "x_reason"          => $reason
+		    );
+		    $refund_signature = $this->flexi_sign($refund_details, $this->settings[ $this->pluginFileName . '_api_key']);
+		    $refund_details['signature'] = $refund_signature;
+
+		    $response = wp_remote_post($refund_address, array(
+			    'method' => 'POST',
+			    'data_format' => 'body',
+			    'body' => json_encode($refund_details),
+			    'timeout' => 3600,
+			    'user-agent' => 'Woocommerce ' . WC_VERSION,
+			    'httpversion' => '1.1',
+			    'headers' => array('Content-Type' => 'application/json; charset=utf-8')
+		    ));
+		    if (is_wp_error($response)) {
+			    throw new Exception(__('There was a problem connecting to the payment gateway.', 'woocommerce'));
+		    }
+		    if (empty($response['response'])) {
+			    throw new Exception(__('Empty response.', 'woocommerce'));
+		    }
+
+            $refund_result = $response['response'];
+
+		    if (isset($refund_result['code']) && $refund_result['code'] == '204') {
+			    $order->add_order_note(sprintf(__('Refunding of $%s for order #%s through %s succeeded', 'woocommerce'), $amount, $order->get_order_number(), $this->pluginDisplayName));
+			    return true;
+		    } elseif (isset($refund_result['code']) && $refund_result['code'] == '400') {
+			    $order->add_order_note(sprintf(__('Refunding of $%s for order #%s through %s failed. Error Code: %s', 'woocommerce'), $amount, $order->get_order_number(), $this->pluginDisplayName, $refund_result['message']));
+		    } elseif (isset($refund_result['code']) && $refund_result['code'] == '401') {
+			    $order->add_order_note(sprintf(__('Refunding of $%s for order #%s through %s failed Signature Check', 'woocommerce')));
+            } else {
+			    $order->add_order_note(sprintf(__('Refunding of $%s for order #%s through %s failed with unknown error', 'woocommerce')));
+            }
+            return false;
         }
 }
