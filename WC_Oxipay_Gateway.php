@@ -19,10 +19,9 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway {
 
             $this->method_description = __( 'Easy to setup installment payment plans from ' . $config::DISPLAY_NAME );
             $this->title              = __( $config::DISPLAY_NAME , 'woocommerce' );
-            $this->description        = __( '<strong>'.$config::DISPLAY_NAME . ' the smarter way to pay.</strong><br/> Shop today, pay over time. 4 easy fortnightly payments.', 'woocommerce' );
             $this->icon               = plugin_dir_url( __FILE__ ) .  'images/oxipay.png';
             $this->shop_details       = __($config::DISPLAY_NAME . ' Payment', 'woocommerce' );
-            $this->order_button_text      = __( 'Proceed to ' . $config::DISPLAY_NAME, 'woocommerce' );
+            $this->order_button_text  = __( 'Proceed to ' . $config::DISPLAY_NAME, 'woocommerce' );
 
             parent::__construct($config);
         }
@@ -71,4 +70,17 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway {
                 }
             }
         }
+
+	function add_top_banner_widget() {
+		if ( isset( $this->settings['top_banner_widget'] ) && $this->settings['top_banner_widget'] == 'yes' ) {
+			if ( ( isset( $this->settings['top_banner_widget_homepage_only'] ) && $this->settings['top_banner_widget_homepage_only'] == 'yes' ) && ! is_front_page() ) {
+				return;
+			} else {
+				$country_domain = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'co.nz' : 'com.au';
+				if ( $country_domain == "com.au" ) {
+					echo '<script id="oxipay-top-banner-script" src="https://widgets.oxipay.' . $country_domain . '/content/scripts/top-banner.js?element=header"></script>';
+				}
+			}
+		}
     }
+}
