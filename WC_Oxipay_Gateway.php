@@ -16,14 +16,12 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway {
 
         function __construct() {
             $config = new Oxipay_Config();
-	        $checkout_total = (WC()->cart)? WC()->cart->get_totals()['total'] : "0";
 
             $this->method_description = __( 'Easy to setup installment payment plans from ' . $config::DISPLAY_NAME );
             $this->title              = __( $config::DISPLAY_NAME , 'woocommerce' );
-            $this->description        = __( '<div id="checkout_method_oxipay"></div><script id="oxipay-checkout-price-widget-script" src="http://widgets.oxipay.com.au/content/scripts/payments-weekly.js?used_in=checkout&&productPrice='.$checkout_total.'&element=%23checkout_method_oxipay"></script>', 'woocommerce' );
             $this->icon               = plugin_dir_url( __FILE__ ) .  'images/oxipay.png';
             $this->shop_details       = __($config::DISPLAY_NAME . ' Payment', 'woocommerce' );
-            $this->order_button_text      = __( 'Proceed to ' . $config::DISPLAY_NAME, 'woocommerce' );
+            $this->order_button_text  = __( 'Proceed to ' . $config::DISPLAY_NAME, 'woocommerce' );
 
             parent::__construct($config);
         }
@@ -79,8 +77,8 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway {
 				return;
 			} else {
 				$country_domain = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'co.nz' : 'com.au';
-				echo '<script id="oxipay-top-banner-script" src="https://widgets.oxipay.' . $country_domain . '/content/scripts/top-banner.js?element=header"></script>';
+				echo '<script id="oxipay-top-banner-script" src="https://s3-ap-southeast-2.amazonaws.com/widgets.oxipay.' . $country_domain . '/content/scripts/top-banner.js?element=header"></script>';
 			}
 		}
-	}
+    }
 }
