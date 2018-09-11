@@ -77,7 +77,9 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway {
 				return;
 			} else {
 				$country_domain = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'co.nz' : 'com.au';
-				echo '<script id="oxipay-top-banner-script" src="https://s3-ap-southeast-2.amazonaws.com/widgets.oxipay.' . $country_domain . '/content/scripts/top-banner.js?element=header"></script>';
+				if ( $country_domain == "com.au" ) {
+					echo '<script id="oxipay-top-banner-script" src="https://widgets.oxipay.' . $country_domain . '/content/scripts/top-banner.js?element=header"></script>';
+				}
 			}
 		}
     }

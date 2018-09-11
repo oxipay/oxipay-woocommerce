@@ -227,17 +227,17 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                 'top_banner_widget' => array(
 	                'title' 		=> __( 'Top Banner Widget', 'woocommerce' ),
 	                'type' 			=> 'checkbox',
-	                'label' 		=> __( 'Enable the ' . $this->pluginDisplayName . ' Top Banner Widget', 'woocommerce' ),
+	                'label' 		=> __( 'Enable the ' . $this->pluginDisplayName . ' Top Banner Widget (AU Only)', 'woocommerce' ),
 	                'default' 		=> 'no',
-	                'description'	=> 'Display a top banner.',
+	                'description'	=> 'Display a top banner. (For AU only. NZ does not have this feature)',
 	                'desc_tip'		=> true
                 ),
                 'top_banner_widget_homepage_only'     => array(
 	                'title' 		=> __( 'Top Banner on FrontPage Only', 'woocommerce' ),
 	                'type' 			=> 'checkbox',
-	                'label' 		=> __( $this->pluginDisplayName . ' Top Banner Widget Shows on FrontPage Only', 'woocommerce' ),
+	                'label' 		=> __( $this->pluginDisplayName . ' Top Banner Widget Shows on FrontPage Only (AU Only)', 'woocommerce' ),
 	                'default' 		=> 'yes',
-	                'description'	=> 'The top banner shows in homepage only (if checked), or shows in every page (if unchecked)',
+	                'description'	=> 'When the top banner enabled, it shows in homepage only (if checked), or shows in every page (if unchecked)',
 	                'desc_tip'		=> true
                 ),
                 'preselect_button_enabled'            => array(
