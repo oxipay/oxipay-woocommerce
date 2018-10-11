@@ -711,17 +711,28 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 
         /**
          * Ensure the order amount is >= $20
+         * Also ensure order is <= max_purchase
          * @param $order
          * @return true
          */
         private function checkOrderAmount($order)
         {
-            if($order->get_total() < 20) {
+            $total = $order->get_total();
+            if ($total < 20) {
                 $errorMessage = "&nbsp;Orders under " . $this->getCurrencyCode() . $this->getCurrencySymbol() . "20 are not supported by " . $this->pluginDisplayName . ". Please select a different payment option.";
                 $order->cancel_order($errorMessage);
                 $this->logValidationError($errorMessage);
                 return false;
             }
+
+            $max = $this->getMaxPurchase();
+            if ($total > $max) {
+                $errorMessage = "&nbsp;Orders over " . $this->getCurrencyCode() . $this->getCurrencySymbol() . $max . " are not supported by " . $this->pluginDisplayName . ". Please select a different payment option.";
+                $order->cancel_order($errorMessage);
+                $this->logValidationError($errorMessage);
+                return false;
+            }
+
             return true;
         }
 
@@ -764,6 +775,13 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
          */
         private function getCurrencySymbol() {
             return $this->currentConfig->countries[$this->getCountryCode()]['currency_symbol'];
+        }
+
+        /**
+         * @return int 
+         */
+        private function getMaxPurchase() {
+            return $this->currentConfig->countries[$this->getCountryCode()]['max_purchase'];
         }
 
         /**
