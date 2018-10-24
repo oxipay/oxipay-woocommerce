@@ -57,22 +57,18 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             add_filter('woocommerce_thankyou_order_received_text', array($this, 'thankyou_page_message'));
 
             $preselect_button_order = $this->settings["preselect_button_order"]? $this->settings["preselect_button_order"] : '20';
-            add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), $preselect_button_order);
-
-            $country_domain = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'co.nz' : 'com.au';
-            $payments_script = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'payments' : 'payments-weekly';
-            $checkout_total = (WC()->cart)? WC()->cart->get_totals()['total'] : "0";
-            if( $this->pluginFileName == "oxipay" ){
-                $this->description = __( '<div id="checkout_method_oxipay"></div><script id="oxipay-checkout-price-widget-script" src="https://widgets.oxipay.'.$country_domain.'/content/scripts/'.$payments_script.'.js?used_in=checkout&productPrice='.$checkout_total.'&element=%23checkout_method_oxipay"></script>', 'woocommerce' );
-            }
-            
+            add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), $preselect_button_order);            
         }
 
         abstract public function add_price_widget();
 
         function flexi_checkout_button(){
+            $button_color = array(
+                "oxipay" => "E68821",
+                "ezipay" => "4EB0E6"
+            );
             if($this->settings["preselect_button_enabled"] == "yes"){
-                echo '<div><a href="'.esc_url( wc_get_checkout_url() ).'?'.$this->pluginDisplayName.'_preselected=true" class="checkout-button button" style="font-size: 1.2em; padding-top: 0.4em; padding-bottom: 0.4em; background-color: #e68821; color: #FFF;">Check out with '.$this->pluginDisplayName.'</a></div>';
+                echo '<div><a href="'.esc_url( wc_get_checkout_url() ).'?'.$this->pluginDisplayName.'_preselected=true" class="checkout-button button" style="font-size: 1.2em; padding-top: 0.4em; padding-bottom: 0.4em; background-color: #' . $button_color[$this->pluginFileName] . '; color: #FFF;">Check out with '.$this->pluginDisplayName.'</a></div>';
             }
         }
 
@@ -439,7 +435,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                 'x_customer_billing_zip' 		=> $order->get_billing_postcode(),
                 //shipping detail
                 'x_customer_shipping_country'	=> $order->get_billing_country(),
-                 'x_customer_shipping_city' 	=> $order->get_shipping_city(),
+                'x_customer_shipping_city' 	    => $order->get_shipping_city(),
                 'x_customer_shipping_address1'  => $order->get_shipping_address_1(),
                 'x_customer_shipping_address2'  => $order->get_shipping_address_2(),
                 'x_customer_shipping_state' 	=> $order->get_shipping_state(),
@@ -718,8 +714,9 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         private function checkOrderAmount($order)
         {
             $total = $order->get_total();
-            if ($total < 20) {
-                $errorMessage = "&nbsp;Orders under " . $this->getCurrencyCode() . $this->getCurrencySymbol() . "20 are not supported by " . $this->pluginDisplayName . ". Please select a different payment option.";
+            $min = $this->getMinPurchase();
+            if ($total < $min) {
+                $errorMessage = "&nbsp;Orders under " . $this->getCurrencyCode() . $this->getCurrencySymbol() . $min . " are not supported by " . $this->pluginDisplayName . ". Please select a different payment option.";
                 $order->cancel_order($errorMessage);
                 $this->logValidationError($errorMessage);
                 return false;
@@ -782,6 +779,10 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
          */
         private function getMaxPurchase() {
             return $this->currentConfig->countries[$this->getCountryCode()]['max_purchase'];
+        }
+
+        private function getMinPurchase() {
+            return $this->currentConfig->countries[$this->getCountryCode()]['min_purchase'];
         }
 
         /**

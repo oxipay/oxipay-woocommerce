@@ -16,6 +16,7 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway {
 
         function __construct() {
             $config = new Oxipay_Config();
+            parent::__construct($config);
 
             $this->method_description = __( 'Easy to setup installment payment plans from ' . $config::DISPLAY_NAME );
             $this->title              = __( $config::DISPLAY_NAME , 'woocommerce' );
@@ -23,7 +24,10 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway {
             $this->shop_details       = __($config::DISPLAY_NAME . ' Payment', 'woocommerce' );
             $this->order_button_text  = __( 'Proceed to ' . $config::DISPLAY_NAME, 'woocommerce' );
 
-            parent::__construct($config);
+            $country_domain = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'co.nz' : 'com.au';
+            $payments_script = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'payments' : 'payments-weekly';
+            $checkout_total = (WC()->cart)? WC()->cart->get_totals()['total'] : "0";
+            $this->description = __( '<div id="checkout_method_oxipay"></div><script id="oxipay-checkout-price-widget-script" src="https://widgets.oxipay.'.$country_domain.'/content/scripts/'.$payments_script.'.js?used_in=checkout&productPrice='.$checkout_total.'&element=%23checkout_method_oxipay"></script>', 'woocommerce' );
         }
 
 
