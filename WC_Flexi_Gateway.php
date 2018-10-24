@@ -57,15 +57,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             add_filter('woocommerce_thankyou_order_received_text', array($this, 'thankyou_page_message'));
 
             $preselect_button_order = $this->settings["preselect_button_order"]? $this->settings["preselect_button_order"] : '20';
-            add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), $preselect_button_order);
-
-            $country_domain = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'co.nz' : 'com.au';
-            $payments_script = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'payments' : 'payments-weekly';
-            $checkout_total = (WC()->cart)? WC()->cart->get_totals()['total'] : "0";
-            if( $this->pluginFileName == "oxipay" ){
-                $this->description = __( '<div id="checkout_method_oxipay"></div><script id="oxipay-checkout-price-widget-script" src="https://widgets.oxipay.'.$country_domain.'/content/scripts/'.$payments_script.'.js?used_in=checkout&productPrice='.$checkout_total.'&element=%23checkout_method_oxipay"></script>', 'woocommerce' );
-            }
-            
+            add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), $preselect_button_order);            
         }
 
         abstract public function add_price_widget();
