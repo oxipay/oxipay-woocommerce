@@ -431,7 +431,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                 'x_customer_billing_zip' 		=> $order->get_billing_postcode(),
                 //shipping detail
                 'x_customer_shipping_country'	=> $order->get_billing_country(),
-                'x_customer_shipping_city' 	=> $order->get_shipping_city(),
+                'x_customer_shipping_city' 	    => $order->get_shipping_city(),
                 'x_customer_shipping_address1'  => $order->get_shipping_address_1(),
                 'x_customer_shipping_address2'  => $order->get_shipping_address_2(),
                 'x_customer_shipping_state' 	=> $order->get_shipping_state(),
@@ -712,7 +712,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             $total = $order->get_total();
             $min = $this->getMinPurchase();
             if ($total < $min) {
-                $errorMessage = "&nbsp;Orders under " . $this->getCurrencyCode() . $this->getCurrencySymbol() . "20 are not supported by " . $this->pluginDisplayName . ". Please select a different payment option.";
+                $errorMessage = "&nbsp;Orders under " . $this->getCurrencyCode() . $this->getCurrencySymbol() . $min . " are not supported by " . $this->pluginDisplayName . ". Please select a different payment option.";
                 $order->cancel_order($errorMessage);
                 $this->logValidationError($errorMessage);
                 return false;
