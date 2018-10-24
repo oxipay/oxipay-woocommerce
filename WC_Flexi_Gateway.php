@@ -431,7 +431,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                 'x_customer_billing_zip' 		=> $order->get_billing_postcode(),
                 //shipping detail
                 'x_customer_shipping_country'	=> $order->get_billing_country(),
-                 'x_customer_shipping_city' 	=> $order->get_shipping_city(),
+                'x_customer_shipping_city' 	=> $order->get_shipping_city(),
                 'x_customer_shipping_address1'  => $order->get_shipping_address_1(),
                 'x_customer_shipping_address2'  => $order->get_shipping_address_2(),
                 'x_customer_shipping_state' 	=> $order->get_shipping_state(),
@@ -710,7 +710,8 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         private function checkOrderAmount($order)
         {
             $total = $order->get_total();
-            if ($total < 20) {
+            $min = $this->getMinPurchase();
+            if ($total < $min) {
                 $errorMessage = "&nbsp;Orders under " . $this->getCurrencyCode() . $this->getCurrencySymbol() . "20 are not supported by " . $this->pluginDisplayName . ". Please select a different payment option.";
                 $order->cancel_order($errorMessage);
                 $this->logValidationError($errorMessage);
@@ -774,6 +775,10 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
          */
         private function getMaxPurchase() {
             return $this->currentConfig->countries[$this->getCountryCode()]['max_purchase'];
+        }
+
+        private function getMinPurchase() {
+            return $this->currentConfig->countries[$this->getCountryCode()]['min_purchase'];
         }
 
         /**

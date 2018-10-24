@@ -16,6 +16,7 @@ class Oxipay_Config {
             'sandboxURL'        => 'https://securesandbox.oxipay.com.au/Checkout?platform=WooCommerce',
             'liveURL'           => 'https://secure.oxipay.com.au/Checkout?platform=WooCommerce',
             'max_purchase'      => 2100,
+            'min_purchase'      => 20,
         ),
         self::COUNTRY_NEW_ZEALAND => array (
             'name'				=> 'New Zealand',
@@ -25,6 +26,7 @@ class Oxipay_Config {
             'sandboxURL'        => 'https://securesandbox.oxipay.co.nz/Checkout?platform=WooCommerce',
             'liveURL'           => 'https://secure.oxipay.co.nz/Checkout?platform=WooCommerce',
             'max_purchase'      => 1500,
+            'min_purchase'      => 20,
         )        
     );
 
