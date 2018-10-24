@@ -63,8 +63,12 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         abstract public function add_price_widget();
 
         function flexi_checkout_button(){
+            $button_color = array(
+                "oxipay" => "E68821",
+                "ezipay" => "4EB0E6"
+            );
             if($this->settings["preselect_button_enabled"] == "yes"){
-                echo '<div><a href="'.esc_url( wc_get_checkout_url() ).'?'.$this->pluginDisplayName.'_preselected=true" class="checkout-button button" style="font-size: 1.2em; padding-top: 0.4em; padding-bottom: 0.4em; background-color: #e68821; color: #FFF;">Check out with '.$this->pluginDisplayName.'</a></div>';
+                echo '<div><a href="'.esc_url( wc_get_checkout_url() ).'?'.$this->pluginDisplayName.'_preselected=true" class="checkout-button button" style="font-size: 1.2em; padding-top: 0.4em; padding-bottom: 0.4em; background-color: #' . $button_color[$this->pluginFileName] . '; color: #FFF;">Check out with '.$this->pluginDisplayName.'</a></div>';
             }
         }
 
