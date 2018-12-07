@@ -57,15 +57,18 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             add_filter('woocommerce_thankyou_order_received_text', array($this, 'thankyou_page_message'));
 
             $preselect_button_order = $this->settings["preselect_button_order"]? $this->settings["preselect_button_order"] : '20';
-            add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), $preselect_button_order);
-            // add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), $this->settings["preselect_button_order"]);
+            add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), $preselect_button_order);            
         }
 
         abstract public function add_price_widget();
 
         function flexi_checkout_button(){
+            $button_color = array(
+                "oxipay" => "E68821",
+                "ezipay" => "4EB0E6"
+            );
             if($this->settings["preselect_button_enabled"] == "yes"){
-                echo '<div><a href="'.esc_url( wc_get_checkout_url() ).'?'.$this->pluginDisplayName.'_preselected=true" class="checkout-button button" style="font-size: 1.2em; padding-top: 0.4em; padding-bottom: 0.4em; background-color: #e68821; color: #FFF;">Check out with '.$this->pluginDisplayName.'</a></div>';
+                echo '<div><a href="'.esc_url( wc_get_checkout_url() ).'?'.$this->pluginDisplayName.'_preselected=true" class="checkout-button button" style="font-size: 1.2em; padding-top: 0.4em; padding-bottom: 0.4em; background-color: #' . $button_color[$this->pluginFileName] . '; color: #FFF;">Check out with '.$this->pluginDisplayName.'</a></div>';
             }
         }
 
@@ -222,17 +225,17 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                 'top_banner_widget' => array(
 	                'title' 		=> __( 'Top Banner Widget', 'woocommerce' ),
 	                'type' 			=> 'checkbox',
-	                'label' 		=> __( 'Enable the ' . $this->pluginDisplayName . ' Top Banner Widget', 'woocommerce' ),
+	                'label' 		=> __( 'Enable the ' . $this->pluginDisplayName . ' Top Banner Widget (AU Only)', 'woocommerce' ),
 	                'default' 		=> 'no',
-	                'description'	=> 'Display a top banner.',
+	                'description'	=> 'Display a top banner. (For AU only. NZ does not have this feature)',
 	                'desc_tip'		=> true
                 ),
                 'top_banner_widget_homepage_only'     => array(
 	                'title' 		=> __( 'Top Banner on FrontPage Only', 'woocommerce' ),
 	                'type' 			=> 'checkbox',
-	                'label' 		=> __( $this->pluginDisplayName . ' Top Banner Widget Shows on FrontPage Only', 'woocommerce' ),
+	                'label' 		=> __( $this->pluginDisplayName . ' Top Banner Widget Shows on FrontPage Only (AU Only)', 'woocommerce' ),
 	                'default' 		=> 'yes',
-	                'description'	=> 'The top banner shows in homepage only (if checked), or shows in every page (if unchecked)',
+	                'description'	=> 'When the top banner enabled, it shows in homepage only (if checked), or shows in every page (if unchecked)',
 	                'desc_tip'		=> true
                 ),
                 'preselect_button_enabled'            => array(
@@ -704,17 +707,29 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 
         /**
          * Ensure the order amount is >= $20
+         * Also ensure order is <= max_purchase
          * @param $order
          * @return true
          */
         private function checkOrderAmount($order)
         {
-            if($order->get_total() < 20) {
-                $errorMessage = "&nbsp;Orders under " . $this->getCurrencyCode() . $this->getCurrencySymbol() . "20 are not supported by " . $this->pluginDisplayName . ". Please select a different payment option.";
+            $total = $order->get_total();
+            $min = $this->getMinPurchase();
+            if ($total < $min) {
+                $errorMessage = "&nbsp;Orders under " . $this->getCurrencyCode() . $this->getCurrencySymbol() . $min . " are not supported by " . $this->pluginDisplayName . ". Please select a different payment option.";
                 $order->cancel_order($errorMessage);
                 $this->logValidationError($errorMessage);
                 return false;
             }
+
+            $max = $this->getMaxPurchase();
+            if ($total > $max) {
+                $errorMessage = "&nbsp;Orders over " . $this->getCurrencyCode() . $this->getCurrencySymbol() . $max . " are not supported by " . $this->pluginDisplayName . ". Please select a different payment option.";
+                $order->cancel_order($errorMessage);
+                $this->logValidationError($errorMessage);
+                return false;
+            }
+
             return true;
         }
 
@@ -757,6 +772,17 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
          */
         private function getCurrencySymbol() {
             return $this->currentConfig->countries[$this->getCountryCode()]['currency_symbol'];
+        }
+
+        /**
+         * @return int 
+         */
+        private function getMaxPurchase() {
+            return $this->currentConfig->countries[$this->getCountryCode()]['max_purchase'];
+        }
+
+        private function getMinPurchase() {
+            return $this->currentConfig->countries[$this->getCountryCode()]['min_purchase'];
         }
 
         /**

@@ -17,6 +17,8 @@ class Oxipay_Config {
             'liveURL'           => 'https://secure.oxipay.com.au/Checkout?platform=WooCommerce',
 	        'sandbox_refund_address'    => 'https://portalssandbox.oxipay.com.au/api/ExternalRefund/processrefund',
             'live_refund_address'    => 'https://portals.oxipay.com.au/api/ExternalRefund/processrefund'
+            'max_purchase'      => 2100,
+            'min_purchase'      => 20,
         ),
         self::COUNTRY_NEW_ZEALAND => array (
             'name'				=> 'New Zealand',
@@ -27,6 +29,8 @@ class Oxipay_Config {
             'liveURL'           => 'https://secure.oxipay.co.nz/Checkout?platform=WooCommerce',
             'sandbox_refund_address'    => 'https://portalssandbox.oxipay.co.nz/api/ExternalRefund/processrefund',
 	        'live_refund_address'    => 'https://portals.oxipay.co.nz/api/ExternalRefund/processrefund'
+            'max_purchase'      => 1500,
+            'min_purchase'      => 20,
         )        
     );
 
