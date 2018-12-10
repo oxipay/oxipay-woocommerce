@@ -15,6 +15,8 @@ class Oxipay_Config {
             'tld'			    => '.com.au',
             'sandboxURL'        => 'https://securesandbox.oxipay.com.au/Checkout?platform=WooCommerce',
             'liveURL'           => 'https://secure.oxipay.com.au/Checkout?platform=WooCommerce',
+	        'sandbox_refund_address'    => 'https://portalssandbox.oxipay.com.au/api/ExternalRefund/processrefund',
+            'live_refund_address'    => 'https://portals.oxipay.com.au/api/ExternalRefund/processrefund',
             'max_purchase'      => 2100,
             'min_purchase'      => 20,
         ),
@@ -25,6 +27,8 @@ class Oxipay_Config {
             'tld'		  	    => '.co.nz',
             'sandboxURL'        => 'https://securesandbox.oxipay.co.nz/Checkout?platform=WooCommerce',
             'liveURL'           => 'https://secure.oxipay.co.nz/Checkout?platform=WooCommerce',
+            'sandbox_refund_address'    => 'https://portalssandbox.oxipay.co.nz/api/ExternalRefund/processrefund',
+	        'live_refund_address'    => 'https://portals.oxipay.co.nz/api/ExternalRefund/processrefund',
             'max_purchase'      => 1500,
             'min_purchase'      => 20,
         )        
