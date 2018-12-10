@@ -57,7 +57,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             add_filter('woocommerce_thankyou_order_received_text', array($this, 'thankyou_page_message'));
 
             $preselect_button_order = $this->settings["preselect_button_order"]? $this->settings["preselect_button_order"] : '20';
-            add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), $preselect_button_order);            
+            add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), $preselect_button_order);
         }
 
         abstract public function add_price_widget();
@@ -600,6 +600,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                     case "completed":
                         $flexi_result_note = __( 'Payment approved using ' . $this->pluginDisplayName . '. Gateway_Reference #' . $params['x_gateway_reference'], 'woocommerce');
                         $order->add_order_note($flexi_result_note);
+                        $order->update_meta_data("flexi_purchase_number", $params["x_gateway_reference"]);
                         $order->payment_complete($params['x_reference']);
 
                         if (!is_null($cart) && !empty($cart)) {
@@ -850,6 +851,10 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             $reason = $reason? $reason : "not provided";
 
 		    $order = wc_get_order($order_id);
+		    $purchase_id = get_post_meta($order_id)["flexi_purchase_number"][0];
+		    if(!$purchase_id){
+			    throw new Exception( __( 'Oxipay Purchase ID not found. Can not proceed with online refund', 'woocommerce' ) );
+            }
 
 		    if ( isset( $this->settings['country'] ) ) {
 			    $countryCode = $this->settings['country'];
@@ -862,7 +867,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 
 		    $refund_details = array(
 			    "x_merchant_number" => $this->settings[ $this->pluginFileName . '_merchant_id' ],
-			    "x_purchase_number" => $order_id,
+			    "x_purchase_number" => $purchase_id,
 			    "x_amount"          => $amount,
 			    "x_reason"          => $reason
 		    );
@@ -886,12 +891,16 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 		    }
 
             $refund_result = $response['response'];
+		    $refund_message = '';
+		    if( $response['body'] ){
+		        $refund_message = json_decode($response['body'], true)['Message'];
+            }
 
 		    if (isset($refund_result['code']) && $refund_result['code'] == '204') {
 			    $order->add_order_note(sprintf(__('Refunding of $%s for order #%s through %s succeeded', 'woocommerce'), $amount, $order->get_order_number(), $this->pluginDisplayName));
 			    return true;
 		    } elseif (isset($refund_result['code']) && $refund_result['code'] == '400') {
-			    $order->add_order_note(sprintf(__('Refunding of $%s for order #%s through %s failed. Error Code: %s', 'woocommerce'), $amount, $order->get_order_number(), $this->pluginDisplayName, $refund_result['message']));
+			    $order->add_order_note(sprintf(__('Refunding of $%s for order #%s through %s failed. Error Code: %s', 'woocommerce'), $amount, $order->get_order_number(), $this->pluginDisplayName, $refund_message));
 		    } elseif (isset($refund_result['code']) && $refund_result['code'] == '401') {
 			    $order->add_order_note(sprintf(__('Refunding of $%s for order #%s through %s failed Signature Check', 'woocommerce')));
             } else {
