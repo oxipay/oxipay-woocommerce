@@ -35,7 +35,7 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway {
         /**
          * Load JavaScript for the checkout page
          */
-         function flexi_enqueue_script() {
+        function flexi_enqueue_script() {
             
             wp_register_script('oxipay_gateway', plugins_url( '/js/oxipay.js', __FILE__ ), array( 'jquery' ), '0.4.5' );
             wp_register_script('oxipay_modal', plugins_url( '/js/oxipay_modal.js', __FILE__ ), array( 'jquery' ), '0.4.5' );
@@ -50,7 +50,7 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway {
         /**
          * Load javascript for Wordpress admin
          */
-         function admin_scripts(){
+        function admin_scripts(){
             wp_register_script( 'oxipay_admin', plugins_url( '/js/admin.js', __FILE__ ), array( 'jquery' ), '0.4.5' );
             wp_enqueue_script( 'oxipay_admin' );
         }
@@ -70,7 +70,7 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway {
                 $maximum = $this->getMaxPrice();
                 $price = wc_get_price_to_display($product);
                 if(($minimum == 0 || $price >= $minimum) && ($maximum == 0 || $price <= $maximum)) {
-                    echo '<script id="oxipay-price-info" src="https://widgets.oxipay.'.$country_domain.'/content/scripts/'.$widget_type.'.js?productPrice='.$price.'"></script>';
+                    echo '<div id="oxipay-price-info-anchor"></div><script id="oxipay-price-info" src="https://widgets.oxipay.'.$country_domain.'/content/scripts/'.$widget_type.'.js?productPrice='.$price.'&element=%23oxipay-price-info-anchor"></script>';
                 }
             }
         }
