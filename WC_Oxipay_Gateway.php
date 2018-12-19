@@ -70,7 +70,7 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway {
                 $maximum = $this->getMaxPrice();
                 $price = wc_get_price_to_display($product);
                 if(($minimum == 0 || $price >= $minimum) && ($maximum == 0 || $price <= $maximum)) {
-                    echo '<script id="oxipay-price-info" src="https://widgets.oxipay.'.$country_domain.'/content/scripts/'.$widget_type.'.js?productPrice='.$price.'"></script>';
+                    echo '<div id="product_method_oxipay"></div><script id="oxipay-price-info" src="https://widgets.oxipay.'.$country_domain.'/content/scripts/'.$widget_type.'.js?productPrice='.$price.'&element=%23product_method_oxipay"></script>';
                 }
             }
         }
