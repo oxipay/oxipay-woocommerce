@@ -592,7 +592,15 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                 return $order_id;
             }
 
-            if ($this->checksign($params, $this->settings[ $this->pluginFileName . '_api_key'])) {
+            $api_key = $this->settings[ $this->pluginFileName . '_api_key'];
+            $sig_exists = isset($params['x_signature']);
+            $sig_match = false;
+            if ($sig_exists) {
+                $expected_sig = $this->flexi_sign($params, $api_key);
+                $sig_match = $expected_sig === $params['x_signature'];
+            }
+
+            if ($sig_exists && $sig_match) {
                 $this->log(sprintf('Processing orderId: %s ', $order_id));
                 // Get the status of the order from XPay and handle accordingly
                 $flexi_result_note = '';
@@ -628,7 +636,10 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             }
             else
             {
-                $order->add_order_note(__( $this->pluginDisplayName . ' payment response failed signature validation. Please check your Merchant Number and API key or contact '.$this->pluginDisplayName . ' for assistance.', 0, 'woocommerce'));
+                $order->add_order_note(__( $this->pluginDisplayName . ' payment response failed signature validation. Please check your Merchant Number and API key or contact '.$this->pluginDisplayName . ' for assistance.'.
+                    '</br></br>isJSON: '.$isJSON.
+                    '</br>Payload: '.print_r($params, true).
+                    '</br>Expected Signature: '.$expected_sig, 0, 'woocommerce'));
                 $msg = "signature error";
                 $_SESSION['flexi_result_note'] = $this->pluginDisplayName . ' signature error';
             }
@@ -811,7 +822,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             $clear_text = '';
             ksort($query);
             foreach ($query as $key => $value) {
-                if (substr($key, 0, 2) === "x_") {
+                if (substr($key, 0, 2) === "x_" && $key !== "x_signature") {
                     $clear_text .= $key . $value;
                 }
             }
@@ -819,20 +830,4 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             return str_replace('-', '', $hash);
         }
 
-        /**
-         * validates and associative array that contains a hmac signature against an api key
-         * @param $query array
-         * @param $api_key string
-         * @return bool
-         */
-        function checksign($query, $api_key)
-        {
-            if (!isset($query['x_signature'])) {
-                return false;
-            }
-            $actualSignature = $query['x_signature'];
-            unset($query['x_signature']);
-            $expectedSignature = $this->flexi_sign($query, $api_key);
-            return $actualSignature == $expectedSignature;
-        }
 }
