@@ -2,7 +2,7 @@
 abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         //current version of the plugin- used to run upgrade tasks on update
         public $plugin_current_version;
-
+        
         public $logger = null;
         private $logContext;
 
@@ -28,7 +28,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             $this->id                     = $this->pluginFileName;
             $this->has_fields             = false;
             $this->method_title           = __($this->pluginDisplayName, 'woocommerce');
-
+            
 	        $this->plugin_current_version = $config->getPluginVersion();
 
             $this->init_form_fields();
@@ -36,9 +36,9 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             if( is_admin() ){
                 $this->init_upgrade_process();
             }
-
+            
             add_action( 'admin_enqueue_scripts', array( $this, 'admin_scripts' ) );
-
+            
             // when we are on the checkout page we want to provide
             // the checkout process through a modal dialog box
             if (!is_admin()) {
@@ -57,7 +57,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             add_filter('woocommerce_thankyou_order_received_text', array($this, 'thankyou_page_message'));
 
             $preselect_button_order = $this->settings["preselect_button_order"]? $this->settings["preselect_button_order"] : '20';
-            add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), $preselect_button_order);
+            add_action('woocommerce_proceed_to_checkout', array($this, "flexi_checkout_button"), $preselect_button_order);            
         }
 
         abstract public function add_price_widget();
@@ -75,7 +75,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         function display_min_max_notice(){
 	        $minimum = $this->getMinPrice();
             $maximum = $this->getMaxPrice();
-
+            
             if ( $minimum != 0 && WC()->cart->total < $minimum ){
                 if(is_checkout()){
 	                wc_print_notice(
@@ -602,15 +602,14 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 
             if ($sig_exists && $sig_match) {
                 $this->log(sprintf('Processing orderId: %s ', $order_id));
-                // Get the status of the order and handle accordingly
+                // Get the status of the order from XPay and handle accordingly
                 $flexi_result_note = '';
                 switch ($params['x_result']) {
                     case "completed":
-                        $flexi_result_note = __( 'Payment approved using ' . $this->pluginDisplayName . '. Gateway_Reference #' . $params['x_gateway_reference'], 'woocommerce');
+                        $flexi_result_note = __( 'Payment approved using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce');
                         $order->add_order_note($flexi_result_note);
-                        $order->update_meta_data("flexi_purchase_number", $params["x_gateway_reference"]);
                         $order->payment_complete($params['x_reference']);
-
+                        
                         if (!is_null($cart) && !empty($cart)) {
                             $cart->empty_cart();
                         }
@@ -618,7 +617,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                         break;
 
                     case "failed":
-                        $flexi_result_note = __( 'Payment declined using ' . $this->pluginDisplayName . '. Gateway Reference #' . $params['x_gateway_reference'], 'woocommerce');
+                        $flexi_result_note = __( 'Payment declined using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce');
                         $order->add_order_note($flexi_result_note);
                         $order->update_status('failed');
                         $msg = 'failed';
@@ -626,9 +625,9 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                         break;
 
                     case "error":
-                        $flexi_result_note = __( 'Payment error using ' . $this->pluginDisplayName . '. Gateway Reference #' . $params['x_gateway_reference'], 'woocommerce');
+                        $flexi_result_note = __( 'Payment error using ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference'], 'woocommerce');
                         $order->add_order_note($flexi_result_note);
-                        $order->update_status('on-hold', 'Error may have occurred with ' . $this->pluginDisplayName . '. Gateway Reference #' . $params['x_gateway_reference']);
+                        $order->update_status('on-hold', 'Error may have occurred with ' . $this->pluginDisplayName . '. Reference #' . $params['x_gateway_reference']);
                         $msg = 'error';
                         $_SESSION['flexi_result'] = 'error';
                         break;
