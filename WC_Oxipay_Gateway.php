@@ -18,11 +18,11 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway {
             $config = new Oxipay_Config();
             parent::__construct($config);
 
-            $this->method_description = __( 'Easy to setup installment payment plans from ' . $config::DISPLAY_NAME );
-            $this->title              = __( $config::DISPLAY_NAME , 'woocommerce' );
-            $this->icon               = plugin_dir_url( __FILE__ ) .  'images/oxipay.png';
-            $this->shop_details       = __($config::DISPLAY_NAME . ' Payment', 'woocommerce' );
-            $this->order_button_text  = __( 'Proceed to ' . $config::DISPLAY_NAME, 'woocommerce' );
+            $this->method_description = __( 'Easy to setup installment payment plans from ' . $config->getDisplayName() );
+            $this->title              = __( $config->getDisplayName() , 'woocommerce' );
+            $this->icon               = plugin_dir_url( __FILE__ ) . 'images/'.$config->getDisplayName() . '.png';
+            $this->shop_details       = __($config->getDisplayName() . ' Payment', 'woocommerce' );
+            $this->order_button_text  = __( 'Proceed to ' . $config->getDisplayName(), 'woocommerce' );
 
             $country_domain = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'co.nz' : 'com.au';
             $payments_script = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'payments' : 'payments-weekly';

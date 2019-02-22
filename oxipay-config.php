@@ -4,6 +4,8 @@ class Oxipay_Config {
     const COUNTRY_NEW_ZEALAND = 'NZ';
 
     const PLATFORM_NAME = 'woocommerce';
+    const DISPLAY_NAME_BEFORE = 'Oxipay';
+    const DISPLAY_NAME_AFTER = 'Humm';
     const DISPLAY_NAME  = 'Oxipay';
     const PLUGIN_FILE_NAME = 'oxipay';
 
@@ -34,9 +36,23 @@ class Oxipay_Config {
         )        
     );
 
-    public function getDisplayName() {
-        return self::DISPLAY_NAME;
-    } 
+    public function getDisplayName(  ) {
+        $name = self::DISPLAY_NAME_BEFORE;
+        $country = get_option('woocommerce_oxipay_settings')['country'];
+        $wc_country = get_option('woocommerce_default_country');
+		if($wc_country){
+			$wc_country = substr($wc_country, 0, 2);
+		}
+		if(!$country){
+			$country = $wc_country;
+		}
+
+        $is_after = ( time() - strtotime("2019-04-01 00:00:00.0") >= 0 );
+        if ( $country == 'AU' &&  $is_after ) {
+        	$name = self::DISPLAY_NAME_AFTER;
+        }
+        return $name;
+    }
     
     public function getPlatformName() {
         return self::PLATFORM_NAME;
