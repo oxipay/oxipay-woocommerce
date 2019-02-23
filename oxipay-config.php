@@ -36,22 +36,32 @@ class Oxipay_Config {
         )        
     );
 
-    public function getDisplayName(  ) {
+    public function getDisplayName() {
         $name = self::DISPLAY_NAME_BEFORE;
         $country = get_option('woocommerce_oxipay_settings')['country'];
+	    if(!$country){
         $wc_country = get_option('woocommerce_default_country');
 		if($wc_country){
-			$wc_country = substr($wc_country, 0, 2);
+			    $country = substr($wc_country, 0, 2);
 		}
-		if(!$country){
-			$country = $wc_country;
-		}
-
-        $is_after = ( time() - strtotime("2019-04-01 00:00:00.0") >= 0 );
+        }
+        $is_after = ( time() - strtotime($this::getLunchDate()) >= 0 );
         if ( $country == 'AU' &&  $is_after ) {
         	$name = self::DISPLAY_NAME_AFTER;
         }
         return $name;
+    }
+
+    private function getLunchDate(){
+    	$launch_time_address ='https://s3-ap-southeast-2.amazonaws.com/widgets.shophumm.com.au/time.txt';
+	    $launch_time_string = get_option('oxipay_launch_time');
+	    $launch_time_update_time_string = get_option('oxipay_launch_time_updated');
+	    if(!$launch_time_string || ( time() - $launch_time_update_time_string >= 3600 )) {
+		    $launch_time_string = wp_remote_get($launch_time_address)['body'];
+		    update_option('oxipay_launch_time', $launch_time_string);
+		    update_option('oxipay_launch_time_updated', time());
+	    }
+	    return $launch_time_string;
     }
     
     public function getPlatformName() {
