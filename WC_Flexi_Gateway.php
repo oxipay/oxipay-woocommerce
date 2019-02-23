@@ -168,9 +168,8 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
             //Build options for the country select field from the config
             $countryOptions = array('' => __( 'Please select...', 'woocommerce' ));
 
-
             foreach( $this->currentConfig->countries as $countryCode => $country ){
-                 $countryOptions[$countryCode] = __( $country['name'], 'woocommerce' );
+                $countryOptions[$countryCode] = __( $country['name'], 'woocommerce' );
             }
 
             $this->form_fields = array(
@@ -508,10 +507,8 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 	            }
             }
 
-            $url = $this->currentConfig->countries[$countryCode]['sandboxURL'];
-            if($this->isTesting() == 'no'){
-                $url = $this->currentConfig->countries[$countryCode]['liveURL'];
-            }
+            $environment = ($this->isTesting() == 'no')? "live" : "sandbox";
+            $url = $this->currentConfig->getUrlAddress($countryCode)[$environment . 'URL'];
 
             return $url;
         }
@@ -857,7 +854,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
 		    }
 
             $environment = ($this->isTesting() == 'no')? "live" : "sandbox";
-            $refund_address = $this->currentConfig->countries[$countryCode][$environment.'_refund_address'];
+            $refund_address = $this->currentConfig->getUrlAddress($countryCode)[$environment.'_refund_address'];
 
 		    $refund_details = array(
 			    "x_merchant_number" => $this->settings[ $this->pluginFileName . '_merchant_id' ],

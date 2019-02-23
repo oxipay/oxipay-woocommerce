@@ -15,10 +15,6 @@ class Oxipay_Config {
             'currency_code' 	=> 'AUD',
             'currency_symbol'	=> '$',
             'tld'			    => '.com.au',
-            'sandboxURL'        => 'https://securesandbox.oxipay.com.au/Checkout?platform=WooCommerce',
-            'liveURL'           => 'https://secure.oxipay.com.au/Checkout?platform=WooCommerce',
-	        'sandbox_refund_address'    => 'https://portalssandbox.oxipay.com.au/api/ExternalRefund/processrefund',
-            'live_refund_address'    => 'https://portals.oxipay.com.au/api/ExternalRefund/processrefund',
             'max_purchase'      => 2100,
             'min_purchase'      => 20,
         ),
@@ -27,29 +23,55 @@ class Oxipay_Config {
             'currency_code'		=> 'NZD',
             'currency_symbol' 	=> '$',
             'tld'		  	    => '.co.nz',
-            'sandboxURL'        => 'https://securesandbox.oxipay.co.nz/Checkout?platform=WooCommerce',
-            'liveURL'           => 'https://secure.oxipay.co.nz/Checkout?platform=WooCommerce',
-            'sandbox_refund_address'    => 'https://portalssandbox.oxipay.co.nz/api/ExternalRefund/processrefund',
-	        'live_refund_address'    => 'https://portals.oxipay.co.nz/api/ExternalRefund/processrefund',
             'max_purchase'      => 1500,
             'min_purchase'      => 20,
         )        
     );
 
-    public function getDisplayName() {
-        $name = self::DISPLAY_NAME_BEFORE;
-        $country = get_option('woocommerce_oxipay_settings')['country'];
-	    if(!$country){
-        $wc_country = get_option('woocommerce_default_country');
-		if($wc_country){
-			    $country = substr($wc_country, 0, 2);
+    const URLS = [
+    	'AU_Oxipay' => [
+		    'sandboxURL'        => 'https://securesandbox.oxipay.com.au/Checkout?platform=WooCommerce',
+		    'liveURL'           => 'https://secure.oxipay.com.au/Checkout?platform=WooCommerce',
+		    'sandbox_refund_address'    => 'https://portalssandbox.oxipay.com.au/api/ExternalRefund/processrefund',
+		    'live_refund_address'    => 'https://portals.oxipay.com.au/api/ExternalRefund/processrefund',
+	    ],
+	    'AU_Humm' => [
+		    'sandboxURL'        => 'https://securesandbox.shophumm.com.au/Checkout?platform=WooCommerce',
+		    'liveURL'           => 'https://secure.shophumm.com.au/Checkout?platform=WooCommerce',
+		    'sandbox_refund_address'    => 'https://portalssandbox.shophumm.com.au/api/ExternalRefund/processrefund',
+		    'live_refund_address'    => 'https://portals.shophumm.com.au/api/ExternalRefund/processrefund',
+	    ],
+	    'NZ' => [
+		    'sandboxURL'        => 'https://securesandbox.oxipay.co.nz/Checkout?platform=WooCommerce',
+		    'liveURL'           => 'https://secure.oxipay.co.nz/Checkout?platform=WooCommerce',
+		    'sandbox_refund_address'    => 'https://portalssandbox.oxipay.co.nz/api/ExternalRefund/processrefund',
+		    'live_refund_address'    => 'https://portals.oxipay.co.nz/api/ExternalRefund/processrefund',
+	    ]
+    ];
+
+	public function getDisplayName() {
+		$name = self::DISPLAY_NAME_BEFORE;
+		$country = get_option('woocommerce_oxipay_settings')['country'];
+		if(!$country){
+			$wc_country = get_option('woocommerce_default_country');
+			if($wc_country){
+				$country = substr($wc_country, 0, 2);
+			}
 		}
-        }
-        $is_after = ( time() - strtotime($this::getLunchDate()) >= 0 );
-        if ( $country == 'AU' &&  $is_after ) {
-        	$name = self::DISPLAY_NAME_AFTER;
-        }
-        return $name;
+		$is_after = ( time() - strtotime($this::getLunchDate()) >= 0 );
+		if ( $country == 'AU' &&  $is_after ) {
+			$name = self::DISPLAY_NAME_AFTER;
+		}
+		return $name;
+	}
+
+    public function getUrlAddress($countryCode) {
+	    $is_after = ( time() - strtotime( $this::getLunchDate() ) >= 0 );
+	    if ( $countryCode == 'AU' ) {
+		    return $is_after? self::URLS['AU_Humm'] : self::URLS['AU_Oxipay'];
+	    } else  {
+		    return self::URLS['NZ'];
+	    }
     }
 
     private function getLunchDate(){
