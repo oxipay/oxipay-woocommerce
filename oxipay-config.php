@@ -9,6 +9,7 @@ class Oxipay_Config {
     const DISPLAY_NAME  = 'Oxipay';
 	const PLUGIN_FILE_NAME = 'oxipay';
 	const LAUNCH_TIME_URL = 'https://s3-ap-southeast-2.amazonaws.com/widgets.shophumm.com.au/time.txt';
+	const LAUNCH_TIME_DEFAULT = '2019-03-31 13:30:00';
 
     public $countries = array(
         self::COUNTRY_AUSTRALIA => array (
@@ -76,12 +77,20 @@ class Oxipay_Config {
     }
 
     private function getLaunchDate(){
-	    $launch_time_string = get_option('oxipay_launch_time');
+		$launch_time_string = get_option('oxipay_launch_time');
 	    $launch_time_update_time_string = get_option('oxipay_launch_time_updated');
-	    if(!$launch_time_string || ( time() - $launch_time_update_time_string >= 3600 )) {
-		    $launch_time_string = wp_remote_get(self::LAUNCH_TIME_URL)['body'];
-		    update_option('oxipay_launch_time', $launch_time_string);
-		    update_option('oxipay_launch_time_updated', time());
+	    if(empty($launch_time_string) || ( time() - $launch_time_update_time_string >= 3600 )) {
+			$remote_launch_time_string = wp_remote_get(self::LAUNCH_TIME_URL)['body'];
+			if(!empty($remote_launch_time_string)){
+				$launch_time_string = $remote_launch_time_string;
+				update_option('oxipay_launch_time', $launch_time_string);
+				update_option('oxipay_launch_time_updated', time());
+			} elseif(empty($launch_time_string) || (empty($launch_time_update_time_string) && $launch_time_string != self::LAUNCH_TIME_DEFAULT)) {
+				// this is when $launch_time_string never set (first time run of the plugin), or local const LAUNCH_TIME_DEFAULT changes and and never update from remote.
+				// Mainly for development, for changing const LAUNCH_TIME_DEFAULT to take effect.
+				$launch_time_string = self::LAUNCH_TIME_DEFAULT;
+				update_option('oxipay_launch_time', $launch_time_string);
+			}
 	    }
 	    return $launch_time_string;
     }
