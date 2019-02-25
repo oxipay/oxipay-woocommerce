@@ -7,7 +7,8 @@ class Oxipay_Config {
     const DISPLAY_NAME_BEFORE = 'Oxipay';
     const DISPLAY_NAME_AFTER = 'Humm';
     const DISPLAY_NAME  = 'Oxipay';
-    const PLUGIN_FILE_NAME = 'oxipay';
+	const PLUGIN_FILE_NAME = 'oxipay';
+	const LAUNCH_TIME_URL = 'https://s3-ap-southeast-2.amazonaws.com/widgets.shophumm.com.au/time.txt';
 
     public $countries = array(
         self::COUNTRY_AUSTRALIA => array (
@@ -58,7 +59,7 @@ class Oxipay_Config {
 				$country = substr($wc_country, 0, 2);
 			}
 		}
-		$is_after = ( time() - strtotime($this::getLunchDate()) >= 0 );
+		$is_after = ( time() - strtotime($this::getLaunchDate()) >= 0 );
 		if ( $country == 'AU' &&  $is_after ) {
 			$name = self::DISPLAY_NAME_AFTER;
 		}
@@ -66,7 +67,7 @@ class Oxipay_Config {
 	}
 
     public function getUrlAddress($countryCode) {
-	    $is_after = ( time() - strtotime( $this::getLunchDate() ) >= 0 );
+	    $is_after = ( time() - strtotime( $this::getLaunchDate() ) >= 0 );
 	    if ( $countryCode == 'AU' ) {
 		    return $is_after? self::URLS['AU_Humm'] : self::URLS['AU_Oxipay'];
 	    } else  {
@@ -74,12 +75,11 @@ class Oxipay_Config {
 	    }
     }
 
-    private function getLunchDate(){
-    	$launch_time_address ='https://s3-ap-southeast-2.amazonaws.com/widgets.shophumm.com.au/time.txt';
+    private function getLaunchDate(){
 	    $launch_time_string = get_option('oxipay_launch_time');
 	    $launch_time_update_time_string = get_option('oxipay_launch_time_updated');
 	    if(!$launch_time_string || ( time() - $launch_time_update_time_string >= 3600 )) {
-		    $launch_time_string = wp_remote_get($launch_time_address)['body'];
+		    $launch_time_string = wp_remote_get(self::LAUNCH_TIME_URL)['body'];
 		    update_option('oxipay_launch_time', $launch_time_string);
 		    update_option('oxipay_launch_time_updated', time());
 	    }
