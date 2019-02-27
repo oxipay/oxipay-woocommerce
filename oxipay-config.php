@@ -6,7 +6,6 @@ class Oxipay_Config {
     const PLATFORM_NAME = 'woocommerce';
     const DISPLAY_NAME_BEFORE = 'Oxipay';
     const DISPLAY_NAME_AFTER = 'Humm';
-    const DISPLAY_NAME  = 'Oxipay';
 	const PLUGIN_FILE_NAME = 'oxipay';
 	const LAUNCH_TIME_URL = 'https://s3-ap-southeast-2.amazonaws.com/widgets.shophumm.com.au/time.txt';
 	const LAUNCH_TIME_DEFAULT = '2019-03-31 13:30:00';
