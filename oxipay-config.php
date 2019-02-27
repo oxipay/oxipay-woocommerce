@@ -10,6 +10,7 @@ class Oxipay_Config {
 	const PLUGIN_FILE_NAME = 'oxipay';
 	const LAUNCH_TIME_URL = 'https://s3-ap-southeast-2.amazonaws.com/widgets.shophumm.com.au/time.txt';
 	const LAUNCH_TIME_DEFAULT = '2019-03-31 13:30:00';
+	const BUTTON_COLOR = array( "Oxipay" => "E68821", "Humm" => "FF6C00" );
 
     public $countries = array(
         self::COUNTRY_AUSTRALIA => array (
@@ -51,6 +52,10 @@ class Oxipay_Config {
 	    ]
     ];
 
+	public function getButtonColor() {
+		return self::BUTTON_COLOR[$this->getDisplayName()];
+	}
+
 	public function getDisplayName() {
 		$name = self::DISPLAY_NAME_BEFORE;
 		$country = get_option('woocommerce_oxipay_settings')['country'];
@@ -79,7 +84,7 @@ class Oxipay_Config {
     private function getLaunchDate(){
 		$launch_time_string = get_option('oxipay_launch_time');
 	    $launch_time_update_time_string = get_option('oxipay_launch_time_updated');
-	    if(empty($launch_time_string) || ( time() - $launch_time_update_time_string >= 3600 )) {
+	    if(empty($launch_time_string) || ( time() - $launch_time_update_time_string >= 1 )) {
 			$remote_launch_time_string = wp_remote_get(self::LAUNCH_TIME_URL)['body'];
 			if(!empty($remote_launch_time_string)){
 				$launch_time_string = $remote_launch_time_string;
@@ -94,7 +99,7 @@ class Oxipay_Config {
 	    }
 	    return $launch_time_string;
     }
-    
+
     public function getPlatformName() {
         return self::PLATFORM_NAME;
     }
