@@ -718,6 +718,9 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
          */
         private function checkOrderAmount($order)
         {
+            if($this->currentConfig->getDisplayName() == 'Humm'){
+                return true;
+            }
             $total = $order->get_total();
             $min = $this->getMinPurchase();
             if ($total < $min) {
