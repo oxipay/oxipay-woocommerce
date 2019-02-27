@@ -28,9 +28,19 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
             $payments_script = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'payments' : 'payments-weekly';
             $checkout_total = (WC()->cart)? WC()->cart->get_totals()['total'] : "0";
             $this->description = __( '<div id="checkout_method_oxipay"></div><script id="oxipay-checkout-price-widget-script" src="https://widgets.oxipay.'.$country_domain.'/content/scripts/'.$payments_script.'.js?used_in=checkout&productPrice='.$checkout_total.'&element=%23checkout_method_oxipay"></script>', 'woocommerce' );
+	        add_action( 'admin_notices', array($this, 'admin_notice_rename_to_humm') );
         }
 
-
+		function admin_notice_rename_to_humm() {
+			$show_times = get_option('humm_admin_notice_update_show_times');
+			if ( !$show_times ){
+				update_option('humm_admin_notice_update_show_times', 1);
+			}
+			if ( $show_times < 3 ) {
+				update_option('humm_admin_notice_update_show_times', $show_times+1);
+				printf('<div class="notice notice-info is-dismissible"><p>Humm <img src="https://s3-ap-southeast-2.amazonaws.com/widgets.shophumm.com.au/dist/au/content/images/logo-orange.svg" height="16px" /> is the new Oxipay!</p></div>');
+			}
+		}
 
         /**
          * Load JavaScript for the checkout page
@@ -45,7 +55,6 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
             wp_enqueue_script('oxipay_modal');
             wp_enqueue_script('iframeResizer');
         }
-
 
         /**
          * Load javascript for Wordpress admin
