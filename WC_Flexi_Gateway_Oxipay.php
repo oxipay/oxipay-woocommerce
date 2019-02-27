@@ -1,5 +1,5 @@
 <?php
-abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
+abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
         //current version of the plugin- used to run upgrade tasks on update
         public $plugin_current_version;
 
