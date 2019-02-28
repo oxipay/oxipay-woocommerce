@@ -24,15 +24,17 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
             $this->shop_details       = __($config->getDisplayName() . ' Payment', 'woocommerce' );
             $this->order_button_text  = __( 'Proceed to ' . $config->getDisplayName(), 'woocommerce' );
 
-	        $country_domain = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'co.nz' : 'com.au';
-            $checkout_total = (WC()->cart)? WC()->cart->get_totals()['total'] : "0";
-            if($this->currentConfig->getDisplayName()=='Humm'){
-            	$widget_type = 'price-info';
-	            $this->description = __( '<div id="checkout_method_humm_anchor"></div><script src="https://s3-ap-southeast-2.amazonaws.com/widgets.shophumm.' . $country_domain . '/dist/au/content/scripts/' . $widget_type . '.js?used_in=checkout&productPrice=' . $checkout_total . '&element=%23checkout_method_humm_anchor"></script>', 'WooCommerce' );
+            if($this->settings['enabled'] == 'yes') {
+	            $country_domain = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'co.nz' : 'com.au';
+	            $checkout_total = ( WC()->cart ) ? WC()->cart->get_totals()['total'] : "0";
+	            if ( $this->currentConfig->getDisplayName() == 'Humm' ) {
+		            $widget_type       = 'price-info';
+		            $this->description = __( '<div id="checkout_method_humm_anchor"></div><script src="https://s3-ap-southeast-2.amazonaws.com/widgets.shophumm.' . $country_domain . '/dist/au/content/scripts/' . $widget_type . '.js?used_in=checkout&productPrice=' . $checkout_total . '&element=%23checkout_method_humm_anchor"></script>', 'WooCommerce' );
 
-            }else {
-	            $widget_type = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'payments' : 'payments-weekly';
-	            $this->description = __( '<div id="checkout_method_oxipay_anchor"></div><script src="https://widgets.oxipay.' . $country_domain . '/content/scripts/' . $widget_type . '.js?used_in=checkout&productPrice=' . $checkout_total . '&element=%23checkout_method_oxipay_anchor"></script>', 'woocommerce' );
+	            } else {
+		            $widget_type       = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'payments' : 'payments-weekly';
+		            $this->description = __( '<div id="checkout_method_oxipay_anchor"></div><script src="https://widgets.oxipay.' . $country_domain . '/content/scripts/' . $widget_type . '.js?used_in=checkout&productPrice=' . $checkout_total . '&element=%23checkout_method_oxipay_anchor"></script>', 'woocommerce' );
+	            }
             }
 	        add_action( 'admin_notices', array($this, 'admin_notice_rename_to_humm') );
         }
@@ -75,7 +77,7 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
             global $product;
             if(isset($this->settings['price_widget']) && $this->settings['price_widget']=='yes'){                $maximum = $this->getMaxPrice();
                 $price = wc_get_price_to_display($product);
-                if($maximum == 0 || $price <= $maximum) {
+                if( ($maximum == 0 || $price <= $maximum) && $this->settings['enabled'] == 'yes' ) {
 	                $country_domain = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'co.nz' : 'com.au';
 	                if($this->currentConfig->getDisplayName()=='Humm') {
 		                $widget_type = 'price-info';
@@ -94,7 +96,7 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
 				return;
 			} else {
 				$country_domain = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'co.nz' : 'com.au';
-				if ( $country_domain == "com.au" ) {
+				if ( $country_domain == "com.au" && $this->settings['enabled'] == 'yes' ) {
 					if($this->currentConfig->getDisplayName()=='Humm') {
 						echo '<script id="humm-top-banner-script" src="https://s3-ap-southeast-2.amazonaws.com/widgets.shophumm.' . $country_domain . '/content/scripts/top-banner.js?element=header"></script>';
 					}else {
