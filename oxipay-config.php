@@ -83,7 +83,7 @@ class Oxipay_Config {
     private function getLaunchDate(){
 		$launch_time_string = get_option('oxipay_launch_time');
 	    $launch_time_update_time_string = get_option('oxipay_launch_time_updated');
-	    if(empty($launch_time_string) || ( time() - $launch_time_update_time_string >= 1 )) {
+	    if(empty($launch_time_string) || ( time() - $launch_time_update_time_string >= 3600 )) {
 			$remote_launch_time_string = wp_remote_get(self::LAUNCH_TIME_URL)['body'];
 			if(!empty($remote_launch_time_string)){
 				$launch_time_string = $remote_launch_time_string;
