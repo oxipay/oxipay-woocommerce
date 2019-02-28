@@ -28,11 +28,11 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
             $checkout_total = (WC()->cart)? WC()->cart->get_totals()['total'] : "0";
             if($this->currentConfig->getDisplayName()=='Humm'){
             	$widget_type = 'price-info';
-	            $this->description = __( '<div id="checkout_method_humm"></div><script id="humm-checkout-price-widget-script" src="https://s3-ap-southeast-2.amazonaws.com/widgets.shophumm.' . $country_domain . '/dist/au/content/scripts/' . $widget_type . '.js?used_in=checkout&productPrice=' . $checkout_total . '&element=%23checkout_method_humm"></script>', 'WooCommerce' );
+	            $this->description = __( '<div id="checkout_method_humm_anchor"></div><script src="https://s3-ap-southeast-2.amazonaws.com/widgets.shophumm.' . $country_domain . '/dist/au/content/scripts/' . $widget_type . '.js?used_in=checkout&productPrice=' . $checkout_total . '&element=%23checkout_method_humm_anchor"></script>', 'WooCommerce' );
 
             }else {
 	            $widget_type = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'payments' : 'payments-weekly';
-	            $this->description = __( '<div id="checkout_method_oxipay"></div><script id="oxipay-checkout-price-widget-script" src="https://widgets.oxipay.' . $country_domain . '/content/scripts/' . $widget_type . '.js?used_in=checkout&productPrice=' . $checkout_total . '&element=%23checkout_method_oxipay"></script>', 'woocommerce' );
+	            $this->description = __( '<div id="checkout_method_oxipay_anchor"></div><script src="https://widgets.oxipay.' . $country_domain . '/content/scripts/' . $widget_type . '.js?used_in=checkout&productPrice=' . $checkout_total . '&element=%23checkout_method_oxipay_anchor"></script>', 'woocommerce' );
             }
 	        add_action( 'admin_notices', array($this, 'admin_notice_rename_to_humm') );
         }
@@ -79,10 +79,10 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
 	                $country_domain = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'co.nz' : 'com.au';
 	                if($this->currentConfig->getDisplayName()=='Humm') {
 		                $widget_type = 'price-info';
-		                echo '<div id="humm-price-info-anchor"></div><script id="humm-price-info" src="https://s3-ap-southeast-2.amazonaws.com/widgets.shophumm.'.$country_domain.'/dist/au/content/scripts/'.$widget_type.'.js?productPrice='.$price.'&element=%23humm-price-info-anchor"></script>';
+		                echo '<div id="humm-price-info-anchor"></div><script src="https://s3-ap-southeast-2.amazonaws.com/widgets.shophumm.'.$country_domain.'/dist/au/content/scripts/'.$widget_type.'.js?productPrice='.$price.'&element=%23humm-price-info-anchor"></script>';
 	                }else {
 		                $widget_type = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'payments' : 'payments-weekly';
-		                echo '<div id="oxipay-price-info-anchor"></div><script id="oxipay-price-info" src="https://widgets.oxipay.' . $country_domain . '/content/scripts/' . $widget_type . '.js?productPrice=' . $price . '&element=%23oxipay-price-info-anchor"></script>';
+		                echo '<div id="oxipay-price-info-anchor"></div><script src="https://widgets.oxipay.' . $country_domain . '/content/scripts/' . $widget_type . '.js?productPrice=' . $price . '&element=%23oxipay-price-info-anchor"></script>';
 	                }
                 }
             }
