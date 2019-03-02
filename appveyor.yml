@@ -23,7 +23,7 @@ deploy:
     force_update: true
     draft: false
     prerelease: false
-    on: 
+    on:
       appveyor_repo_tag: true
 notifications:
   - provider: Email
