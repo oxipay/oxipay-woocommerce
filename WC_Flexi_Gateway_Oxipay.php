@@ -435,6 +435,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
                 'x_customer_shipping_address2'  => $order->get_shipping_address_2(),
                 'x_customer_shipping_state' 	=> $order->get_shipping_state(),
                 'x_customer_shipping_zip' 		=> $order->get_shipping_postcode(),
+                'version_info'                  => 'plugin_'.$this->currentConfig->getPluginVersion().'_on_wc'.WC()->version,
                 'gateway_url' 					=> $gatewayUrl
             );
 
