@@ -65,7 +65,7 @@ class Oxipay_Config {
                 $country = substr( $wc_country, 0, 2 );
             }
         }
-        $is_after = ( time() - strtotime( $this::getLaunchDate() ) >= 0 );
+        $is_after = ( time() - strtotime( $this::getLaunchDateString() ) >= 0 );
         if ( $country == 'AU' && $is_after ) {
             $name = self::DISPLAY_NAME_AFTER;
         }
@@ -74,7 +74,7 @@ class Oxipay_Config {
     }
 
     public function getUrlAddress( $countryCode ) {
-        $is_after = ( time() - strtotime( $this::getLaunchDate() ) >= 0 );
+        $is_after = ( time() - strtotime( $this::getLaunchDateString() ) >= 0 );
         if ( $countryCode == 'AU' ) {
             return $is_after ? self::URLS['AU_Humm'] : self::URLS['AU_Oxipay'];
         } else {
@@ -82,20 +82,20 @@ class Oxipay_Config {
         }
     }
 
-    private function getLaunchDate() {
-        $launch_time_string             = get_option( 'oxipay_launch_time' );
-        $launch_time_update_time_string = get_option( 'oxipay_launch_time_updated' );
-        if ( empty( $launch_time_string ) || ( time() - $launch_time_update_time_string >= 3600 ) ) {
+    private function getLaunchDateString() {
+        $launch_time_string      = get_option( 'oxipay_launch_time_string' );
+        $launch_time_update_time = get_option( 'oxipay_launch_time_updated' );
+        if ( empty( $launch_time_string ) || empty( $launch_time_update_time ) || ( time() - $launch_time_update_time >= 3600 ) ) {
             $remote_launch_time_string = wp_remote_get( self::LAUNCH_TIME_URL )['body'];
             if ( ! empty( $remote_launch_time_string ) ) {
                 $launch_time_string = $remote_launch_time_string;
-                update_option( 'oxipay_launch_time', $launch_time_string );
+                update_option( 'oxipay_launch_time_string', $launch_time_string );
                 update_option( 'oxipay_launch_time_updated', time() );
-            } elseif ( empty( $launch_time_string ) || ( empty( $launch_time_update_time_string ) && $launch_time_string != self::LAUNCH_TIME_DEFAULT ) ) {
+            } elseif ( empty( $launch_time_string ) || ( empty( $launch_time_update_time ) && $launch_time_string != self::LAUNCH_TIME_DEFAULT ) ) {
                 // this is when $launch_time_string never set (first time run of the plugin), or local const LAUNCH_TIME_DEFAULT changes and and never update from remote.
                 // Mainly for development, for changing const LAUNCH_TIME_DEFAULT to take effect.
                 $launch_time_string = self::LAUNCH_TIME_DEFAULT;
-                update_option( 'oxipay_launch_time', $launch_time_string );
+                update_option( 'oxipay_launch_time_string', $launch_time_string );
             }
         }
 
