@@ -10,6 +10,7 @@ class Oxipay_Config {
     const PLUGIN_FILE_NAME = 'oxipay';
     const LAUNCH_TIME_URL = 'https://s3-ap-southeast-2.amazonaws.com/humm-variables/launch-time.txt';
     const LAUNCH_TIME_DEFAULT = '2019-04-07 14:30:00 UTC';
+    const LAUNCH_TIME_CHECK_ENDS = "2019-10-07 13:30:00 UTC";
     const BUTTON_COLOR = array( "Oxipay" => "E68821", "Humm" => "FF6C00" );
 
     public $countries = array(
@@ -83,7 +84,16 @@ class Oxipay_Config {
     private function getLaunchDateString() {
         $launch_time_string      = get_option( 'oxipay_launch_time_string' );
         $launch_time_update_time = get_option( 'oxipay_launch_time_updated' );
-        if ( empty( $launch_time_string ) || empty( $launch_time_update_time ) || ( time() - $launch_time_update_time >= 3600 ) ) {
+        if ( time() - strtotime( self::LAUNCH_TIME_CHECK_ENDS ) > 0 ) {
+            // if after LAUNCH_TIME_CHECK_ENDS time, and launch_time is still empty, set it to default launch time, and done.
+            if ( ! $launch_time_string ) {
+                $launch_time_string = self::LAUNCH_TIME_DEFAULT;
+                update_option( 'oxipay_launch_time_string', $launch_time_string );
+            }
+
+            return $launch_time_string;
+        }
+        if ( empty( $launch_time_string ) || empty( $launch_time_update_time ) || ( time() - $launch_time_update_time >= 1 ) ) {
             $remote_launch_time_string = wp_remote_get( self::LAUNCH_TIME_URL )['body'];
             if ( ! empty( $remote_launch_time_string ) ) {
                 $launch_time_string = $remote_launch_time_string;
