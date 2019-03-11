@@ -65,8 +65,7 @@ class Oxipay_Config {
                 $country = substr( $wc_country, 0, 2 );
             }
         }
-        $is_after = ( time() - strtotime( $this::getLaunchDateString() ) >= 0 );
-        if ( $country == 'AU' && $is_after ) {
+        if ( $country == 'AU' && $this->isAfter() ) {
             $name = self::DISPLAY_NAME_AFTER;
         }
 
@@ -74,9 +73,8 @@ class Oxipay_Config {
     }
 
     public function getUrlAddress( $countryCode ) {
-        $is_after = ( time() - strtotime( $this::getLaunchDateString() ) >= 0 );
         if ( $countryCode == 'AU' ) {
-            return $is_after ? self::URLS['AU_Humm'] : self::URLS['AU_Oxipay'];
+            return $this->isAfter() ? self::URLS['AU_Humm'] : self::URLS['AU_Oxipay'];
         } else {
             return self::URLS['NZ'];
         }
@@ -100,6 +98,13 @@ class Oxipay_Config {
         }
 
         return $launch_time_string;
+    }
+
+    public function isAfter() {
+        $force_humm = get_option( 'woocommerce_oxipay_settings' )['force_humm'];
+
+        return $force_humm == 'yes' ? true : ( time() - strtotime( $this->getLaunchDateString() ) >= 0 );
+
     }
 
     public function getPlatformName() {
