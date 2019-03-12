@@ -622,7 +622,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                         $order->add_order_note($flexi_result_note);
                         $order->update_status('failed');
                         $msg = 'failed';
-                        $_SESSION['flexi_result'] = 'failed';
+                        WC()->session->set( 'flexi_result', 'failed' );
                         break;
 
                     case "error":
@@ -630,10 +630,10 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                         $order->add_order_note($flexi_result_note);
                         $order->update_status('on-hold', 'Error may have occurred with ' . $this->pluginDisplayName . '. Gateway Reference #' . $params['x_gateway_reference']);
                         $msg = 'error';
-                        $_SESSION['flexi_result'] = 'error';
+                        WC()->session->set( 'flexi_result', 'error' );
                         break;
                 }
-                $_SESSION['flexi_result_note'] = $flexi_result_note;
+                WC()->session->set( 'flexi_result_note', $flexi_result_note );
             }
             else
             {
@@ -642,7 +642,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
                     '</br>Payload: '.print_r($params, true).
                     '</br>Expected Signature: '.$expected_sig, 0, 'woocommerce'));
                 $msg = "signature error";
-                $_SESSION['flexi_result_note'] = $this->pluginDisplayName . ' signature error';
+                WC()->session->set( 'flexi_result_note', $this->pluginDisplayName . ' signature error' );
             }
 
             if ($isJSON) {
@@ -656,8 +656,8 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         }
 
         function thankyou_page_message($original_message){
-            if ($_SESSION['flexi_result_note'] != ''){
-                return $_SESSION['flexi_result_note'];
+            if ( ! empty( WC()->session->get( 'flexi_result_note' ) ) ) {
+                return WC()->session->get( 'flexi_result_note' );
             }
         }
 
@@ -787,7 +787,7 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway {
         }
 
         /**
-         * @return int 
+         * @return int
          */
         private function getMaxPurchase() {
             return $this->currentConfig->countries[$this->getCountryCode()]['max_purchase'];
