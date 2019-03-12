@@ -210,7 +210,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
                 'description' => __( 'While test mode is enabled, transactions will be simulated and cards will not be charged', 'woocommerce' ),
                 'desc_tip'    => true
             ),
-            'force_humm'                            => array(
+            'force_humm'                          => array(
                 'title'       => __( 'Force Humm', 'woocommerce' ),
                 'type'        => 'checkbox',
                 'label'       => __( 'Force display and checkout with Humm, not waiting for automatic switch over (AU only)', 'woocommerce' ),
@@ -643,26 +643,26 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
                     $flexi_result_note = __( 'Payment declined using ' . $this->pluginDisplayName . '. Gateway Reference #' . $params['x_gateway_reference'], 'woocommerce' );
                     $order->add_order_note( $flexi_result_note );
                     $order->update_status( 'failed' );
-                    $msg                      = 'failed';
-                    $_SESSION['flexi_result'] = 'failed';
+                    $msg = 'failed';
+                    WC()->session->set( 'flexi_result', 'failed' );
                     break;
 
                 case "error":
                     $flexi_result_note = __( 'Payment error using ' . $this->pluginDisplayName . '. Gateway Reference #' . $params['x_gateway_reference'], 'woocommerce' );
                     $order->add_order_note( $flexi_result_note );
                     $order->update_status( 'on-hold', 'Error may have occurred with ' . $this->pluginDisplayName . '. Gateway Reference #' . $params['x_gateway_reference'] );
-                    $msg                      = 'error';
-                    $_SESSION['flexi_result'] = 'error';
+                    $msg = 'error';
+                    WC()->session->set( 'flexi_result', 'error' );
                     break;
             }
-            $_SESSION['flexi_result_note'] = $flexi_result_note;
+            WC()->session->set( 'flexi_result_note', $flexi_result_note );
         } else {
             $order->add_order_note( __( $this->pluginDisplayName . ' payment response failed signature validation. Please check your Merchant Number and API key or contact ' . $this->pluginDisplayName . ' for assistance.' .
                                         '</br></br>isJSON: ' . $isJSON .
                                         '</br>Payload: ' . print_r( $params, true ) .
                                         '</br>Expected Signature: ' . $expected_sig, 0, 'woocommerce' ) );
-            $msg                           = "signature error";
-            $_SESSION['flexi_result_note'] = $this->pluginDisplayName . ' signature error';
+            $msg = "signature error";
+            WC()->session->set( 'flexi_result_note', $this->pluginDisplayName . ' signature error' );
         }
 
         if ( $isJSON ) {
@@ -677,8 +677,8 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
     }
 
     function thankyou_page_message( $original_message ) {
-        if ( $_SESSION['flexi_result_note'] != '' ) {
-            return $_SESSION['flexi_result_note'];
+        if ( ! empty( WC()->session->get( 'flexi_result_note' ) ) ) {
+            return WC()->session->get( 'flexi_result_note' );
         }
     }
 
