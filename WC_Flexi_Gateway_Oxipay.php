@@ -541,7 +541,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
     function admin_options() { ?>
         <h2><?php _e( $this->pluginDisplayName, 'woocommerce' ); ?></h2>
 
-        <p><?php _e( $this->method_description, 'woocommerce' ); ?></p>
         <p>For help setting this plugin up please contact our integration team.</p>
 
         <table class="form-table">
