@@ -107,4 +107,32 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
             }
         }
     }
+
+    public function get_settings() {
+        // these are safe values to export via javascript
+        $whitelist = [
+            'enabled'         => null,
+            'display_details' => null,
+            'title'           => null,
+            'description'     => null,
+            'shop_details'    => null,
+            'shop_name'       => null,
+            'country'         => null,
+            'use_modal'       => null
+        ];
+        foreach ( $whitelist as $k => $v ) {
+            if ( isset( $this->settings[ $k ] ) ) {
+                $whitelist[ $k ] = $this->settings[ $k ];
+            }
+        }
+
+        // if Humm, always set 'use_modal' to 'no'
+        if ( $whitelist['use_modal'] == 'yes' ) {
+            if ( $this->currentConfig->getDisplayName() == 'Humm' ) {
+                $whitelist['use_modal'] = 'no';
+            }
+        }
+
+        return $whitelist;
+    }
 }

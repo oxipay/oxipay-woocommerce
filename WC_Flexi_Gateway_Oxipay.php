@@ -221,7 +221,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
             'use_modal'                           => array(
                 'title'       => __( 'Modal Checkout', 'woocommerce' ),
                 'type'        => 'checkbox',
-                'label'       => __( 'Modal Checkout', 'woocommerce' ),
+                'label'       => __( 'Modal Checkout (For Oxipay in NZ only. Not supported with Humm)', 'woocommerce' ),
                 'default'     => 'no',
                 'description' => __( 'The customer will be forwarded to ' . $this->pluginDisplayName . ' in a modal dialog', 'woocommerce' ),
                 'desc_tip'    => true
