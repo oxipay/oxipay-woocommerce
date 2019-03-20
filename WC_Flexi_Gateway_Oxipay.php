@@ -211,17 +211,17 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
                 'desc_tip'    => true
             ),
             'force_humm'                          => array(
-                'title'       => __( 'Force Humm', 'woocommerce' ),
+                'title'       => __( 'Force humm', 'woocommerce' ),
                 'type'        => 'checkbox',
-                'label'       => __( 'Force display and checkout with Humm, not waiting for automatic switch over (AU only)', 'woocommerce' ),
+                'label'       => __( 'Force display and checkout with <strong>humm</strong>, not waiting for automatic switch over (AU only)', 'woocommerce' ),
                 'default'     => 'no',
-                'description' => __( 'You will switch to Humm if this is set to \'yes\' and the store is in Australia. Otherwise you will be automatically switched over on the official Humm launch date', 'woocommerce' ),
+                'description' => __( 'You will switch to <strong>humm</strong> if this is set to \'yes\' and the store is in Australia. Otherwise you will be automatically switched over on the official <strong>humm</strong> launch date', 'woocommerce' ),
                 'desc_tip'    => true
             ),
             'use_modal'                           => array(
                 'title'       => __( 'Modal Checkout', 'woocommerce' ),
                 'type'        => 'checkbox',
-                'label'       => __( 'Modal Checkout (For Oxipay in NZ only. Not supported with Humm)', 'woocommerce' ),
+                'label'       => __( 'Modal Checkout (For Oxipay in NZ only. Not supported with <strong>humm</strong>)', 'woocommerce' ),
                 'default'     => 'no',
                 'description' => __( 'The customer will be forwarded to ' . $this->pluginDisplayName . ' in a modal dialog', 'woocommerce' ),
                 'desc_tip'    => true
@@ -458,7 +458,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
             'x_customer_shipping_address2' => $order->get_shipping_address_2(),
             'x_customer_shipping_state'    => $order->get_shipping_state(),
             'x_customer_shipping_zip'      => $order->get_shipping_postcode(),
-            'version_info'                 => 'Humm_' . $this->currentConfig->getPluginVersion() . '_on_wc' . substr( WC()->version, 0, 3 ),
+            'version_info'                 => 'humm_' . $this->currentConfig->getPluginVersion() . '_on_wc' . substr( WC()->version, 0, 3 ),
             'gateway_url'                  => $gatewayUrl
         );
 
@@ -752,7 +752,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
      * @return true
      */
     private function checkOrderAmount( $order ) {
-        if ( $this->currentConfig->getDisplayName() == 'Humm' ) {
+        if ( $this->currentConfig->getDisplayName() == 'humm' ) {
             return true;
         }
         $total = $order->get_total();
