@@ -28,8 +28,12 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
             $country_domain = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'co.nz' : 'com.au';
             $checkout_total = ( WC()->cart ) ? WC()->cart->get_totals()['total'] : "0";
             if ( $this->currentConfig->getDisplayName() == 'humm' ) {
-                $widget_type       = 'price-info';
-                $this->description = __( '<div id="checkout_method_humm_anchor"></div><script src="https://widgets.shophumm.' . $country_domain . '/content/scripts/' . $widget_type . '.js?used_in=checkout&productPrice=' . $checkout_total . '&element=%23checkout_method_humm_anchor"></script>', 'WooCommerce' );
+                $widget_type   = 'price-info';
+                $merchant_type = "&".$this->settings['merchant_type'];
+                if ( $merchant_type == '&both' ) {
+                    $merchant_type = '';
+                }
+                $this->description = __( '<div id="checkout_method_humm_anchor"></div><script src="https://widgets.shophumm.' . $country_domain . '/content/scripts/' . $widget_type . '.js?used_in=checkout&productPrice=' . $checkout_total . '&element=%23checkout_method_humm_anchor' . $merchant_type . '"></script>', 'WooCommerce' );
 
             } else {
                 $widget_type       = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'payments' : 'payments-weekly';
@@ -81,8 +85,12 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
             if ( ( $maximum == 0 || $price <= $maximum ) && $this->settings['enabled'] == 'yes' ) {
                 $country_domain = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'co.nz' : 'com.au';
                 if ( $this->currentConfig->getDisplayName() == 'humm' ) {
-                    $widget_type = 'price-info';
-                    echo '<div id="humm-price-info-anchor"></div><script src="https://widgets.shophumm.' . $country_domain . '/content/scripts/' . $widget_type . '.js?productPrice=' . $price . '&element=%23humm-price-info-anchor"></script>';
+                    $widget_type   = 'price-info';
+                    $merchant_type = "&".$this->settings['merchant_type'];
+                    if ( $merchant_type == '&both' ) {
+                        $merchant_type = '';
+                    }
+                    echo '<div id="humm-price-info-anchor"></div><script src="https://widgets.shophumm.' . $country_domain . '/content/scripts/' . $widget_type . '.js?productPrice=' . $price . '&element=%23humm-price-info-anchor' . $merchant_type . '"></script>';
                 } else {
                     $widget_type = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'payments' : 'payments-weekly';
                     echo '<div id="oxipay-price-info-anchor"></div><script src="https://widgets.oxipay.' . $country_domain . '/content/scripts/' . $widget_type . '.js?productPrice=' . $price . '&element=%23oxipay-price-info-anchor"></script>';

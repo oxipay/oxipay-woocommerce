@@ -177,6 +177,12 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
             $countryOptions[ $countryCode ] = __( $country['name'], 'woocommerce' );
         }
 
+        $merchantTypes = array(
+            'both'         => __( 'both (default)', 'woocommerce' ),
+            'BigThings'    => 'BigThings only',
+            'LittleThings' => 'LittleThings only',
+        );
+
         $this->form_fields = array(
             'enabled'                             => array(
                 'title'       => __( 'Enabled', 'woocommerce' ),
@@ -233,6 +239,15 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
                 'default'     => 'yes',
                 'description' => 'Display a price widget in each product page.',
                 'desc_tip'    => true
+            ),
+            'merchant_type'                       => array(
+                'title'             => __( 'Merchant Type (for humm only)', 'woocommerce' ),
+                'type'              => 'select',
+                'class'             => 'wc-enhanced-select',
+                'description'       => 'Select the option that matches your retailer agreement.',
+                'options'           => $merchantTypes,
+                'desc_tip'          => true,
+                'custom_attributes' => array( 'required' => 'required' ),
             ),
             'top_banner_widget'                   => array(
                 'title'       => __( 'Top Banner Widget', 'woocommerce' ),
@@ -370,7 +385,14 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
                 $this->settings['top_banner_widget_homepage_only'] = "20";
                 $this->updateSetting( 'top_banner_widget_homepage_only', $this->settings['top_banner_widget_homepage_only'] );
             }
+        } elseif ( version_compare( $currentDbVersion, '1.6.0' ) < 0 ) {
+            if ( ! isset( $this->settings['merchant_type'] ) ) {
+                // default to both
+                $this->settings['merchant_type'] = "both";
+                $this->updateSetting( 'merchant_type', $this->settings['merchant_type'] );
+            }
         }
+
 
         return true;
     }
