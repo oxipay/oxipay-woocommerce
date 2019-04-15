@@ -42,8 +42,8 @@ class Oxipay_Config {
         'AU_Humm'   => [
             'sandboxURL'             => 'https://integration-cart.shophumm.com.au/Checkout?platform=WooCommerce',
             'liveURL'                => 'https://cart.shophumm.com.au/Checkout?platform=WooCommerce',
-            'sandbox_refund_address' => 'https://integration-cart.shophumm.com.au/api/ExternalRefund/processrefund',
-            'live_refund_address'    => 'https://cart.shophumm.com.au/api/ExternalRefund/processrefund',
+            'sandbox_refund_address' => 'https://integration-buyerapi.shophumm.com.au/api/ExternalRefund/v1/processrefund',
+            'live_refund_address'    => 'https://buyerapi.shophumm.com.au/api/ExternalRefund/v1/processrefund',
         ],
         'NZ'        => [
             'sandboxURL'             => 'https://securesandbox.oxipay.co.nz/Checkout?platform=WooCommerce',
