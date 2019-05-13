@@ -216,14 +216,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
                 'description' => __( 'While test mode is enabled, transactions will be simulated and cards will not be charged', 'woocommerce' ),
                 'desc_tip'    => true
             ),
-            'force_humm'                          => array(
-                'title'       => __( 'Force humm', 'woocommerce' ),
-                'type'        => 'checkbox',
-                'label'       => __( 'Force display and checkout with <strong>humm</strong>, not waiting for automatic switch over (AU only)', 'woocommerce' ),
-                'default'     => 'no',
-                'description' => __( 'You will switch to <strong>humm</strong> if this is set to \'yes\' and the store is in Australia. Otherwise you will be automatically switched over on the official <strong>humm</strong> launch date', 'woocommerce' ),
-                'desc_tip'    => true
-            ),
             'use_modal'                           => array(
                 'title'       => __( 'Modal Checkout', 'woocommerce' ),
                 'type'        => 'checkbox',
