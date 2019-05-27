@@ -192,13 +192,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
                 'description' => 'Disable ' . $this->pluginDisplayName . ' services, your customers will not be able to use our easy installment plans.',
                 'desc_tip'    => true
             ),
-            'shop_name'                           => array(
-                'title'       => __( 'Shop Name', 'woocommerce' ),
-                'type'        => 'text',
-                'description' => __( 'The name of the shop that will be displayed in ' . $this->pluginDisplayName, 'woocommerce' ),
-                'default'     => __( '', 'woocommerce' ),
-                'desc_tip'    => true,
-            ),
             'country'                             => array(
                 'title'             => __( $this->pluginDisplayName . ' Region', 'woocommerce' ),
                 'type'              => 'select',
@@ -213,65 +206,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
                 'type'        => 'checkbox',
                 'label'       => __( 'Use Test Mode', 'woocommerce' ),
                 'default'     => 'yes',
-                'description' => __( 'While test mode is enabled, transactions will be simulated and cards will not be charged', 'woocommerce' ),
-                'desc_tip'    => true
-            ),
-            'use_modal'                           => array(
-                'title'       => __( 'Modal Checkout', 'woocommerce' ),
-                'type'        => 'checkbox',
-                'label'       => __( 'Modal Checkout (For Oxipay in NZ only. Not supported with <strong>humm</strong>)', 'woocommerce' ),
-                'default'     => 'no',
-                'description' => __( 'The customer will be forwarded to ' . $this->pluginDisplayName . ' in a modal dialog', 'woocommerce' ),
-                'desc_tip'    => true
-            ),
-            'price_widget'                        => array(
-                'title'       => __( 'Price Widget', 'woocommerce' ),
-                'type'        => 'checkbox',
-                'label'       => __( 'Enable the ' . $this->pluginDisplayName . ' Price Widget', 'woocommerce' ),
-                'default'     => 'yes',
-                'description' => 'Display a price widget in each product page.',
-                'desc_tip'    => true
-            ),
-            'merchant_type'                       => array(
-                'title'             => __( 'Merchant Type (for humm only)', 'woocommerce' ),
-                'type'              => 'select',
-                'class'             => 'wc-enhanced-select',
-                'description'       => 'Select the option that matches your retailer agreement.',
-                'options'           => $merchantTypes,
-                'desc_tip'          => true,
-                'custom_attributes' => array( 'required' => 'required' ),
-            ),
-            'top_banner_widget'                   => array(
-                'title'       => __( 'Top Banner Widget', 'woocommerce' ),
-                'type'        => 'checkbox',
-                'label'       => __( 'Enable the ' . $this->pluginDisplayName . ' Top Banner Widget (AU Only)', 'woocommerce' ),
-                'default'     => 'no',
-                'description' => 'Display a top banner. (For AU only. NZ does not have this feature)',
-                'desc_tip'    => true
-            ),
-            'top_banner_widget_homepage_only'     => array(
-                'title'       => __( 'Top Banner on FrontPage Only', 'woocommerce' ),
-                'type'        => 'checkbox',
-                'label'       => __( $this->pluginDisplayName . ' Top Banner Widget Shows on FrontPage Only (AU Only)', 'woocommerce' ),
-                'default'     => 'yes',
-                'description' => 'When the top banner enabled, it shows in homepage only (if checked), or shows in every page (if unchecked)',
-                'desc_tip'    => true
-            ),
-            'preselect_button_enabled'            => array(
-                'title'       => __( 'Pre-select Checkout Button', 'woocommerce' ),
-                'type'        => 'checkbox',
-                'label'       => __( 'Add a "Checkout with ' . $this->pluginDisplayName . '" button in Cart page', 'woocommerce' ),
-                'default'     => 'yes',
-                'description' => __( 'Add a "Checkout with ' . $this->pluginDisplayName . '" button in Cart page that takes customer to Checkout page and have ' . $this->pluginDisplayName . ' pre-selected', 'woocommerce' ),
-                'desc_tip'    => true
-            ),
-            'preselect_button_order'              => array(
-                'title'       => __( 'Pre-select Button Order', 'woocommerce' ),
-                'type'        => 'text',
-                'label'       => __( 'Pre-select Button Order', 'woocommerce' ),
-                'default'     => '20',
-                'description' => __( 'Position the "checkout with ' . $this->pluginDisplayName . ' button" in Cart page if there are multiple checkout buttons. Default is 20. Smaller number moves the button ahead and larger number moves it lower in the list of checkout buttons.', 'woocommerce' ),
-                'desc_tip'    => true
+                'description' => __( 'While test mode is enabled, transactions will be simulated and cards will not be charged', 'woocommerce' )
             ),
             "{$this->pluginFileName}_merchant_id" => array(
                 'id'                => $this->pluginFileName . '_merchant_id',
@@ -290,6 +225,85 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
                 'description'       => $this->pluginDisplayName . ' will have supplied you with your ' . $this->pluginDisplayName . ' API key. Contact us if you cannot find it.',
                 'desc_tip'          => true,
                 'custom_attributes' => array( 'required' => 'required' ),
+            ),
+            'display_settings'                    => array(
+                'title' => __( 'Display Settings', 'woocommerce' ),
+                'type'  => 'title',
+            ),
+            'price_widget'                        => array(
+                'title'       => __( 'Price Widget', 'woocommerce' ),
+                'type'        => 'checkbox',
+                'label'       => __( 'Enable the ' . $this->pluginDisplayName . ' Price Widget', 'woocommerce' ),
+                'default'     => 'yes',
+                'description' => 'Display a price widget in each product page.',
+            ),
+            'preselect_button_enabled'            => array(
+                'title'       => __( 'Pre-select Checkout Button', 'woocommerce' ),
+                'type'        => 'checkbox',
+                'label'       => __( 'Add a "Checkout with ' . $this->pluginDisplayName . '" button in Cart page', 'woocommerce' ),
+                'default'     => 'yes',
+                'description' => __( 'Add a "Checkout with ' . $this->pluginDisplayName . '" button in Cart page that takes customer to Checkout page and have ' . $this->pluginDisplayName . ' pre-selected', 'woocommerce' ),
+            ),
+            'preselect_button_order'              => array(
+                'title'       => __( 'Pre-select Button Order', 'woocommerce' ),
+                'type'        => 'text',
+                'label'       => __( 'Pre-select Button Order', 'woocommerce' ),
+                'default'     => '20',
+                'description' => __( 'Position the "checkout with ' . $this->pluginDisplayName . ' button" in Cart page if there are multiple checkout buttons. Default is 20. Smaller number moves the button ahead and larger number moves it lower in the list of checkout buttons.', 'woocommerce' ),
+                'desc_tip'    => true
+            ),
+            'au_settings'                         => array(
+                'title' => __( '', 'woocommerce' ),
+                'type'  => 'title',
+            ),
+            'merchant_type'                       => array(
+                'title'             => __( 'Humm Merchant Type', 'woocommerce' ),
+                'type'              => 'select',
+                'class'             => 'wc-enhanced-select',
+                'description'       => 'Select the option that matches your retailer agreement.',
+                'options'           => $merchantTypes,
+                'desc_tip'          => true,
+                'custom_attributes' => array( 'required' => 'required' ),
+            ),
+            'top_banner_widget'                   => array(
+                'title'           => __( 'Humm Top Banner Widget', 'woocommerce' ),
+                'label'           => __( 'Enable the ' . $this->pluginDisplayName . ' Top Banner Widget', 'woocommerce' ),
+                'default'         => 'no',
+                'type'            => 'checkbox',
+                'checkboxgroup'   => 'start',
+                'show_if_checked' => 'option',
+                'description'     => 'Display a top banner.',
+            ),
+            'top_banner_widget_homepage_only'     => array(
+                'label'           => __( 'Top Banner Widget Shows on FrontPage Only', 'woocommerce' ),
+                'default'         => 'yes',
+                'type'            => 'checkbox',
+                'checkboxgroup'   => 'end',
+                'show_if_checked' => 'yes',
+                'description'     => 'When the top banner enabled, it shows in homepage only (if checked), or shows in every page (if unchecked)',
+                'autoload'        => false,
+            ),
+            'nz_settings'                         => array(
+                'title' => __( '', 'woocommerce' ),
+                'type'  => 'title',
+            ),
+            'use_modal'                           => array(
+                'title'       => __( 'Modal Checkout', 'woocommerce' ),
+                'type'        => 'checkbox',
+                'label'       => __( 'Modal Checkout', 'woocommerce' ),
+                'default'     => 'no',
+                'description' => __( 'The customer will be forwarded to checkout in a modal dialog', 'woocommerce' )
+            ),
+            'shop_settings'                       => array(
+                'title' => __( 'Shop Settings', 'woocommerce' ),
+                'type'  => 'title',
+            ),
+            'shop_name'                           => array(
+                'title'       => __( 'Shop Name', 'woocommerce' ),
+                'type'        => 'text',
+                'description' => __( 'The name of the shop that will be displayed in ' . $this->pluginDisplayName, 'woocommerce' ),
+                'default'     => __( '', 'woocommerce' ),
+                'desc_tip'    => true,
             ),
             $this->pluginFileName . '_minimum'    => array(
                 'id'          => $this->pluginFileName . '_minimum',
@@ -553,7 +567,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
      * Renders plugin configuration markup
      */
     function admin_options() { ?>
-        <h2><?php _e( $this->pluginDisplayName, 'woocommerce' ); ?></h2>
+        <h2><?php _e( $this->pluginDisplayName, 'woocommerce' ); ?> Payment Gateway</h2>
 
         <p>For help setting this plugin up please contact our integration team.</p>
 
