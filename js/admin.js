@@ -10,11 +10,11 @@
 
         function refresh() {
             var selectedRegion = regionSelect.val();
-            if (selectedRegion == "AU") {
+            if (selectedRegion === "AU") {
                 au_settings.show();
                 nz_settings.hide();
             }
-            if (selectedRegion == "NZ") {
+            if (selectedRegion === "NZ") {
                 nz_settings.show();
                 au_settings.hide();
             }

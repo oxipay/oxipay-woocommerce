@@ -40,7 +40,7 @@ html {
         border-radius: 0;
         position: absolute;
         width: 100%;
-        min-height: 0px;
+        min-height: 0;
         overflow: scroll;
         bottom: 0;
         top: 55px;

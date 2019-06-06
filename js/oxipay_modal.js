@@ -1,6 +1,5 @@
 ///<reference path="../typings/jquery/jquery.d.ts"/>
 function oxipay(q) {
-    var initialised = false;
     var iframeId = 'oxipay-iframe';
     var data;
     var form = null;
@@ -43,6 +42,7 @@ function oxipay(q) {
      * Setup Oxipay Checkout
      * @param targetUrl
      * @param keyValue
+     * @param stylesheetURL
      */
     function setup(targetUrl, keyValue, stylesheetURL) {
         targetUrl = targetUrl || '/';
@@ -140,5 +140,4 @@ function oxipay(q) {
         a.href = url;
         return a.protocol + "//" + a.host;
     }
-    ;
 }

@@ -1,6 +1,9 @@
 /**
  * This is used to switch on the modal dialog for Oxipay transactions
  */
+
+/* global wc_checkout_params */
+
 (function ($) {
     'use strict';
     var oxipay_settings;
@@ -83,7 +86,7 @@
                 // we have failed to load the settings for some reason.
             }
         });
-    };
+    }
 
     function extractKeys(redirectUrl) {
         var keyArr = redirectUrl.split('&');
@@ -93,14 +96,10 @@
             keys[split[0].trim()] = decodeURIComponent((split[1]).trim());
         }
         return keys;
-    };
+    }
 
     function showModal(urlString) {
-
-        var modal = false;
-
-        var form = $('form.checkout.woocommerce-checkout');
-        var keyStartPos = urlString.indexOf('?') + 1
+        var keyStartPos = urlString.indexOf('?') + 1;
         var values = extractKeys(urlString.substring(keyStartPos));
         modal = oxipay_settings.use_modal;
 
@@ -108,7 +107,7 @@
         // we already include the platform as part of the gateway URL so remove it
         delete values.platform;
 
-        if (modal && modal != 'no' && modal != false) {
+        if (modal && modal !== 'no' && modal !== false) {
             var oxi = oxipay($);
             var modalCSS = php_vars.plugin_url + '/css/oxipay-modal.css';
             oxi.setup(gateway, values, modalCSS);
@@ -117,7 +116,7 @@
         } else {
             post(gateway, values);
         }
-    };
+    }
 
     function post(path, params) {
         // The rest of this code assumes you are not using a library.
@@ -125,7 +124,7 @@
         var form = document.createElement("form");
         form.setAttribute("method", "post");
         form.setAttribute("action", path);
-        form.setAttribute('id', 'oxipay-submission')
+        form.setAttribute('id', 'oxipay-submission');
 
         for (var key in params) {
             if (params.hasOwnProperty(key)) {

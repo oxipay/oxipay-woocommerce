@@ -31,13 +31,13 @@ class Oxipay_Config {
     );
 
     const URLS = [
-        'AU'   => [
+        'AU' => [
             'sandboxURL'             => 'https://integration-cart.shophumm.com.au/Checkout?platform=WooCommerce',
             'liveURL'                => 'https://cart.shophumm.com.au/Checkout?platform=WooCommerce',
             'sandbox_refund_address' => 'https://integration-buyerapi.shophumm.com.au/api/ExternalRefund/v1/processrefund',
             'live_refund_address'    => 'https://buyerapi.shophumm.com.au/api/ExternalRefund/v1/processrefund',
         ],
-        'NZ'        => [
+        'NZ' => [
             'sandboxURL'             => 'https://securesandbox.oxipay.co.nz/Checkout?platform=WooCommerce',
             'liveURL'                => 'https://secure.oxipay.co.nz/Checkout?platform=WooCommerce',
             'sandbox_refund_address' => 'https://portalssandbox.oxipay.co.nz/api/ExternalRefund/processrefund',
