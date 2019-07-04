@@ -36,7 +36,6 @@
                         if (true === data.refresh) {
                             $(document.body).trigger('update_checkout');
                         }
-
                         // Add new errors
                         if (data.messages) {
                             submit_error(data.messages);
@@ -101,11 +100,13 @@
     function showModal(urlString) {
         var keyStartPos = urlString.indexOf('?') + 1;
         var values = extractKeys(urlString.substring(keyStartPos));
-        modal = oxipay_settings.use_modal;
+        var encodedFields = ['x_url_callback', 'x_url_complete', 'gateway_url', 'x_url_cancel'];
+        encodedFields.forEach(function(item){
+            values[item] = atob(values[item])
+        });
+        var modal = oxipay_settings.use_modal;
 
-        var gateway = urlString.substring(0, urlString.indexOf('&'));
-        // we already include the platform as part of the gateway URL so remove it
-        delete values.platform;
+        var gateway = values.gateway_url;
 
         if (modal && modal !== 'no' && modal !== false) {
             var oxi = oxipay($);
