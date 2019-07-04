@@ -493,12 +493,23 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
         $signature                          = $this->flexi_sign( $transaction_details, $this->settings[ $this->pluginFileName . '_api_key' ] );
         $transaction_details['x_signature'] = $signature;
 
+        $encodedFields = array(
+            'x_url_callback',
+            'x_url_complete',
+            'gateway_url',
+            'x_url_cancel'
+        );
+
+        foreach ( $encodedFields as $i ) {
+            $transaction_details[ $i ] = base64_encode( $transaction_details[ $i ] );
+        }
+
         // use RFC 3986 so that we can decode it correctly in js
         $qs = http_build_query( $transaction_details, null, '&', PHP_QUERY_RFC3986 );
 
         return array(
             'result'   => 'success',
-            'redirect' => $gatewayUrl . '&' . $qs
+            'redirect' => plugins_url( "processing.php?$qs", __FILE__ )
         );
     }
 

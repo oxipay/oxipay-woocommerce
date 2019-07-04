@@ -1,6 +1,9 @@
 /**
  * This is used to switch on the modal dialog for Oxipay transactions
  */
+
+/* global wc_checkout_params */
+
 (function ($) {
     'use strict';
     var oxipay_settings;
@@ -33,7 +36,6 @@
                         if (true === data.refresh) {
                             $(document.body).trigger('update_checkout');
                         }
-
                         // Add new errors
                         if (data.messages) {
                             submit_error(data.messages);
@@ -83,7 +85,7 @@
                 // we have failed to load the settings for some reason.
             }
         });
-    };
+    }
 
     function extractKeys(redirectUrl) {
         var keyArr = redirectUrl.split('&');
@@ -93,22 +95,20 @@
             keys[split[0].trim()] = decodeURIComponent((split[1]).trim());
         }
         return keys;
-    };
+    }
 
     function showModal(urlString) {
-
-        var modal = false;
-
-        var form = $('form.checkout.woocommerce-checkout');
-        var keyStartPos = urlString.indexOf('?') + 1
+        var keyStartPos = urlString.indexOf('?') + 1;
         var values = extractKeys(urlString.substring(keyStartPos));
-        modal = oxipay_settings.use_modal;
+        var encodedFields = ['x_url_callback', 'x_url_complete', 'gateway_url', 'x_url_cancel'];
+        encodedFields.forEach(function(item){
+            values[item] = atob(values[item])
+        });
+        var modal = oxipay_settings.use_modal;
 
-        var gateway = urlString.substring(0, urlString.indexOf('&'));
-        // we already include the platform as part of the gateway URL so remove it
-        delete values.platform;
+        var gateway = values.gateway_url;
 
-        if (modal && modal != 'no' && modal != false) {
+        if (modal && modal !== 'no' && modal !== false) {
             var oxi = oxipay($);
             var modalCSS = php_vars.plugin_url + '/css/oxipay-modal.css';
             oxi.setup(gateway, values, modalCSS);
@@ -117,7 +117,7 @@
         } else {
             post(gateway, values);
         }
-    };
+    }
 
     function post(path, params) {
         // The rest of this code assumes you are not using a library.
@@ -125,7 +125,7 @@
         var form = document.createElement("form");
         form.setAttribute("method", "post");
         form.setAttribute("action", path);
-        form.setAttribute('id', 'oxipay-submission')
+        form.setAttribute('id', 'oxipay-submission');
 
         for (var key in params) {
             if (params.hasOwnProperty(key)) {
