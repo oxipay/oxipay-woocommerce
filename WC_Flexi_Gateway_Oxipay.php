@@ -704,11 +704,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
         }
 
         if ( $isJSON ) {
-            $return = array(
-                'message' => $msg,
-                'id'      => $order_id
-            );
-            wp_send_json( $return );
+            wp_redirect( plugins_url( 'callback-response.php', __FILE__ ) . '?x_result=' . $msg . '&x_reference=' . $order_id );
         }
 
         return $order_id;
