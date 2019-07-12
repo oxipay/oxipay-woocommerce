@@ -1,4 +1,7 @@
 <?php
+
+defined( 'ABSPATH' ) || exit;
+
 if ( ! class_exists( 'WC_Flexi_Gateway_Oxipay' ) ) {
     require_once( 'WC_Flexi_Gateway_Oxipay.php' );
 }
