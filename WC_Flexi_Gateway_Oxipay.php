@@ -1,5 +1,7 @@
 <?php
 
+defined( 'ABSPATH' ) || exit;
+
 abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
     //current version of the plugin- used to run upgrade tasks on update
     public $plugin_current_version;
@@ -23,8 +25,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
             $this->logger     = wc_get_logger();
             $this->logContext = array( 'source' => $this->pluginDisplayName );
         }
-
-        $this->logger->debug( 'Product Name: ' . $this->pluginDisplayName );
 
         $this->id           = $this->pluginFileName;
         $this->has_fields   = false;
@@ -151,7 +151,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
      * @param string $level WC_Log_Levels
      */
     public function log( $message, $level = WC_Log_Levels::DEBUG ) {
-        if ( $this->logger != null ) {
+        if ( $this->logger != null && $this->settings["enable_logging"] ) {
             $this->logger->log( $level, $message, $this->logContext );
         }
     }
@@ -225,6 +225,13 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
                 'description'       => $this->pluginDisplayName . ' will have supplied you with your ' . $this->pluginDisplayName . ' API key. Contact us if you cannot find it.',
                 'desc_tip'          => true,
                 'custom_attributes' => array( 'required' => 'required' ),
+            ),
+            'enable_logging'                      => array(
+                'title'       => __( 'Enable Logging', 'woocommerce' ),
+                'type'        => 'checkbox',
+                'label'       => __( 'Enable logging', 'woocommerce' ),
+                'default'     => 'yes',
+                'description' => __( 'The ' . $this->pluginDisplayName . ' logs are available at the <a href="' . admin_url( 'admin.php?page=wc-status&tab=logs' ) . '">WooCommerce status page</a>', 'woocommerce' )
             ),
             'display_settings'                    => array(
                 'title' => __( 'Display Settings', 'woocommerce' ),
@@ -397,8 +404,13 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
                 $this->settings['merchant_type'] = "both";
                 $this->updateSetting( 'merchant_type', $this->settings['merchant_type'] );
             }
+        } elseif ( version_compare( $currentDbVersion, '1.7.4' ) < 0 ) {
+            if ( ! isset( $this->settings['enable_logging'] ) ) {
+                // default to yes
+                $this->settings['enable_logging'] = "yes";
+                $this->updateSetting( 'enable_logging', $this->settings['enable_logging'] );
+            }
         }
-
 
         return true;
     }
@@ -430,6 +442,25 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
         }
 
         return $whitelist;
+    }
+
+    public function payment_fields() {
+        $country_domain = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'co.nz' : 'com.au';
+        $checkout_total = ( WC()->cart ) ? WC()->cart->get_totals()['total'] : "0";
+
+        if ( $this->currentConfig->getDisplayName() == 'humm' ) {
+            $widget_type   = 'price-info';
+            $merchant_type = "&" . $this->settings['merchant_type'];
+            if ( $merchant_type == '&both' ) {
+                $merchant_type = '';
+            }
+            $this->description = __( '<div id="checkout_method_humm_anchor"></div><script src="https://widgets.shophumm.' . $country_domain . '/content/scripts/' . $widget_type . '.js?used_in=checkout&productPrice=' . $checkout_total . '&element=%23checkout_method_humm_anchor' . $merchant_type . '"></script>', 'WooCommerce' );
+        } else {
+            $widget_type       = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'payments' : 'payments-weekly';
+            $this->description = __( '<div id="checkout_method_oxipay_anchor"></div><script src="https://widgets.oxipay.' . $country_domain . '/content/scripts/' . $widget_type . '.js?used_in=checkout&productPrice=' . $checkout_total . '&element=%23checkout_method_oxipay_anchor"></script>', 'woocommerce' );
+        }
+
+        echo $this->description;
     }
 
     /**
@@ -616,6 +647,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
         $isJSON = ( $_SERVER['REQUEST_METHOD'] === "POST" && isset( $_SERVER['CONTENT_TYPE'] ) &&
                     ( strpos( $_SERVER['CONTENT_TYPE'], 'application/json' ) !== false ) );
 
+        $isAsyncCallback = $isJSON ? "true" : "false";
         // This addresses the callback.
         if ( $isJSON ) {
             $params = json_decode( file_get_contents( 'php://input' ), true );
@@ -637,7 +669,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
 
         // we need order information in order to complete the order
         if ( empty( $order ) ) {
-            $this->log( sprintf( 'unable to get order information for orderId: %s ', $order_id ) );
+            $this->log( sprintf( 'unable to get order information for orderId: %s, (isAsyncCallback=%s)', $order_id, $isAsyncCallback ) );
 
             return $order_id;
         }
@@ -646,8 +678,8 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
         // OIR-3
         if ( $order->get_data()['payment_method'] !== $this->pluginFileName ) {
             // we don't care about it because it's not an flexi order
-            // only log in debug mode
-            $this->log( sprintf( 'No action required orderId: %s is not an ' . $this->pluginDisplayName . ' order ', $order_id ) );
+            // log in debug level
+            $this->log( sprintf( 'No action required. orderId: %s is not a %s order, (isAsyncCallback=%s)', $order_id, $this->pluginDisplayName, $isAsyncCallback ) );
 
             return $order_id;
         }
@@ -661,7 +693,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
         }
 
         if ( $sig_exists && $sig_match ) {
-            $this->log( sprintf( 'Processing orderId: %s ', $order_id ) );
+            $this->log( sprintf( 'Finalising orderId: %s, (isAsyncCallback=%s)', $order_id, $isAsyncCallback ) );
             // Get the status of the order and handle accordingly
             $flexi_result_note = '';
             switch ( $params['x_result'] ) {
