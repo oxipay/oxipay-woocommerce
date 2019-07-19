@@ -26,23 +26,8 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
         $this->icon               = plugin_dir_url( __FILE__ ) . 'images/' . $config->getDisplayName() . '.png';
         $this->shop_details       = __( $config->getDisplayName() . ' Payment', 'woocommerce' );
         $this->order_button_text  = __( 'Proceed to ' . $config->getDisplayName(), 'woocommerce' );
+        $this->description        = "<br>";
 
-        if ( $this->settings['enabled'] == 'yes' ) {
-            $country_domain = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'co.nz' : 'com.au';
-            $checkout_total = ( WC()->cart ) ? WC()->cart->get_totals()['total'] : "0";
-            if ( $this->currentConfig->getDisplayName() == 'humm' ) {
-                $widget_type   = 'price-info';
-                $merchant_type = "&".$this->settings['merchant_type'];
-                if ( $merchant_type == '&both' ) {
-                    $merchant_type = '';
-                }
-                $this->description = __( '<div id="checkout_method_humm_anchor"></div><script src="https://widgets.shophumm.' . $country_domain . '/content/scripts/' . $widget_type . '.js?used_in=checkout&productPrice=' . $checkout_total . '&element=%23checkout_method_humm_anchor' . $merchant_type . '"></script>', 'WooCommerce' );
-
-            } else {
-                $widget_type       = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'payments' : 'payments-weekly';
-                $this->description = __( '<div id="checkout_method_oxipay_anchor"></div><script src="https://widgets.oxipay.' . $country_domain . '/content/scripts/' . $widget_type . '.js?used_in=checkout&productPrice=' . $checkout_total . '&element=%23checkout_method_oxipay_anchor"></script>', 'woocommerce' );
-            }
-        }
         add_action( 'admin_notices', array( $this, 'admin_notice_rename_to_humm' ) );
     }
 
@@ -89,7 +74,7 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
                 $country_domain = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'co.nz' : 'com.au';
                 if ( $this->currentConfig->getDisplayName() == 'humm' ) {
                     $widget_type   = 'price-info';
-                    $merchant_type = "&".$this->settings['merchant_type'];
+                    $merchant_type = "&" . $this->settings['merchant_type'];
                     if ( $merchant_type == '&both' ) {
                         $merchant_type = '';
                     }
