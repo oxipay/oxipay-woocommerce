@@ -46,8 +46,6 @@
 </script>
 
 <?php
-include_once( 'oxipay-config.php' );
-
 parse_str( $_SERVER['QUERY_STRING'], $query );
 
 function oxipay_generate_processing_form( $query ) {
@@ -56,7 +54,7 @@ function oxipay_generate_processing_form( $query ) {
 
         return;
     }
-//    $url = $query["gateway_url"];
+
     $url = base64_decode( $query["gateway_url"] );
     $url = htmlspecialchars( $url, ENT_QUOTES );
 
@@ -68,7 +66,6 @@ function oxipay_generate_processing_form( $query ) {
         'gateway_url',
         'x_url_cancel'
     );
-    // $encodedFields = [];
 
     foreach ( $query as $i => $v ) {
         $item  = htmlspecialchars( $i, ENT_QUOTES );
@@ -79,9 +76,7 @@ function oxipay_generate_processing_form( $query ) {
             $value = htmlspecialchars( $v, ENT_QUOTES );
         }
 
-//        if ( substr( $item, 0, 2 ) === "x_" ) {
-            echo sprintf( '<input id="%s" name="%s" value="%s" type="hidden" />', $item, $item, $value );
-//        }
+        echo sprintf( '<input id="%s" name="%s" value="%s" type="hidden" />', $item, $item, $value );
     }
 
     echo "</form>";
@@ -89,7 +84,6 @@ function oxipay_generate_processing_form( $query ) {
 }
 
 oxipay_generate_processing_form( $query );
-
 ?>
 
 </body>
