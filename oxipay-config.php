@@ -95,7 +95,7 @@ class Oxipay_Config {
 
             return $launch_time_string;
         }
-        if ( empty( $launch_time_string ) || empty( $launch_time_update_time ) || ( time() - $launch_time_update_time >= 1 ) ) {
+        if ( empty( $launch_time_string ) || empty( $launch_time_update_time ) || ( time() - $launch_time_update_time >= 3600 ) ) {
             $remote_launch_time_string = wp_remote_get( self::LAUNCH_TIME_URL )['body'];
             if ( ! empty( $remote_launch_time_string ) ) {
                 $launch_time_string = $remote_launch_time_string;
