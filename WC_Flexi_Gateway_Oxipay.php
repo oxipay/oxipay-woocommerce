@@ -205,7 +205,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
                 'title'       => __( 'Test Mode', 'woocommerce' ),
                 'type'        => 'checkbox',
                 'label'       => __( 'Use Test Mode', 'woocommerce' ),
-                'default'     => 'yes',
+                'default'     => 'no',
                 'description' => __( 'While test mode is enabled, transactions will be simulated and cards will not be charged', 'woocommerce' )
             ),
             "{$this->pluginFileName}_merchant_id" => array(
