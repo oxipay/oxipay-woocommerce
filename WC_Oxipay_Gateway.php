@@ -67,22 +67,35 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
     function add_price_widget() {
         // do we really need a global here?
         global $product;
-        if ( isset( $this->settings['price_widget'] ) && $this->settings['price_widget'] == 'yes' ) {
+        if ( $this->settings['enabled'] == 'yes' && isset( $this->settings['price_widget'] ) && $this->settings['price_widget'] == 'yes' ) {
+            $country_domain = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'co.nz' : 'com.au';
             $maximum = $this->getMaxPrice();
-            $price   = wc_get_price_to_display( $product );
-            if ( ( $maximum == 0 || $price <= $maximum ) && $this->settings['enabled'] == 'yes' ) {
-                $country_domain = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'co.nz' : 'com.au';
-                if ( $this->currentConfig->getDisplayName() == 'humm' ) {
-                    $widget_type   = 'price-info';
-                    $merchant_type = "&" . $this->settings['merchant_type'];
-                    if ( $merchant_type == '&both' ) {
-                        $merchant_type = '';
+            if ( $maximum == 0 )
+                $maximum = 100000;
+
+            if ( $this->currentConfig->getDisplayName() == 'humm' ) {
+                $widget_type   = 'price-info';
+                $merchant_type = "&" . $this->settings['merchant_type'];
+                if ( $merchant_type == '&both' )
+                    $merchant_type = '';
+
+                echo '<div id="humm-price-info-anchor"></div>';
+
+                if ( isset( $this->settings['price_widget_dynamic_enabled'] ) && $this->settings['price_widget_dynamic_enabled'] ) {
+                    if ( isset( $this->settings['price_widget_selector'] )) {
+                        $selector = $this->settings['price_widget_selector'];
+                    } else {
+                        $selector = '.woocommerce-Price-amount';
                     }
-                    echo '<div id="humm-price-info-anchor"></div><script src="https://widgets.shophumm.' . $country_domain . '/content/scripts/' . $widget_type . '.js?productPrice=' . $price . '&element=%23humm-price-info-anchor' . $merchant_type . '"></script>';
+
+                    echo '<script data-max="' . $maximum . '" src="https://widgets.shophumm.' . $country_domain . '/content/scripts/' . $widget_type . '.js?price-selector=' . urlencode($selector) . '&element=%23humm-price-info-anchor' . $merchant_type . '"></script>';
                 } else {
-                    $widget_type = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'payments' : 'payments-weekly';
-                    echo '<div id="oxipay-price-info-anchor"></div><script src="https://widgets.oxipay.' . $country_domain . '/content/scripts/' . $widget_type . '.js?productPrice=' . $price . '&element=%23oxipay-price-info-anchor"></script>';
+                    $price = wc_get_price_to_display( $product );
+                    echo '<script data-max="' . $maximum . '" src="https://widgets.shophumm.' . $country_domain . '/content/scripts/' . $widget_type . '.js?productPrice=' . $price . '&element=%23humm-price-info-anchor' . $merchant_type . '"></script>';
                 }
+            } else {
+                $widget_type = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'payments' : 'payments-weekly';
+                echo '<div id="oxipay-price-info-anchor"></div><script data-max="' . $maximum . '" src="https://widgets.oxipay.' . $country_domain . '/content/scripts/' . $widget_type . '.js?productPrice=' . $price . '&element=%23oxipay-price-info-anchor"></script>';
             }
         }
     }

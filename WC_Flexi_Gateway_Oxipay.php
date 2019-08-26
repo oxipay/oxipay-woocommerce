@@ -230,7 +230,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
                 'title'       => __( 'Enable Logging', 'woocommerce' ),
                 'type'        => 'checkbox',
                 'label'       => __( 'Enable logging', 'woocommerce' ),
-                'default'     => 'yes',
+                'default'     => 'no',
                 'description' => __( 'The ' . $this->pluginDisplayName . ' logs are available at the <a href="' . admin_url( 'admin.php?page=wc-status&tab=logs' ) . '">WooCommerce status page</a>', 'woocommerce' )
             ),
             'display_settings'                    => array(
@@ -243,6 +243,21 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
                 'label'       => __( 'Enable the ' . $this->pluginDisplayName . ' Price Widget', 'woocommerce' ),
                 'default'     => 'yes',
                 'description' => 'Display a price widget in each product page.',
+            ),
+            'price_widget_dynamic_enabled'            => array(
+                'title'       => __( 'Dynamic Price Widget', 'woocommerce' ),
+                'type'        => 'checkbox',
+                'label'       => __( 'Enable the humm Dynamic Price Widget' ),
+                'default'     => 'no',
+                'description' => 'Price widget will automatically update breakdown if the product price changes. Uses the CSS selector below to track changes. Leave disabled if unsure.',
+            ),
+            'price_widget_selector' => array(
+                'id'                => $this->pluginFileName . '_api_key',
+                'title'             => __( 'Price Widget CSS Selector', 'woocommerce' ),
+                'type'              => 'text',
+                'default'           => '.woocommerce-Price-amount',
+                'description'       => 'CSS selector for the element containing the product price',
+                'desc_tip'          => true,
             ),
             'preselect_button_enabled'            => array(
                 'title'       => __( 'Pre-select Checkout Button', 'woocommerce' ),
@@ -692,48 +707,48 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
             $sig_match    = $expected_sig === $params['x_signature'];
         }
 
-        if ( $sig_exists && $sig_match ) {
-            $this->log( sprintf( 'Finalising orderId: %s, (isAsyncCallback=%s)', $order_id, $isAsyncCallback ) );
-            // Get the status of the order and handle accordingly
-            $flexi_result_note = '';
-            switch ( $params['x_result'] ) {
-                case "completed":
-                    $flexi_result_note = __( 'Payment approved using ' . $this->pluginDisplayName . '. Gateway_Reference #' . $params['x_gateway_reference'], 'woocommerce' );
-                    $order->add_order_note( $flexi_result_note );
-                    $order->update_meta_data( "flexi_purchase_number", $params["x_gateway_reference"] );
-                    $order->payment_complete( $params['x_reference'] );
+        if ( !$sig_exists || !$sig_match ) { 
+            $logMsg = sprintf('SigMisMatch - Order: %s isCallback: %s', $order_id, $isAsyncCallback);
+            if (!$isJSON)
+                $logMsg .= '</br>URL: ' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+            $logMsg .= '</br>Field: ' . print_r($params, true);
 
-                    if ( ! is_null( $cart ) && ! empty( $cart ) ) {
-                        $cart->empty_cart();
-                    }
-                    $msg = 'complete';
-                    break;
-
-                case "failed":
-                    $flexi_result_note = __( 'Payment declined using ' . $this->pluginDisplayName . '. Gateway Reference #' . $params['x_gateway_reference'], 'woocommerce' );
-                    $order->add_order_note( $flexi_result_note );
-                    $order->update_status( 'failed' );
-                    $msg = 'failed';
-                    WC()->session->set( 'flexi_result', 'failed' );
-                    break;
-
-                case "error":
-                    $flexi_result_note = __( 'Payment error using ' . $this->pluginDisplayName . '. Gateway Reference #' . $params['x_gateway_reference'], 'woocommerce' );
-                    $order->add_order_note( $flexi_result_note );
-                    $order->update_status( 'on-hold', 'Error may have occurred with ' . $this->pluginDisplayName . '. Gateway Reference #' . $params['x_gateway_reference'] );
-                    $msg = 'error';
-                    WC()->session->set( 'flexi_result', 'error' );
-                    break;
-            }
-            WC()->session->set( 'flexi_result_note', $flexi_result_note );
-        } else {
-            $order->add_order_note( __( $this->pluginDisplayName . ' payment response failed signature validation. Please check your Merchant Number and API key or contact ' . $this->pluginDisplayName . ' for assistance.' .
-                                        '</br></br>isJSON: ' . $isJSON .
-                                        '</br>Payload: ' . print_r( $params, true ) .
-                                        '</br>Expected Signature: ' . $expected_sig, 0, 'woocommerce' ) );
-            $msg = "signature error";
-            WC()->session->set( 'flexi_result_note', $this->pluginDisplayName . ' signature error' );
+            return $order_id;
         }
+
+        $this->log( sprintf( 'Finalising orderId: %s, (isAsyncCallback=%s)', $order_id, $isAsyncCallback ) );
+        // Get the status of the order and handle accordingly
+        $flexi_result_note = '';
+        switch ( $params['x_result'] ) {
+            case "completed":
+                $flexi_result_note = __( 'Payment approved using ' . $this->pluginDisplayName . '. Gateway_Reference #' . $params['x_gateway_reference'], 'woocommerce' );
+                $order->add_order_note( $flexi_result_note );
+                $order->update_meta_data( "flexi_purchase_number", $params["x_gateway_reference"] );
+                $order->payment_complete( $params['x_reference'] );
+
+                if ( ! is_null( $cart ) && ! empty( $cart ) ) {
+                    $cart->empty_cart();
+                }
+                $msg = 'complete';
+                break;
+
+            case "failed":
+                $flexi_result_note = __( 'Payment declined using ' . $this->pluginDisplayName . '. Gateway Reference #' . $params['x_gateway_reference'], 'woocommerce' );
+                $order->add_order_note( $flexi_result_note );
+                $order->update_status( 'failed' );
+                $msg = 'failed';
+                WC()->session->set( 'flexi_result', 'failed' );
+                break;
+
+            case "error":
+                $flexi_result_note = __( 'Payment error using ' . $this->pluginDisplayName . '. Gateway Reference #' . $params['x_gateway_reference'], 'woocommerce' );
+                $order->add_order_note( $flexi_result_note );
+                $order->update_status( 'on-hold', 'Error may have occurred with ' . $this->pluginDisplayName . '. Gateway Reference #' . $params['x_gateway_reference'] );
+                $msg = 'error';
+                WC()->session->set( 'flexi_result', 'error' );
+                break;
+        }
+        WC()->session->set( 'flexi_result_note', $flexi_result_note );
 
         if ( $isJSON ) {
             $return = array(
