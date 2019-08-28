@@ -244,6 +244,21 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
                 'default'     => 'yes',
                 'description' => 'Display a price widget in each product page.',
             ),
+            'price_widget_dynamic_enabled'            => array(
+                'title'       => __( 'Dynamic Price Widget', 'woocommerce' ),
+                'type'        => 'checkbox',
+                'label'       => __( 'Enable the humm Dynamic Price Widget' ),
+                'default'     => 'no',
+                'description' => 'Price widget will automatically update breakdown if the product price changes. Uses the CSS selector below to track changes. Leave disabled if unsure.',
+            ),
+            'price_widget_selector' => array(
+                'id'                => $this->pluginFileName . '_api_key',
+                'title'             => __( 'Price Widget CSS Selector', 'woocommerce' ),
+                'type'              => 'text',
+                'default'           => '.price .woocommerce-Price-amount.amount',
+                'description'       => 'CSS selector for the element containing the product price',
+                'desc_tip'          => true,
+            ),
             'preselect_button_enabled'            => array(
                 'title'       => __( 'Pre-select Checkout Button', 'woocommerce' ),
                 'type'        => 'checkbox',
