@@ -24,4 +24,25 @@
         refresh();
 
     });
+
+    $(function () {
+        var priceWidgetSetting = $("input#woocommerce_oxipay_price_widget");
+        var dynamicPriceWidgetSetting = $("input#woocommerce_oxipay_price_widget_dynamic_enabled").parent().parent().parent().parent();
+        var priceWidgetCssSelector = $("input#woocommerce_oxipay_price_widget_selector").parent().parent().parent();
+
+        function refresh() {
+            var priceWidgetEnabled = priceWidgetSetting.is(":checked");
+            if (priceWidgetEnabled) {
+                dynamicPriceWidgetSetting.show();
+                priceWidgetCssSelector.show();
+            } else {
+                dynamicPriceWidgetSetting.hide();
+                priceWidgetCssSelector.hide();
+            }
+        }
+
+        priceWidgetSetting.change(refresh);
+        refresh();
+
+    });
 })(jQuery);
