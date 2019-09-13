@@ -16,6 +16,7 @@
         }
 
         function submit_post() {
+            showLoadingPopup();
             $.ajax({
                 url: wc_checkout_params.checkout_url,
                 type: 'POST',
@@ -53,6 +54,40 @@
 
         $('form.checkout').on('checkout_place_order_oxipay', submit_post);
     });
+
+    function showLoadingPopup(){
+        var oxipay_popup_wrapper = $(document.createElement('div'))
+            .attr('id', 'oxipay-popup-wrapper')
+            .css({
+                'position': 'fixed',
+                'width': '100%',
+                'min-height': '100%',
+                'z-index': 999999,
+                'left': 0,
+                'top': 0,
+                'right': 0,
+                'bottom': 0,
+                'overflow': 'auto',
+                'display': 'flex',
+                'justify-content': 'center',
+                'align-content': 'center',
+                'align-items': 'center',
+                'background-color': 'rgba(255, 255, 255, 0.4)'
+            })
+            .appendTo('body')
+            .on('click', function(event) {
+                closeLoadingPopup(event);
+            });
+
+        $(document.createElement('img'))
+            .attr('src', php_vars.plugin_url + '/images/spinner.gif')
+            .appendTo(oxipay_popup_wrapper);
+    }
+
+    function closeLoadingPopup(event) {
+        event.preventDefault();
+        $('#oxipay-popup-wrapper').hide();
+    };
 
     /**
      * This is more or less a direct copy of the woocommerce implementation
