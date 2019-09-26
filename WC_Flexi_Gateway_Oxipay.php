@@ -970,7 +970,8 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
         $order       = wc_get_order( $order_id );
         $purchase_id = get_post_meta( $order_id )["flexi_purchase_number"][0];
         if ( ! $purchase_id ) {
-            throw new Exception( __( 'Oxipay Purchase ID not found. Can not proceed with online refund', 'woocommerce' ) );
+            $this->log( __( 'Oxipay Purchase ID not found. Can not proceed with online refund', 'woocommerce' ) );
+            return false;
         }
 
         if ( isset( $this->settings['country'] ) ) {
@@ -1001,10 +1002,12 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
             'headers'     => array( 'Content-Type' => 'application/json; charset=utf-8' )
         ) );
         if ( is_wp_error( $response ) ) {
-            throw new Exception( __( 'There was a problem connecting to the payment gateway.', 'woocommerce' ) );
+            $this->log( __( 'There was a problem connecting to the refund gateway.', 'woocommerce' ) );
+            return false;
         }
         if ( empty( $response['response'] ) ) {
-            throw new Exception( __( 'Empty response.', 'woocommerce' ) );
+            $this->log( __( 'Empty response.', 'woocommerce' ) );
+            return false;
         }
 
         $refund_result  = $response['response'];
