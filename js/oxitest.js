@@ -11,7 +11,7 @@ function extractKeys(redirectUrl) {
         keys[split[0].trim()] = split[1].trim();
     }
     return keys;
-};
+}
 
 var response = extractKeys(redirectUrl);
 console.log(response);

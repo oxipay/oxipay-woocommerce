@@ -14,7 +14,11 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
     protected $pluginFileName = null;
     protected $flexi_payment_preselected = false;
 
-    function __construct( $config ) {
+    /**
+     * Can the order be refunded?
+     * @param	Oxipay_Config	$config
+     */
+    function __construct( Oxipay_Config $config ) {
 
         $this->currentConfig     = $config;
         $this->pluginDisplayName = $config->getDisplayName();
@@ -244,19 +248,19 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
                 'default'     => 'yes',
                 'description' => 'Display a price widget in each product page.',
             ),
-            'price_widget_dynamic_enabled'            => array(
+            'price_widget_dynamic_enabled'        => array(
                 'type'        => 'checkbox',
                 'label'       => __( 'Use Dynamic Version of the Price Widget' ),
                 'default'     => 'no',
                 'description' => 'Price widget will automatically update the breakdown if the product price changes. <br>Leave this disabled if unsure. <br><strong>Uses the CSS selector below to track changes.</strong>',
             ),
-            'price_widget_selector' => array(
-                'id'                => $this->pluginFileName . '_api_key',
-                'label'             => __( 'Price Widget CSS Selector', 'woocommerce' ),
-                'type'              => 'text',
-                'default'           => '.price .woocommerce-Price-amount.amount',
-                'description'       => 'CSS selector for the element containing the product price',
-                'desc_tip'          => true,
+            'price_widget_selector'               => array(
+                'id'          => $this->pluginFileName . '_api_key',
+                'label'       => __( 'Price Widget CSS Selector', 'woocommerce' ),
+                'type'        => 'text',
+                'default'     => '.price .woocommerce-Price-amount.amount',
+                'description' => 'CSS selector for the element containing the product price',
+                'desc_tip'    => true,
             ),
             'preselect_button_enabled'            => array(
                 'title'       => __( 'Pre-select Checkout Button', 'woocommerce' ),
@@ -559,7 +563,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
     }
 
     /**
-     * @param $order
+     * @param WC_Order $order
      *
      * @return bool
      */
@@ -657,6 +661,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
     function payment_finalisation( $order_id ) {
         $order = wc_get_order( $order_id );
         $cart  = WC()->cart;
+        $msg   = "";
 
         $isAsyncCallback = $_SERVER['REQUEST_METHOD'] === "POST" ? true : false;
 
@@ -761,6 +766,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
         if ( ! empty( WC()->session->get( 'flexi_result_note' ) ) ) {
             return WC()->session->get( 'flexi_result_note' );
         }
+        return $original_message;
     }
 
     /**
@@ -794,7 +800,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
     /**
      * Ensure the customer is being billed from and is shipping to, Australia.
      *
-     * @param $order
+     * @param WC_Order $order
      *
      * @return bool
      */
@@ -828,7 +834,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
      * Ensure the order amount is >= $20
      * Also ensure order is <= max_purchase
      *
-     * @param $order
+     * @param WC_Order $order
      *
      * @return true
      */
@@ -946,11 +952,14 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
     }
 
     function supports( $feature ) {
-        if ( in_array( $feature, array( "products", "refunds" ) ) ) {
-            return true;
-        }
+        return in_array( $feature, array( "products", "refunds" ) ) ? true : false;
     }
 
+    /**
+     * Can the order be refunded?
+     * @param	WC_Order	$order
+     * @return	bool
+     */
     function can_refund_order( $order ) {
         return ( $order->get_status() == "processing" || $order->get_status() == "on-hold" || $order->get_status() == "completed" );
     }
