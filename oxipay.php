@@ -66,6 +66,7 @@ function get_oxipay_settings( $query ) {
         return;
     }
 
+    /** @var WC_Oxipay_Gateway $oxipay */
     $oxipay = $list['oxipay'];
 
     if ( isset( $query->query_vars['oxi_settings'] ) ) {

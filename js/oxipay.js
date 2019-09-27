@@ -87,7 +87,7 @@
     function closeLoadingPopup(event) {
         event.preventDefault();
         $('#oxipay-popup-wrapper').hide();
-    };
+    }
 
     /**
      * This is more or less a direct copy of the woocommerce implementation
