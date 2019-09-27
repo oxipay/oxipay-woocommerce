@@ -658,13 +658,10 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
         $order = wc_get_order( $order_id );
         $cart  = WC()->cart;
 
-        $isJSON = ( $_SERVER['REQUEST_METHOD'] === "POST" && isset( $_SERVER['CONTENT_TYPE'] ) &&
-                    ( strpos( $_SERVER['CONTENT_TYPE'], 'application/json' ) !== false ) );
+        $isAsyncCallback = $_SERVER['REQUEST_METHOD'] === "POST" ? true : false;
 
-        $isAsyncCallback = $isJSON ? "true" : "false";
-        // This addresses the callback.
-        if ( $isJSON ) {
-            $params = json_decode( file_get_contents( 'php://input' ), true );
+        if ( $isAsyncCallback ) {
+            $params = $_POST;
         } else {
             $scheme = 'http';
             if ( ! empty( $_SERVER['HTTPS'] ) ) {
@@ -742,14 +739,14 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
             WC()->session->set( 'flexi_result_note', $flexi_result_note );
         } else {
             $order->add_order_note( __( $this->pluginDisplayName . ' payment response failed signature validation. Please check your Merchant Number and API key or contact ' . $this->pluginDisplayName . ' for assistance.' .
-                                        '</br></br>isJSON: ' . $isJSON .
+                                        '</br></br>isJSON: ' . $isAsyncCallback .
                                         '</br>Payload: ' . print_r( $params, true ) .
                                         '</br>Expected Signature: ' . $expected_sig, 0, 'woocommerce' ) );
             $msg = "signature error";
             WC()->session->set( 'flexi_result_note', $this->pluginDisplayName . ' signature error' );
         }
 
-        if ( $isJSON ) {
+        if ( $isAsyncCallback ) {
             $return = array(
                 'message' => $msg,
                 'id'      => $order_id
