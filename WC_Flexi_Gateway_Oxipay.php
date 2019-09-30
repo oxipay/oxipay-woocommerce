@@ -14,6 +14,10 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
     protected $pluginFileName = null;
     protected $flexi_payment_preselected = false;
 
+    /**
+     * Can the order be refunded?
+     * @param	Oxipay_Config	$config
+     */
     function __construct( $config ) {
 
         $this->currentConfig     = $config;
@@ -244,19 +248,19 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
                 'default'     => 'yes',
                 'description' => 'Display a price widget in each product page.',
             ),
-            'price_widget_dynamic_enabled'            => array(
+            'price_widget_dynamic_enabled'        => array(
                 'type'        => 'checkbox',
                 'label'       => __( 'Use Dynamic Version of the Price Widget' ),
                 'default'     => 'no',
                 'description' => 'Price widget will automatically update the breakdown if the product price changes. <br>Leave this disabled if unsure. <br><strong>Uses the CSS selector below to track changes.</strong>',
             ),
-            'price_widget_selector' => array(
-                'id'                => $this->pluginFileName . '_api_key',
-                'label'             => __( 'Price Widget CSS Selector', 'woocommerce' ),
-                'type'              => 'text',
-                'default'           => '.price .woocommerce-Price-amount.amount',
-                'description'       => 'CSS selector for the element containing the product price',
-                'desc_tip'          => true,
+            'price_widget_selector'               => array(
+                'id'          => $this->pluginFileName . '_api_key',
+                'label'       => __( 'Price Widget CSS Selector', 'woocommerce' ),
+                'type'        => 'text',
+                'default'     => '.price .woocommerce-Price-amount.amount',
+                'description' => 'CSS selector for the element containing the product price',
+                'desc_tip'    => true,
             ),
             'preselect_button_enabled'            => array(
                 'title'       => __( 'Pre-select Checkout Button', 'woocommerce' ),
@@ -559,7 +563,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
     }
 
     /**
-     * @param $order
+     * @param WC_Order $order
      *
      * @return bool
      */
@@ -657,14 +661,12 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
     function payment_finalisation( $order_id ) {
         $order = wc_get_order( $order_id );
         $cart  = WC()->cart;
+        $msg   = "";
 
-        $isJSON = ( $_SERVER['REQUEST_METHOD'] === "POST" && isset( $_SERVER['CONTENT_TYPE'] ) &&
-                    ( strpos( $_SERVER['CONTENT_TYPE'], 'application/json' ) !== false ) );
+        $isAsyncCallback = $_SERVER['REQUEST_METHOD'] === "POST" ? true : false;
 
-        $isAsyncCallback = $isJSON ? "true" : "false";
-        // This addresses the callback.
-        if ( $isJSON ) {
-            $params = json_decode( file_get_contents( 'php://input' ), true );
+        if ( $isAsyncCallback ) {
+            $params = $_POST;
         } else {
             $scheme = 'http';
             if ( ! empty( $_SERVER['HTTPS'] ) ) {
@@ -742,14 +744,14 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
             WC()->session->set( 'flexi_result_note', $flexi_result_note );
         } else {
             $order->add_order_note( __( $this->pluginDisplayName . ' payment response failed signature validation. Please check your Merchant Number and API key or contact ' . $this->pluginDisplayName . ' for assistance.' .
-                                        '</br></br>isJSON: ' . $isJSON .
+                                        '</br></br>isJSON: ' . $isAsyncCallback .
                                         '</br>Payload: ' . print_r( $params, true ) .
                                         '</br>Expected Signature: ' . $expected_sig, 0, 'woocommerce' ) );
             $msg = "signature error";
             WC()->session->set( 'flexi_result_note', $this->pluginDisplayName . ' signature error' );
         }
 
-        if ( $isJSON ) {
+        if ( $isAsyncCallback ) {
             $return = array(
                 'message' => $msg,
                 'id'      => $order_id
@@ -764,6 +766,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
         if ( ! empty( WC()->session->get( 'flexi_result_note' ) ) ) {
             return WC()->session->get( 'flexi_result_note' );
         }
+        return $original_message;
     }
 
     /**
@@ -797,7 +800,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
     /**
      * Ensure the customer is being billed from and is shipping to, Australia.
      *
-     * @param $order
+     * @param WC_Order $order
      *
      * @return bool
      */
@@ -831,7 +834,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
      * Ensure the order amount is >= $20
      * Also ensure order is <= max_purchase
      *
-     * @param $order
+     * @param WC_Order $order
      *
      * @return true
      */
@@ -949,11 +952,14 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
     }
 
     function supports( $feature ) {
-        if ( in_array( $feature, array( "products", "refunds" ) ) ) {
-            return true;
-        }
+        return in_array( $feature, array( "products", "refunds" ) ) ? true : false;
     }
 
+    /**
+     * Can the order be refunded?
+     * @param	WC_Order	$order
+     * @return	bool
+     */
     function can_refund_order( $order ) {
         return ( $order->get_status() == "processing" || $order->get_status() == "on-hold" || $order->get_status() == "completed" );
     }
@@ -964,7 +970,8 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
         $order       = wc_get_order( $order_id );
         $purchase_id = get_post_meta( $order_id )["flexi_purchase_number"][0];
         if ( ! $purchase_id ) {
-            throw new Exception( __( 'Oxipay Purchase ID not found. Can not proceed with online refund', 'woocommerce' ) );
+            $this->log( __( 'Oxipay Purchase ID not found. Can not proceed with online refund', 'woocommerce' ) );
+            return false;
         }
 
         if ( isset( $this->settings['country'] ) ) {
@@ -995,10 +1002,12 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
             'headers'     => array( 'Content-Type' => 'application/json; charset=utf-8' )
         ) );
         if ( is_wp_error( $response ) ) {
-            throw new Exception( __( 'There was a problem connecting to the payment gateway.', 'woocommerce' ) );
+            $this->log( __( 'There was a problem connecting to the refund gateway.', 'woocommerce' ) );
+            return false;
         }
         if ( empty( $response['response'] ) ) {
-            throw new Exception( __( 'Empty response.', 'woocommerce' ) );
+            $this->log( __( 'Empty response.', 'woocommerce' ) );
+            return false;
         }
 
         $refund_result  = $response['response'];

@@ -46,7 +46,7 @@ function oxipay(q) {
      */
     function setup(targetUrl, keyValue, stylesheetURL) {
         targetUrl = targetUrl || '/';
-        if (targetUrl.substr(0, 4) == "http") {
+        if (targetUrl.substr(0, 4) === "http") {
             // targetUrl is fine and absolute
         } else if (targetUrl.substr(0, 1) !== "/") {
             targetUrl = window.location.pathname + targetUrl;
@@ -90,7 +90,7 @@ function oxipay(q) {
         }
     }
 
-    function message(e) {
+    function message() {
         try {
             q('.oxi-modal-splash').addClass('animated fadeOut');
             setTimeout(function () {

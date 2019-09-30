@@ -7,9 +7,11 @@
 (function ($) {
     'use strict';
     var oxipay_settings;
-
+    /**
+     * @param wc_checkout_params.checkout_url
+     * @param wc_checkout_params.i18n_checkout_error
+     */
     $(document).ready(function () {
-
         if (typeof wc_checkout_params != 'undefined' && wc_checkout_params.checkout_url) {
             var checkoutUrl = wc_checkout_params.checkout_url;
             loadSettings(checkoutUrl);
@@ -22,13 +24,10 @@
                 type: 'POST',
                 data: $(this).serialize(),
                 success: function (data) {
-                    try {
-                        if (data && data.redirect) {
-                            showModal(data.redirect);
-                        } else {
-                            throw 'Invalid response';
-                        }
-                    } catch (err) {
+                    if (data && data.redirect) {
+                        showModal(data.redirect);
+                    } else {
+                        $('#oxipay-popup-wrapper').hide();
                         if (true === data.reload) {
                             window.location.reload();
                             return;
@@ -55,7 +54,7 @@
         $('form.checkout').on('checkout_place_order_oxipay', submit_post);
     });
 
-    function showLoadingPopup(){
+    function showLoadingPopup() {
         var oxipay_popup_wrapper = $(document.createElement('div'))
             .attr('id', 'oxipay-popup-wrapper')
             .css({
@@ -75,7 +74,7 @@
                 'background-color': 'rgba(255, 255, 255, 0.4)'
             })
             .appendTo('body')
-            .on('click', function(event) {
+            .on('click', function (event) {
                 closeLoadingPopup(event);
             });
 
@@ -87,7 +86,7 @@
     function closeLoadingPopup(event) {
         event.preventDefault();
         $('#oxipay-popup-wrapper').hide();
-    };
+    }
 
     /**
      * This is more or less a direct copy of the woocommerce implementation
@@ -136,7 +135,7 @@
         var keyStartPos = urlString.indexOf('?') + 1;
         var values = extractKeys(urlString.substring(keyStartPos));
         var encodedFields = ['x_url_callback', 'x_url_complete', 'gateway_url', 'x_url_cancel'];
-        encodedFields.forEach(function(item){
+        encodedFields.forEach(function (item) {
             values[item] = atob(values[item])
         });
         var modal = oxipay_settings.use_modal;

@@ -1,4 +1,4 @@
-<html>
+<html lang="en">
 <head>
     <title>Redirecting to Oxipay</title>
     <link rel="stylesheet" href="css/oxipay.css">
