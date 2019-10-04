@@ -10,9 +10,9 @@ class Oxipay_Config {
     const DISPLAY_NAME_BEFORE = 'Oxipay';
     const DISPLAY_NAME_AFTER = 'humm';
     const PLUGIN_FILE_NAME = 'oxipay';
-    const LAUNCH_TIME_URL = 'https://s3-ap-southeast-2.amazonaws.com/humm-variables/nz-launch-time.txt';
-    const LAUNCH_TIME_DEFAULT = '2019-10-07 14:30:00 UTC';
-    const LAUNCH_TIME_CHECK_ENDS = "2020-01-07 13:30:00 UTC";
+    const LAUNCH_TIME_URL = 'https://humm-variables.s3-ap-southeast-2.amazonaws.com/nz-launch-time.txt';
+    const LAUNCH_TIME_DEFAULT = "2019-02-23 13:30:00 UTC";
+    const LAUNCH_TIME_CHECK_ENDS = "2020-05-23 13:30:00 UTC";
     const BUTTON_COLOR = array( "Oxipay" => "E68821", "humm" => "FF6C00" );
 
     public $countries = array(
@@ -42,14 +42,14 @@ class Oxipay_Config {
             'live_refund_address'    => 'https://buyerapi.shophumm.com.au/api/ExternalRefund/v1/processrefund',
         ],
         'NZ_Oxipay' => [
-            'sandboxURL'             => 'https://securesandbox.oxipay.co.nz/Checkout?platform=WooCommerce',
-            'liveURL'                => 'https://secure.oxipay.co.nz/Checkout?platform=WooCommerce',
+            'sandboxURL'             => 'https://securesandbox.oxipay.co.nz/Checkout?platform=Default',
+            'liveURL'                => 'https://secure.oxipay.co.nz/Checkout?platform=Default',
             'sandbox_refund_address' => 'https://portalssandbox.oxipay.co.nz/api/ExternalRefund/processrefund',
             'live_refund_address'    => 'https://portals.oxipay.co.nz/api/ExternalRefund/processrefund',
         ],
         'NZ_Humm' => [
-            'sandboxURL'             => 'https://integration-cart.shophumm.co.nz/Checkout?platform=WooCommerce',
-            'liveURL'                => 'https://cart.shophumm.co.nz/Checkout?platform=WooCommerce',
+            'sandboxURL'             => 'https://integration-cart.shophumm.co.nz/Checkout?platform=Default',
+            'liveURL'                => 'https://cart.shophumm.co.nz/Checkout?platform=Default',
             'sandbox_refund_address' => 'https://integration-buyerapi.shophumm.co.nz/api/ExternalRefund/v1/processrefund',
             'live_refund_address'    => 'https://buyerapi.shophumm.co.nz/api/ExternalRefund/v1/processrefund',
         ]
