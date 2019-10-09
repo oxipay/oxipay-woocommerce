@@ -87,8 +87,8 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
 
             //  Widget type - Dynamic or Static
             if ( isset( $this->settings['price_widget_dynamic_enabled'] ) && $this->settings['price_widget_dynamic_enabled'] === 'yes') {
-                if ( isset( $this->settings['price_widget_selector'] )) {
-                    $selector = $this->settings['price_widget_selector'];
+                if ( isset( $this->settings['price_widget_price_selector'] )) {
+                    $selector = $this->settings['price_widget_price_selector'];
                 } else {
                     $selector = '.price .woocommerce-Price-amount.amount';
                 }
