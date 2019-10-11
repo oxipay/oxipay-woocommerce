@@ -72,9 +72,7 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
             $maximum = $this->getMaxPrice();
             $name = $this->currentConfig->getDisplayName();
 
-            $advanced = isset( $this->settings['price_widget_advanced'] ) && $this->settings['price_widget_advanced'] === 'yes');
-
-
+            $advanced = isset( $this->settings['price_widget_advanced'] ) && $this->settings['price_widget_advanced'] === 'yes';
 
             // data-max
             $script = '<script ';
