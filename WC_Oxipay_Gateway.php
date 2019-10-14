@@ -72,8 +72,7 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
             $maximum = $this->getMaxPrice();
             $name = $this->currentConfig->getDisplayName();
 
-            // Insert anchor
-            echo '<div id="' . $name . '-price-info-anchor"></div>';
+            $advanced = isset( $this->settings['price_widget_advanced'] ) && $this->settings['price_widget_advanced'] === 'yes';
 
             // data-max
             $script = '<script ';
@@ -86,9 +85,9 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
             $script .= '.js?';
 
             //  Widget type - Dynamic or Static
-            if ( isset( $this->settings['price_widget_dynamic_enabled'] ) && $this->settings['price_widget_dynamic_enabled'] === 'yes') {
-                if ( isset( $this->settings['price_widget_selector'] )) {
-                    $selector = $this->settings['price_widget_selector'];
+            if ( $advanced && isset( $this->settings['price_widget_dynamic_enabled'] ) && $this->settings['price_widget_dynamic_enabled'] === 'yes') {
+                if ( isset( $this->settings['price_widget_price_selector'] )) {
+                    $selector = $this->settings['price_widget_price_selector'];
                 } else {
                     $selector = '.price .woocommerce-Price-amount.amount';
                 }
@@ -98,8 +97,15 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
                 $script .= 'productPrice=' . wc_get_price_to_display( $product );
             }
 
-            // Link anchor element
-            $script .= '&element=%23' . $name . '-price-info-anchor';
+            // Widget location in page
+            $script .= '&element=';
+            if ( $advanced && isset( $this->settings['price_widget_element_selector'] ) && $this->settings['price_widget_element_selector'] !== '') {
+                $script .= urlencode($this->settings['price_widget_element_selector']);
+            } else {
+                // Insert anchor and link
+                echo '<div id="' . $name . '-price-info-anchor"></div>';
+                $script .= '%23' . $name . '-price-info-anchor';
+            }
 
             // Merchant type
             if ( $name === 'humm' ) {

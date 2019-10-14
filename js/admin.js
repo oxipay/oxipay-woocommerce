@@ -26,27 +26,45 @@
 
     $(function () {
         var priceWidgetSetting = $("input#woocommerce_oxipay_price_widget");
+        var priceWidgetAdvanced = $("input#woocommerce_oxipay_price_widget_advanced");
         var dynamicPriceWidgetSetting = $("input#woocommerce_oxipay_price_widget_dynamic_enabled");
+
+        var priceWidgetAdvancedBlock = priceWidgetAdvanced.parent().parent().parent().parent();
+        var priceWidgetElementSelectorBlock = $("input#woocommerce_oxipay_price_widget_element_selector").parent().parent().parent();
         var dynamicPriceWidgetSettingBlock = dynamicPriceWidgetSetting.parent().parent().parent().parent();
-        var priceWidgetCssSelectorBlock = $("input#woocommerce_oxipay_price_widget_selector").parent().parent().parent();
+        var priceWidgetCssSelectorBlock = $("input#woocommerce_oxipay_price_widget_price_selector").parent().parent().parent();
 
         function refresh() {
             var priceWidgetEnabled = priceWidgetSetting.is(":checked");
+            var priceWidgetAdvancedEnabled = priceWidgetAdvanced.is(":checked");
             var dynamicPriceWidgetEnabled = dynamicPriceWidgetSetting.is(":checked");
+
             if (priceWidgetEnabled) {
-                dynamicPriceWidgetSettingBlock.show();
-                if (dynamicPriceWidgetEnabled) {
-                    priceWidgetCssSelectorBlock.show();
+                priceWidgetAdvancedBlock.show();
+                if (priceWidgetAdvancedEnabled) {
+                    priceWidgetElementSelectorBlock.show();
+                    dynamicPriceWidgetSettingBlock.show();
+
+                    if (dynamicPriceWidgetEnabled) {
+                        priceWidgetCssSelectorBlock.show();
+                    } else {
+                        priceWidgetCssSelectorBlock.hide();
+                    }
                 } else {
+                    priceWidgetElementSelectorBlock.hide();
+                    dynamicPriceWidgetSettingBlock.hide();
                     priceWidgetCssSelectorBlock.hide();
                 }
             } else {
+                priceWidgetAdvancedBlock.hide();
+                priceWidgetElementSelectorBlock.hide();
                 dynamicPriceWidgetSettingBlock.hide();
                 priceWidgetCssSelectorBlock.hide();
             }
         }
 
         priceWidgetSetting.change(refresh);
+        priceWidgetAdvanced.change(refresh);
         dynamicPriceWidgetSetting.change(refresh);
         refresh();
     });
