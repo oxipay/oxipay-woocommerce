@@ -55,7 +55,8 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
             'process_admin_options'
         ) );
         add_action( 'wp_footer', array( $this, 'add_top_banner_widget' ) );
-        add_action( 'woocommerce_single_product_summary', array( $this, 'add_price_widget' ) );
+        add_action( 'wp_footer', array( $this, 'add_price_widget' ) );
+        add_action( 'woocommerce_single_product_summary', array( $this, 'add_price_widget_anchor' ) );
         add_filter( 'woocommerce_thankyou_order_id', array( $this, 'payment_finalisation' ) );
         add_filter( 'the_title', array( $this, 'order_received_title' ), 11 );
         add_action( 'woocommerce_before_checkout_form', array( $this, 'display_min_max_notice' ) );
@@ -71,7 +72,9 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
         ), $preselect_button_order );
     }
 
+    abstract public function add_top_banner_widget();
     abstract public function add_price_widget();
+    abstract public function add_price_widget_anchor();
 
     function flexi_checkout_button() {
         if ( $this->settings["preselect_button_enabled"] == "yes" && $this->settings['enabled'] == 'yes' ) {

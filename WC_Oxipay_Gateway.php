@@ -102,8 +102,6 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
             if ( $advanced && isset( $this->settings['price_widget_element_selector'] ) && $this->settings['price_widget_element_selector'] !== '') {
                 $script .= urlencode($this->settings['price_widget_element_selector']);
             } else {
-                // Insert anchor and link
-                echo '<div id="' . $name . '-price-info-anchor"></div>';
                 $script .= '%23' . $name . '-price-info-anchor';
             }
 
@@ -117,6 +115,10 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
             $script .= '"></script>';
             echo $script;
         }
+    }
+
+    function add_price_widget_anchor() {
+        echo '<div id="' . $this->currentConfig->getDisplayName() . '-price-info-anchor"></div>';
     }
 
     function add_top_banner_widget() {
