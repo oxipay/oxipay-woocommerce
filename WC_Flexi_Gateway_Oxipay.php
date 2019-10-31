@@ -55,7 +55,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway {
             'process_admin_options'
         ) );
         add_action( 'wp_footer', array( $this, 'add_top_banner_widget' ) );
-        add_action( 'wp_footer', array( $this, 'add_price_widget' ) );
+        add_action( 'woocommerce_after_single_product', array( $this, 'add_price_widget' ) );
         add_action( 'woocommerce_single_product_summary', array( $this, 'add_price_widget_anchor' ) );
         add_filter( 'woocommerce_thankyou_order_id', array( $this, 'payment_finalisation' ) );
         add_filter( 'the_title', array( $this, 'order_received_title' ), 11 );
