@@ -13,9 +13,10 @@ class Oxipay_Config {
             'currency_code' 	=> 'AUD',
             'currency_symbol'	=> '$',
             'tld'			    => '.com.au',
-            'sandboxURL'        => 'https://securesandbox.oxipay.com.au/Checkout?platform=WooCommerce',
+//          'sandboxURL'        => 'https://securesandbox.oxipay.com.au/Checkout?platform=WooCommerce',
+            'sandboxURL'        => 'https://integration-cart.shophumm.com.au/Checkout?platform=WooCommerce',
             'liveURL'           => 'https://secure.oxipay.com.au/Checkout?platform=WooCommerce',
-	        'sandbox_refund_address'    => 'https://portalssandbox.oxipay.com.au/api/ExternalRefund/processrefund',
+	        'sandbox_refund_address'    => 'https://integration-cart.shophumm.com.au/api/ExternalRefund/processrefund',
             'live_refund_address'    => 'https://portals.oxipay.com.au/api/ExternalRefund/processrefund',
             'max_purchase'      => 2100,
             'min_purchase'      => 20,
@@ -31,13 +32,13 @@ class Oxipay_Config {
 	        'live_refund_address'    => 'https://portals.oxipay.co.nz/api/ExternalRefund/processrefund',
             'max_purchase'      => 1500,
             'min_purchase'      => 20,
-        )        
+        )
     );
 
     public function getDisplayName() {
         return self::DISPLAY_NAME;
-    } 
-    
+    }
+
     public function getPlatformName() {
         return self::PLATFORM_NAME;
     }
