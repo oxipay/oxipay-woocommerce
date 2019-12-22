@@ -1,11 +1,11 @@
 /**
  * This is used to switch on the modal dialog for Oxipay transactions
  */
-(function($) {
+(function ($) {
     'use strict';
     var oxipay_settings;
 
-    $( document ).ready(function() {
+    $(document).ready(function () {
 
         if (typeof wc_checkout_params != 'undefined' && wc_checkout_params.checkout_url) {
             var checkoutUrl = wc_checkout_params.checkout_url;
@@ -14,10 +14,10 @@
 
         function submit_post() {
             $.ajax({
-                url     : wc_checkout_params.checkout_url,
-                type    : 'POST',
-                data    : $(this).serialize(),
-                success : function( data ) {
+                url: wc_checkout_params.checkout_url,
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function (data) {
                     try {
                         if (data && data.redirect) {
                             showModal(data.redirect);
@@ -30,25 +30,23 @@
                             return;
                         }
                         // Trigger update in case we need a fresh nonce
-                        if ( true === data.refresh ) {
-                            $( document.body ).trigger( 'update_checkout' );
+                        if (true === data.refresh) {
+                            $(document.body).trigger('update_checkout');
                         }
-
                         // Add new errors
-                        if ( data.messages ) {
-                            submit_error( data.messages );
+                        if (data.messages) {
+                            submit_error(data.messages);
                         } else {
-                            submit_error( '<div class="woocommerce-error">' + wc_checkout_params.i18n_checkout_error + '</div>' );
+                            submit_error('<div class="woocommerce-error">' + wc_checkout_params.i18n_checkout_error + '</div>');
                         }
                     }
                 },
-                error:  function( jqXHR, textStatus, errorThrown ) {
-                    submit_error( '<div class="woocommerce-error">' + errorThrown + '</div>' );
+                error: function (jqXHR, textStatus, errorThrown) {
+                    submit_error('<div class="woocommerce-error">' + errorThrown + '</div>');
                 }
             });
             return false;
         }
-
         $('form.checkout').on('checkout_place_order_oxipay', submit_post);
     });
 
@@ -58,28 +56,27 @@
      * their error handling.
      *
      */
-    function submit_error( error_message ) {
+    function submit_error(error_message) {
         var wc_checkout_form = $('form.checkout.woocommerce-checkout');
-
-        $( '.woocommerce-NoticeGroup-checkout, .woocommerce-error, .woocommerce-message' ).remove();
-        wc_checkout_form.prepend( '<div class="woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout">' + error_message + '</div>' );
-        wc_checkout_form.removeClass( 'processing' ).unblock();
-        wc_checkout_form.find( '.input-text, select, input:checkbox' ).blur();
-        $( 'html, body' ).animate({
-                    scrollTop: ( $( 'form.checkout' ).offset().top - 100 )
-        }, 1000 );
-        $( document.body ).trigger( 'checkout_error' );
+        $('.woocommerce-NoticeGroup-checkout, .woocommerce-error, .woocommerce-message').remove();
+        wc_checkout_form.prepend('<div class="woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout">' + error_message + '</div>');
+        wc_checkout_form.removeClass('processing').unblock();
+        wc_checkout_form.find('.input-text, select, input:checkbox').blur();
+        $('html, body').animate({
+            scrollTop: ($('form.checkout').offset().top - 100)
+        }, 1000);
+        $(document.body).trigger('checkout_error');
     }
 
 
     function loadSettings(checkoutUrl) {
         $.ajax({
-            url     : checkoutUrl + "&oxi_settings=true",
-            type    : 'GET',
-            success : function( data ) {
+            url: checkoutUrl + "&oxi_settings=true",
+            type: 'GET',
+            success: function (data) {
                 oxipay_settings = data;
             },
-            error   : function( xhr, err ) {
+            error: function (xhr, err) {
                 // we have failed to load the settings for some reason.
             }
         });
@@ -99,18 +96,18 @@
 
         var modal = false;
 
-        var form        = $('form.checkout.woocommerce-checkout');
-        var keyStartPos = urlString.indexOf('?')+1
-        var values      = extractKeys(urlString.substring(keyStartPos));
-        modal           = oxipay_settings.use_modal;
+        var form = $('form.checkout.woocommerce-checkout');
+        var keyStartPos = urlString.indexOf('?') + 1
+        var values = extractKeys(urlString.substring(keyStartPos));
+        modal = oxipay_settings.use_modal;
 
-        var gateway = urlString.substring(0,urlString.indexOf('&'));
+        var gateway = urlString.substring(0, urlString.indexOf('&'));
         // we already include the platform as part of the gateway URL so remove it
         delete values.platform;
 
         if (modal && modal != 'no' && modal != false) {
             var oxi = oxipay($);
-            var modalCSS = php_vars.plugin_url+'/css/oxipay-modal.css';
+            var modalCSS = php_vars.plugin_url + '/css/oxipay-modal.css';
             oxi.setup(gateway, values, modalCSS);
             oxi.show();
 
@@ -126,9 +123,8 @@
         form.setAttribute("method", "post");
         form.setAttribute("action", path);
         form.setAttribute('id', 'oxipay-submission')
-
-        for(var key in params) {
-            if(params.hasOwnProperty(key)) {
+        for (var key in params) {
+            if (params.hasOwnProperty(key)) {
                 var hiddenField = document.createElement("input");
                 hiddenField.setAttribute("type", "hidden");
                 hiddenField.setAttribute("name", key);
@@ -137,7 +133,6 @@
                 form.appendChild(hiddenField);
             }
         }
-
         document.body.appendChild(form);
         form.submit();
     }
