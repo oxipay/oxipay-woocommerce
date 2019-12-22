@@ -286,7 +286,6 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway
     /**
      * display_min_max_notice()
      */
-
     function display_min_max_notice()
     {
         $minimum = $this->getMinPrice();

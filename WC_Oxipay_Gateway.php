@@ -3,6 +3,9 @@ if (!class_exists('WC_Flexi_Gateway')) {
     require_once('WC_Flexi_Gateway.php');
 }
 
+/**
+ * Class WC_Oxipay_Gateway
+ */
 class WC_Oxipay_Gateway extends WC_Flexi_Gateway
 {
 
@@ -15,6 +18,9 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway
 
     public $shop_details;
 
+    /**
+     * WC_Oxipay_Gateway constructor.
+     */
     function __construct()
     {
         $config = new Oxipay_Config();
@@ -50,14 +56,18 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway
 
 
     /**
-     * Load javascript for Wordpress adminau
+     * Load javascript for Wordpress adminAu
      */
+
     function admin_scripts()
     {
         wp_register_script('oxipay_admin', plugins_url('/js/admin.js', __FILE__), array('jquery'), '0.4.5');
         wp_enqueue_script('oxipay_admin');
     }
 
+    /**
+     *
+     */
     function add_price_widget()
     {
         global $product;
@@ -71,18 +81,17 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway
 
             $maximum = $this->getMaxPrice();
             $price = wc_get_price_to_display($product);
-//          $widget =  '<div id="oxipay-price-info-anchor"></div><script id="oxipay-price-info" src="https://widgets.oxipay.' . $country_domain . '/content/scripts/' . $widget_type . '.js?productPrice=' . $price . '&element=%23oxipay-price-info-anchor"></script>';
-
             $auWidget = '<script src="https://widgets.shophumm.com.au/content/scripts/price-info.js?productPrice=500"></script>';
-            $widget1 = '<script class="oxipay-price-info" id="my-id" src="https://widgets.oxipay.com.au/content/scripts/payments.js?price-selector=%23priceinfo"></script>';
-
-            var_dump($auWidget);
             echo $auWidget;
             if ($maximum == 0 || $price <= $maximum) {
                 echo '<div id="oxipay-price-info-anchor"></div><script id="oxipay-price-info" src="https://widgets.oxipay.' . $country_domain . '/content/scripts/' . $widget_type . '.js?productPrice=' . $price . '&element=%23oxipay-price-info-anchor"></script>';
             }
         }
     }
+
+    /**
+     *
+     */
 
     function add_top_banner_widget()
     {
