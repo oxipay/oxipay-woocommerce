@@ -457,10 +457,11 @@ abstract class WC_Flexi_Gateway extends WC_Payment_Gateway
 
         $qs = http_build_query($transaction_details, null, '&', PHP_QUERY_RFC3986);
 
-        return array(
+        $returnArray = array(
             'result' => 'success',
             'redirect' => $gatewayUrl . '&' . $qs
         );
+        return $returnArray;
     }
 
     /**
