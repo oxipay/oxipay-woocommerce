@@ -4,10 +4,9 @@
  * Plugin URI: https://www.oxipay.com.au
  * Description: Easy to setup installment payment plans from <a href="https://oxipay.com.au">Oxipay</a>.
  * Version: plugin_version_placeholder
- * Author: FlexiGroup
+ * Author: roger.bi@flexigroup.com.au
  * Author URI: https://www.oxipay.com.au
  * @package WordPress
- * @author FlexiGroup
  * @since 0.4.8
  */
 
@@ -15,8 +14,7 @@ if (!defined('ABSPATH')) exit;
 
 include_once(ABSPATH . 'wp-admin/includes/plugin.php');
 if (!is_plugin_active('woocommerce/woocommerce.php')) return;
-
-require_once('oxipay-config.php');
+require_once plugin_dir_path(__FILE__) . 'includes/WC_Oxipay_config.php';
 
 add_action('plugins_loaded', 'woocommerce_oxipay_init', 0);
 
@@ -28,7 +26,7 @@ add_action('parse_request', 'get_oxipay_settings');
 
 function woocommerce_oxipay_init()
 {
-    require_once('WC_Oxipay_Gateway.php');
+    require_once plugin_dir_path(__FILE__) . 'includes/WC_Oxipay_Gateway.php';
 }
 
 /**
@@ -64,13 +62,11 @@ function get_oxipay_settings($query)
 
     $gateways = WC_Payment_Gateways::instance();
     if (!$gateways) {
-        // oxipay not installed properly
         return;
     }
 
     $list = $gateways->payment_gateways();
     if (!$list || !isset($list['oxipay'])) {
-        // abort
         return;
     }
 
