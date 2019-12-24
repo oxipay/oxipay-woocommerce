@@ -1,6 +1,5 @@
 ///<reference path="../typings/jquery/jquery.d.ts"/>
 function oxipay(q) {
-    var initialised = false;
     var iframeId = 'oxipay-iframe';
     var data;
     var form = null;
@@ -38,14 +37,16 @@ function oxipay(q) {
         form: form
     };
     return model;
+
     /**
      * Setup Oxipay Checkout
      * @param targetUrl
      * @param keyValue
+     * @param stylesheetURL
      */
     function setup(targetUrl, keyValue, stylesheetURL) {
         targetUrl = targetUrl || '/';
-        if (targetUrl.substr(0,4) == "http") {
+        if (targetUrl.substr(0, 4) === "http") {
             // targetUrl is fine and absolute
         } else if (targetUrl.substr(0, 1) !== "/") {
             targetUrl = window.location.pathname + targetUrl;
@@ -53,7 +54,7 @@ function oxipay(q) {
 
         model.targetUrl = targetUrl;
         var baseUrl = getBaseUrl(targetUrl);
-        
+
         model.data = keyValue;
 
         stylesheetUrl = baseUrl + stylesheetUrl;
@@ -62,7 +63,7 @@ function oxipay(q) {
         }
         setStyle(q(document).find('head'));
     }
-    
+
     /**
      * Show the Oxipay Checkout Modal
      */
@@ -70,32 +71,36 @@ function oxipay(q) {
         try {
             model.create();
             model.form.submit();
-            setTimeout(function () { return message(null); }, 5000);
-        }
-        catch (e) {
+            setTimeout(function () {
+                return message(null);
+            }, 5000);
+        } catch (e) {
             console.error(e);
         }
     }
+
     function hide() {
         try {
             q("#" + iframeId).remove();
             q(".oxi-modal").remove();
             q(".oxi-modal-overlay").remove();
             model.form.remove();
-        }
-        catch (e) {
+        } catch (e) {
             console.error(e);
         }
     }
-    function message(e) {
+
+    function message() {
         try {
             q('.oxi-modal-splash').addClass('animated fadeOut');
-            setTimeout(function () { return q('.oxi-modal-splash').remove(); }, 2000);
-        }
-        catch (e) {
+            setTimeout(function () {
+                return q('.oxi-modal-splash').remove();
+            }, 2000);
+        } catch (e) {
             console.error(e);
         }
     }
+
     function create() {
         try {
             var body = q('body');
@@ -109,12 +114,12 @@ function oxipay(q) {
             var iframeBody = iframe.contents().find('body');
             iframeBody.append(form_1);
             model.form = form_1;
-            iFrameResize({ log: true, checkOrigin: false, closedCallback: hide, messageCallback: message }, iframe[0]);
-        }
-        catch (e) {
+            iFrameResize({log: true, checkOrigin: false, closedCallback: hide, messageCallback: message}, iframe[0]);
+        } catch (e) {
             console.error(e);
         }
     }
+
     function getForm() {
         var target = window.innerWidth <= 650 ? "_top" : "_self";
         var form = "<form id=\"oxi-form\" action='" + model.targetUrl + "' method='POST' style=\"display:none;\" target=\"" + target + "\">";
@@ -125,13 +130,14 @@ function oxipay(q) {
         form += "</form>";
         return form;
     }
+
     function setStyle(head) {
         head.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"" + stylesheetUrl + "\">");
     }
+
     function getBaseUrl(url) {
         var a = document.createElement('a');
         a.href = url;
         return a.protocol + "//" + a.host;
     }
-    ;
 }

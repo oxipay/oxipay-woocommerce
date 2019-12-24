@@ -1,159 +1,215 @@
 ﻿.iframe-body {
-  background-color: #fff;
-  overflow: hidden; }
+    background-color: #fff;
+    overflow: hidden;
+}
 
 .oxi-modal-overlay {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 100;
-  background-color: rgba(0, 0, 0, 0.2); }
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1100;
+    background-color: rgba(0, 0, 0, 0.2);
+}
 
 .oxi-modal {
-  position: absolute;
-  top: 50px;
-  left: 4rem;
-  right: 4rem;
-  width: 450px;
-  margin-left: auto;
-  margin-right: auto;
-  z-index: 200; }
+    position: absolute;
+    top: 50px;
+    left: 4rem;
+    right: 4rem;
+    width: 450px;
+    margin-left: auto;
+    margin-right: auto;
+    z-index: 1101;
+}
 
 .oxi-modal-header {
-  padding: 15px;
-  background-color: #515565;
-  min-height: 45px;
-  padding-left: 0.9rem;
-  padding-right: 0.9rem; }
+    padding: 15px;
+    background-color: #515565;
+    min-height: 45px;
+    padding-left: 0.9rem;
+    padding-right: 0.9rem;
+}
+
 .oxi-modal-header > .oxi-modal-logo {
-  background-image: url(https://secure.oxipay.com.au/Client/skins/img/logo-orange.svg);
-  background-repeat: no-repeat;
-  background-position: left;
-  height: 30px;
-  margin: 5px; }
+    background-image: url(https://secure.oxipay.com.au/Client/skins/img/logo-orange.svg);
+    background-repeat: no-repeat;
+    background-position: left;
+    height: 30px;
+    margin: 5px;
+}
 
 .oxi-modal-body {
-  background-color: #fff;
-  -webkit-box-shadow: 0px 5px 15px 3px rgba(0, 0, 0, 0.1);
-  -moz-box-shadow: 0px 5px 15px 3px rgba(0, 0, 0, 0.1);
-  box-shadow: 0px 5px 15px 3px rgba(0, 0, 0, 0.1); }
+    background-color: #fff;
+    -webkit-box-shadow: 0 5px 15px 3px rgba(0, 0, 0, 0.1);
+    -moz-box-shadow: 0 5px 15px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 15px 3px rgba(0, 0, 0, 0.1);
+}
+
 .oxi-modal-body iframe {
-  display: block;
-  margin: 0 auto;
-  width: 450px;
-  border: none; }
+    display: block;
+    margin: 0 auto;
+    width: 450px;
+    border: none;
+}
+
 .oxi-modal-body > div {
-  position: absolute;
-  width: 450px;
-  border: none; }
+    position: absolute;
+    width: 450px;
+    border: none;
+}
+
 .oxi-modal-body .oxi-modal-iframe {
-  z-index: 101; }
+    z-index: 101;
+}
+
 .oxi-modal-body .oxi-modal-splash {
-  z-index: 102;
-  height: 496px;
-  background-color: #fff; }
+    z-index: 102;
+    height: 496px;
+    background-color: #fff;
+}
+
 .oxi-modal-body .oxi-modal-splash.fadeOut {
-  -webkit-animation-name: fadeOut;
-  animation-name: fadeOut; }
+    -webkit-animation-name: fadeOut;
+    animation-name: fadeOut;
+}
+
 .oxi-modal-body .oxi-modal-splash.animated {
-  -webkit-animation-duration: 0.5s;
-  animation-duration: 0.5s;
-  -webkit-animation-fill-mode: both;
-  animation-fill-mode: both; }
+    -webkit-animation-duration: 0.5s;
+    animation-duration: 0.5s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+}
 
 .oxi-modal-splash .splash {
-  height: 100%;
-  width: 100%;
-  z-index: 1050;
-  position: relative;
-  left: 0px;
-  top: 50px; }
+    height: 100%;
+    width: 100%;
+    z-index: 1050;
+    position: relative;
+    left: 0;
+    top: 50px;
+}
+
 .oxi-modal-splash .splash .fa-spin {
-  color: #FA8B23; }
+    color: #FA8B23;
+}
+
 .oxi-modal-splash .splash h2 {
-  color: #444; }
+    color: #444;
+}
 
 .oxi-modal-splash .splashText {
-  color: #FA8B23;
-  margin-top: 40px;
-  text-align: center; }
+    color: #FA8B23;
+    margin-top: 40px;
+    text-align: center;
+}
 
 .oxi-modal-splash .splashFrame {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 5%; }
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 5%;
+}
 
 .oxi-modal-splash .splashGraphic {
-  position: relative;
-  margin: 0 auto;
-  width: 100px; }
+    position: relative;
+    margin: 0 auto;
+    width: 100px;
+}
+
 .oxi-modal-splash .splashGraphic:before {
-  content: '';
-  display: block;
-  padding-top: 100%; }
+    content: '';
+    display: block;
+    padding-top: 100%;
+}
 
 .oxi-modal-splash .circular {
-  animation: rotate 1s linear infinite;
-  height: 100%;
-  transform-origin: center center;
-  width: 100%;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto; }
+    animation: rotate 1s linear infinite;
+    height: 100%;
+    transform-origin: center center;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
 
 .oxi-modal-splash .path {
-  stroke-dasharray: 1, 200;
-  stroke-dashoffset: 0;
-  animation: dash 1.5s ease-in-out infinite, color 6s ease-in-out infinite;
-  stroke-linecap: round; }
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+    animation: dash 1.5s ease-in-out infinite, color 6s ease-in-out infinite;
+    stroke-linecap: round;
+}
 
 @media screen and (max-width: 650px) {
-  .oxi-modal, .oxi-modal-splash, .oxi-modal-iframe, .oxipay-iframe, .oxi-modal-body iframe {
-    position: absolute;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    width: 100% !important;
-    height: 100% !important; } }
+
+    .oxi-modal,
+    .oxi-modal-splash,
+    .oxi-modal-iframe,
+    .oxipay-iframe,
+    .oxi-modal-body iframe {
+        position: absolute;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+    }
+}
 
 @keyframes rotate {
-  100% {
-    transform: rotate(360deg); } }
+    100% {
+        transform: rotate(360deg);
+    }
+}
 
 @keyframes dash {
-  0% {
-    stroke-dasharray: 1, 200;
-    stroke-dashoffset: 0; }
-  50% {
-    stroke-dasharray: 89, 200;
-    stroke-dashoffset: -35px; }
-  100% {
-    stroke-dasharray: 89, 200;
-    stroke-dashoffset: -124px; } }
+    0% {
+        stroke-dasharray: 1, 200;
+        stroke-dashoffset: 0;
+    }
+
+    50% {
+        stroke-dasharray: 89, 200;
+        stroke-dashoffset: -35px;
+    }
+
+    100% {
+        stroke-dasharray: 89, 200;
+        stroke-dashoffset: -124px;
+    }
+}
 
 @keyframes color {
-  100%,
-  0% {
-    stroke: #FA8B23; } }
+
+    100%,
+    0% {
+        stroke: #FA8B23;
+    }
+}
 
 @-webkit-keyframes fadeOut {
-  from {
-    opacity: 1; }
-  to {
-    opacity: 0; } }
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
 
 @keyframes fadeOut {
-  from {
-    opacity: 1; }
-  to {
-    opacity: 0; } }
+    from {
+        opacity: 1;
+    }
 
+    to {
+        opacity: 0;
+    }
+}
