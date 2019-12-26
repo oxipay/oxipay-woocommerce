@@ -9,6 +9,9 @@ defined('ABSPATH') || exit;
  */
 class Oxipay_Config
 {
+    /**
+     * constant
+     */
     const COUNTRY_AUSTRALIA = 'AU';
     const COUNTRY_NEW_ZEALAND = 'NZ';
 
@@ -32,6 +35,10 @@ class Oxipay_Config
             'live_refund_address' => 'https://portals.oxipay.co.nz/api/ExternalRefund/processrefund',
         ]
     ];
+
+    /**
+     * @var array
+     */
     public $countries = array(
         self::COUNTRY_AUSTRALIA => array(
             'name' => 'Australia',
@@ -51,10 +58,17 @@ class Oxipay_Config
         )
     );
 
+    /**
+     * @return mixed
+     */
     public function getButtonColor()
     {
         return self::BUTTON_COLOR[$this->getDisplayName()];
     }
+
+    /**
+     * @return string
+     */
 
     public function getDisplayName()
     {
@@ -73,6 +87,11 @@ class Oxipay_Config
         return $name;
     }
 
+    /**
+     * @param $countryCode
+     * @return mixed
+     */
+
     public function getUrlAddress($countryCode)
     {
         if ($countryCode == 'AU') {
@@ -82,15 +101,27 @@ class Oxipay_Config
         }
     }
 
+    /**
+     * @return string
+     */
+
     public function getPlatformName()
     {
         return self::PLATFORM_NAME;
     }
 
+    /**
+     * @return string
+     */
+
     public function getPluginFileName()
     {
         return self::PLUGIN_FILE_NAME;
     }
+
+    /**
+     * @return mixed
+     */
 
     public function getPluginVersion()
     {
