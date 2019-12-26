@@ -1,6 +1,8 @@
 branches:
   only:
     - master
+    - humm/develop
+    - humm/master
 environment:
   tag_name: "%APPVEYOR_REPO_TAG_NAME%"
   release_name: "oxipay-woocommerce_v%appveyor_repo_tag_name%.zip"
@@ -23,7 +25,7 @@ deploy:
     force_update: true
     draft: false
     prerelease: false
-    on: 
+    on:
       appveyor_repo_tag: true
 notifications:
   - provider: Email
