@@ -21,7 +21,7 @@ if (!is_plugin_active('woocommerce/woocommerce.php')) {
     return;
 }
 
-require_once('includes/oxipay_config.php');
+require_once('includes/Oxipay_config.php');
 
 add_action('plugins_loaded', 'woocommerce_oxipay_init', 0);
 

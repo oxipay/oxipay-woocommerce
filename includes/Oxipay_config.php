@@ -2,6 +2,11 @@
 
 defined('ABSPATH') || exit;
 
+/**
+ * Class Oxipay_Config
+ * @copyright flexigroup
+ * @author roger.bi@flexigroup.com.au
+ */
 class Oxipay_Config
 {
     const COUNTRY_AUSTRALIA = 'AU';
@@ -13,7 +18,20 @@ class Oxipay_Config
     const PLUGIN_FILE_NAME = 'oxipay';
     const LAUNCH_TIME_URL = 'https://s3-ap-southeast-2.amazonaws.com/humm-variables/launch-time.txt';
     const BUTTON_COLOR = array("Oxipay" => "E68821", "humm" => "FF6C00");
-
+    const URLS = [
+        'AU' => [
+            'sandboxURL' => 'https://integration-cart.shophumm.com.au/Checkout?platform=Default',
+            'liveURL' => 'https://cart.shophumm.com.au/Checkout?platform=Default',
+            'sandbox_refund_address' => 'https://integration-buyerapi.shophumm.com.au/api/ExternalRefund/v1/processrefund',
+            'live_refund_address' => 'https://buyerapi.shophumm.com.au/api/ExternalRefund/v1/processrefund',
+        ],
+        'NZ' => [
+            'sandboxURL' => 'https://securesandbox.oxipay.co.nz/Checkout?platform=Default',
+            'liveURL' => 'https://secure.oxipay.co.nz/Checkout?platform=Default',
+            'sandbox_refund_address' => 'https://portalssandbox.oxipay.co.nz/api/ExternalRefund/processrefund',
+            'live_refund_address' => 'https://portals.oxipay.co.nz/api/ExternalRefund/processrefund',
+        ]
+    ];
     public $countries = array(
         self::COUNTRY_AUSTRALIA => array(
             'name' => 'Australia',
@@ -32,21 +50,6 @@ class Oxipay_Config
             'min_purchase' => 20,
         )
     );
-
-    const URLS = [
-        'AU' => [
-            'sandboxURL' => 'https://integration-cart.shophumm.com.au/Checkout?platform=Default',
-            'liveURL' => 'https://cart.shophumm.com.au/Checkout?platform=Default',
-            'sandbox_refund_address' => 'https://integration-buyerapi.shophumm.com.au/api/ExternalRefund/v1/processrefund',
-            'live_refund_address' => 'https://buyerapi.shophumm.com.au/api/ExternalRefund/v1/processrefund',
-        ],
-        'NZ' => [
-            'sandboxURL' => 'https://securesandbox.oxipay.co.nz/Checkout?platform=Default',
-            'liveURL' => 'https://secure.oxipay.co.nz/Checkout?platform=Default',
-            'sandbox_refund_address' => 'https://portalssandbox.oxipay.co.nz/api/ExternalRefund/processrefund',
-            'live_refund_address' => 'https://portals.oxipay.co.nz/api/ExternalRefund/processrefund',
-        ]
-    ];
 
     public function getButtonColor()
     {
@@ -91,6 +94,6 @@ class Oxipay_Config
 
     public function getPluginVersion()
     {
-        return get_plugin_data(plugin_dir_path(__FILE__) .'includes/'. Oxipay_Config::PLUGIN_FILE_NAME . '.php', false, false)['Version'];
+        return get_plugin_data(plugin_dir_path(__FILE__) . 'includes/' . Oxipay_Config::PLUGIN_FILE_NAME . '.php', false, false)['Version'];
     }
 }
