@@ -91,14 +91,17 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
             $country_domain = (isset($this->settings['country']) && $this->settings['country'] == 'NZ') ? 'oxipay.co.nz' : 'shophumm.com.au';
             $maximum = $this->getMaxPrice();
             $name = $this->currentConfig->getDisplayName();
-
             $advanced = isset($this->settings['price_widget_advanced']) && $this->settings['price_widget_advanced'] === 'yes';
-
             // data-max
             $script = '<script ';
             if ($maximum > 0)
                 $script .= 'data-max="' . $maximum . '" ';
-
+            if(is_cart()){
+                $displayPrice = WC()->cart->get_cart_total();
+            }
+            if(is_product()){
+                $displayPrice = wc_get_price_to_display($product);
+            }
             // Script URL
             $script .= 'src="https://widgets.' . $country_domain . '/content/scripts/';
             $script .= $name === 'humm' ? 'price-info' : 'payments';
@@ -114,7 +117,7 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
 
                 $script .= 'price-selector=' . urlencode($selector);
             } else {
-                $script .= 'productPrice=' . wc_get_price_to_display($product);
+                $script .= 'productPrice=' . $displayPrice;
             }
 
             // Widget location in page
