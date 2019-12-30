@@ -2,6 +2,10 @@
 
 defined('ABSPATH') || exit;
 
+/**
+ * Class WC_Flexi_Gateway_Oxipay
+ */
+
 abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
 {
     //current version of the plugin- used to run upgrade tasks on update
@@ -80,12 +84,20 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
 
     abstract public function add_price_widget_anchor();
 
+    /**
+     * flexi_checkout_button
+     */
+
     function flexi_checkout_button()
     {
         if ($this->settings["preselect_button_enabled"] == "yes" && $this->settings['enabled'] == 'yes') {
             echo '<div><a href="' . esc_url(wc_get_checkout_url()) . '?' . $this->pluginDisplayName . '_preselected=true" class="checkout-button button" style="font-size: 1.2em; padding-top: 0.4em; padding-bottom: 0.4em; background-color: #' . $this->currentConfig->getButtonColor() . '; color: #FFF;">Check out with ' . $this->pluginDisplayName . '</a></div>';
         }
     }
+
+    /**
+     * display_min_max_notice
+     */
 
     function display_min_max_notice()
     {
@@ -115,6 +127,10 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         }
     }
 
+    /**
+     * @return int
+     */
+
     protected function getMinPrice()
     {
         $field = sprintf('%s_minimum', $this->pluginFileName);
@@ -122,12 +138,20 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         return isset($this->settings[$field]) ? $this->settings[$field] : 0;
     }
 
+    /**
+     * @return int
+     */
     protected function getMaxPrice()
     {
         $field = sprintf('%s_maximum', $this->pluginFileName);
 
         return isset($this->settings[$field]) ? $this->settings[$field] : 0;
     }
+
+    /**
+     * @param $available_gateways
+     * @return mixed
+     */
 
     function display_min_max_filter($available_gateways)
     {
@@ -141,6 +165,11 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
 
         return $available_gateways;
     }
+
+    /**
+     * @param $available_gateways
+     * @return mixed
+     */
 
     function preselect_flexi($available_gateways)
     {
@@ -470,6 +499,10 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         update_option($this->get_option_key(), $this->settings);
     }
 
+    /**
+     * @return array
+     */
+
     public function get_settings()
     {
         // these are safe values to export via javascript
@@ -492,6 +525,9 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         return $whitelist;
     }
 
+    /**
+     * payment_fields
+     */
     public function payment_fields()
     {
         $country_domain = (isset($this->settings['country']) && $this->settings['country'] == 'NZ') ? 'co.nz' : 'com.au';
@@ -798,6 +834,11 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         return $order_id;
     }
 
+    /**
+     * @param $original_message
+     * @return array|string
+     */
+
     function thankyou_page_message($original_message)
     {
         if (!empty(WC()->session->get('flexi_result_note'))) {
@@ -904,6 +945,10 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         return true;
     }
 
+    /**
+     * @param $message
+     */
+
     private function logValidationError($message)
     {
         wc_add_notice(__('Payment error: ', 'woothemes') . $message, 'error');
@@ -957,6 +1002,10 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         return $this->currentConfig->countries[$this->getCountryCode()]['max_purchase'];
     }
 
+    /**
+     * @return mixed
+     */
+
     private function getMinPurchase()
     {
         return $this->currentConfig->countries[$this->getCountryCode()]['min_purchase'];
@@ -991,6 +1040,11 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         return str_replace('-', '', $hash);
     }
 
+    /**
+     * @param string $feature
+     * @return bool
+     */
+
     function supports($feature)
     {
         return in_array($feature, array("products", "refunds")) ? true : false;
@@ -1005,6 +1059,13 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     {
         return ($order->get_status() == "processing" || $order->get_status() == "on-hold" || $order->get_status() == "completed");
     }
+
+    /**
+     * @param int $order_id
+     * @param null $amount
+     * @param string $reason
+     * @return bool
+     */
 
     function process_refund($order_id, $amount = null, $reason = '')
     {
