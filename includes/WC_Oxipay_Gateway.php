@@ -86,7 +86,6 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
      */
     function add_price_widget()
     {
-        // do we really need a global here?
         global $product;
         if ($this->settings['enabled'] == 'yes' && isset($this->settings['price_widget']) && $this->settings['price_widget'] == 'yes') {
             $country_domain = (isset($this->settings['country']) && $this->settings['country'] == 'NZ') ? 'oxipay.co.nz' : 'shophumm.com.au';
