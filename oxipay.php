@@ -29,14 +29,10 @@ add_action('parse_request', 'get_oxipay_settings');
 /**
  * Hook for WC plugin subsystem to initialise the Oxipay plugin
  */
-/**
- *
- */
 function woocommerce_oxipay_init()
 {
     require_once('includes/WC_Oxipay_Gateway.php');
 }
-
 /**
  * @param $methods
  * @return array
@@ -71,7 +67,6 @@ function get_oxipay_settings($query)
 
     $gateways = WC_Payment_Gateways::instance();
     if (!$gateways) {
-        // oxipay not installed properly
         return;
     }
 
