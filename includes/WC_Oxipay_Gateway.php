@@ -86,6 +86,7 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
      */
     function add_price_widget()
     {
+        global $woocommerce;
         global $product;
         if ($this->settings['enabled'] == 'yes' && isset($this->settings['price_widget']) && $this->settings['price_widget'] == 'yes') {
             $country_domain = (isset($this->settings['country']) && $this->settings['country'] == 'NZ') ? 'oxipay.co.nz' : 'shophumm.com.au';
@@ -96,17 +97,16 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
             $script = '<script ';
             if ($maximum > 0)
                 $script .= 'data-max="' . $maximum . '" ';
-            if(is_cart()){
-                $displayPrice = WC()->cart->get_cart_total();
+            if (is_cart()) {
+                $displayPrice = $amount2 = floatval( preg_replace( '#[^\d.]#', '', $woocommerce->cart->get_cart_total() ) );
             }
-            if(is_product()){
+            if (is_product()) {
                 $displayPrice = wc_get_price_to_display($product);
             }
             // Script URL
             $script .= 'src="https://widgets.' . $country_domain . '/content/scripts/';
             $script .= $name === 'humm' ? 'price-info' : 'payments';
             $script .= '.js?';
-
             //  Widget type - Dynamic or Static
             if ($advanced && isset($this->settings['price_widget_dynamic_enabled']) && $this->settings['price_widget_dynamic_enabled'] === 'yes') {
                 if (isset($this->settings['price_widget_price_selector'])) {
