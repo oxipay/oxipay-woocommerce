@@ -98,7 +98,7 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
             if ($maximum > 0)
                 $script .= 'data-max="' . $maximum . '" ';
             if (is_cart()) {
-                $displayPrice = $amount2 = floatval( preg_replace( '#[^\d.]#', '', $woocommerce->cart->get_cart_total() ) );
+                $displayPrice = $amount2 = floatval(preg_replace('#[^\d.]#', '', $woocommerce->cart->get_cart_total()));
             }
             if (is_product()) {
                 $displayPrice = wc_get_price_to_display($product);
