@@ -402,25 +402,18 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         global $post;
         ?>
         <style>
-            mark.building::after {
-                content: '\e011';
-                color: #CCC;
 
-                font-family: WooCommerce;
-                speak: none;
-                font-weight: 400;
-                font-variant: normal;
-                text-transform: none;
-                line-height: 1;
-                -webkit-font-smoothing: antialiased;
-                margin: 0;
-                text-indent: 0;
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                text-align: center;
+            mark.humm-status {
+                display: -webkit-inline-flex;
+                display: inline-flex;
+                line-height: 2.5em;
+                color: #777;
+                background: #e5e5e5;
+                border-radius: 4px;
+                border-bottom: 1px solid rgba(0,0,0,.05);
+                margin: -.25em 0;
+                cursor: inherit!important;
+                max-width: 100%;
             }
         </style>
         <?
@@ -428,7 +421,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
             $order = wc_get_order($post->ID);
             $orderNote = $this->get_private_order_notes($order->get_id());
             if ($order->get_data()['payment_method'] == $this->pluginFileName) {
-                $showNote = ' <mark class="order-status status-cancelled"><span>' .$orderNote. '</span></mark>';
+                $showNote = ' <mark class="humm-status"><span>' . $orderNote . '</span></mark>';
                 echo $showNote;
             }
         }
@@ -451,12 +444,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
 
         $orderNote = '';
         foreach ($results as $note) {
-            $orderNote = $orderNote.$note->comment_content;
-//            $note->comment_date.
-//            $orderNote[] = array(
-////                'note_date' => $note->comment_date,
-//                'note_content' => $note->comment_content,
-//            );
+            $orderNote = sprintf("%s <br/>", $note->comment_content);
         }
         return $orderNote;
     }
