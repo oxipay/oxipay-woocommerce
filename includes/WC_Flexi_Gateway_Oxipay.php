@@ -8,13 +8,37 @@ defined('ABSPATH') || exit;
 abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
 {
     //current version of the plugin- used to run upgrade tasks on update
+
+    /**
+     * @var mixed
+     */
     public $plugin_current_version;
 
+    /**
+     * @var WC_Logger|null
+     */
     public $logger = null;
+
+    /**
+     * @var Oxipay_Config|null
+     */
     protected $currentConfig = null;
+
+    /**
+     * @var string|null
+     */
     protected $pluginDisplayName = null;
+    /**
+     * @var string|null
+     */
     protected $pluginFileName = null;
+    /**
+     * @var bool
+     */
     protected $flexi_payment_preselected = false;
+    /**
+     * @var array
+     */
     private $logContext;
 
     /**
