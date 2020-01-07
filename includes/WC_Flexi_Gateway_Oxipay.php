@@ -11,12 +11,11 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     public $plugin_current_version;
 
     public $logger = null;
-    private $logContext;
-
     protected $currentConfig = null;
     protected $pluginDisplayName = null;
     protected $pluginFileName = null;
     protected $flexi_payment_preselected = false;
+    private $logContext;
 
     /**
      * Can the order be refunded?
@@ -71,6 +70,8 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         add_filter('woocommerce_available_payment_gateways', array($this, 'display_min_max_filter'));
         add_filter('woocommerce_available_payment_gateways', array($this, 'preselect_flexi'));
         add_filter('woocommerce_thankyou_order_received_text', array($this, 'thankyou_page_message'));
+        add_filter('manage_edit-shop_order_columns', array($this, 'humm_add_new_order_admin_list_column'));
+        add_action('manage_shop_order_posts_custom_column', array($this, 'humm_add_new_order_admin_list_column_content'));
 
         $preselect_button_order = $this->settings["preselect_button_order"] ? $this->settings["preselect_button_order"] : '20';
         add_action('woocommerce_proceed_to_checkout', array(
@@ -78,141 +79,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
             "flexi_checkout_button"
         ), $preselect_button_order);
     }
-
-    abstract public function add_top_banner_widget();
-
-    abstract public function add_price_widget();
-
-    abstract public function add_price_widget_anchor();
-
-    /**
-     * flexi_checkout_button
-     */
-
-    function flexi_checkout_button()
-    {
-        if ($this->settings["preselect_button_enabled"] == "yes" && $this->settings['enabled'] == 'yes') {
-            echo '<div><a href="' . esc_url(wc_get_checkout_url()) . '?' . $this->pluginDisplayName . '_preselected=true" class="checkout-button button" style="font-size: 1.2em; padding-top: 0.4em; padding-bottom: 0.4em; background-color: #' . $this->currentConfig->getButtonColor() . '; color: #FFF;">Check out with ' . $this->pluginDisplayName . '</a></div>';
-        }
-    }
-
-    /**
-     * display_min_max_notice
-     */
-
-    function display_min_max_notice()
-    {
-        $minimum = $this->getMinPrice();
-        $maximum = $this->getMaxPrice();
-
-        if ($minimum != 0 && WC()->cart->total < $minimum) {
-            if (is_checkout()) {
-                wc_print_notice(
-                    sprintf("You must have an order with a minimum of %s to use %s. Your current order total is %s.",
-                        wc_price($minimum),
-                        $this->pluginDisplayName,
-                        wc_price(WC()->cart->total)
-                    ), 'notice'
-                );
-            }
-        } elseif ($maximum != 0 && WC()->cart->total > $maximum) {
-            if (is_checkout()) {
-                wc_print_notice(
-                    sprintf("You must have an order with a maximum of %s to use %s. Your current order total is %s.",
-                        wc_price($maximum),
-                        $this->pluginDisplayName,
-                        wc_price(WC()->cart->total)
-                    ), 'notice'
-                );
-            }
-        }
-    }
-
-    /**
-     * @return int
-     */
-
-    protected function getMinPrice()
-    {
-        $field = sprintf('%s_minimum', $this->pluginFileName);
-
-        return isset($this->settings[$field]) ? $this->settings[$field] : 0;
-    }
-
-    /**
-     * @return int
-     */
-    protected function getMaxPrice()
-    {
-        $field = sprintf('%s_maximum', $this->pluginFileName);
-
-        return isset($this->settings[$field]) ? $this->settings[$field] : 0;
-    }
-
-    /**
-     * @param $available_gateways
-     * @return mixed
-     */
-
-    function display_min_max_filter($available_gateways)
-    {
-        $minimum = $this->getMinPrice();
-        $maximum = $this->getMaxPrice();
-        if (($minimum != 0 && WC()->cart->total < $minimum) || ($maximum != 0 && WC()->cart->total > $maximum)) {
-            if (isset($available_gateways[$this->pluginFileName])) {
-                unset($available_gateways[$this->pluginFileName]);
-            }
-        }
-
-        return $available_gateways;
-    }
-
-    /**
-     * @param $available_gateways
-     * @return mixed
-     */
-
-    function preselect_flexi($available_gateways)
-    {
-        if (isset($_GET[$this->pluginDisplayName . "_preselected"])) {
-            $this->flexi_payment_preselected = $_GET[$this->pluginDisplayName . "_preselected"];
-        }
-
-        if (!empty($available_gateways)) {
-            if ($this->flexi_payment_preselected == "true") {
-                foreach ($available_gateways as $gateway) {
-                    if (strtolower($gateway->id) == $this->pluginFileName) {
-                        WC()->session->set('chosen_payment_method', $gateway->id);
-                    }
-                }
-            }
-        }
-
-        return $available_gateways;
-    }
-
-    /**
-     * Log a message using the 2.7 logging infrastructure
-     *
-     * @param string $message Message log
-     * @param string $level WC_Log_Levels
-     */
-    public function log($message, $level = WC_Log_Levels::DEBUG)
-    {
-        if ($this->logger != null && $this->settings["enable_logging"]) {
-            $this->logger->log($level, $message, $this->logContext);
-        }
-    }
-
-    /**
-     * Load javascript for Wordpress admin
-     */
-    abstract protected function admin_scripts();
-
-    /**
-     * Load JavaScript for the checkout page
-     */
-    abstract protected function flexi_enqueue_script();
 
     /**
      * WC override to display the administration property page
@@ -500,6 +366,196 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         update_option($this->get_option_key(), $this->settings);
     }
 
+    abstract public function add_top_banner_widget();
+
+    abstract public function add_price_widget();
+
+    abstract public function add_price_widget_anchor();
+
+    /**
+     * flexi_checkout_button
+     */
+
+    function flexi_checkout_button()
+    {
+        if ($this->settings["preselect_button_enabled"] == "yes" && $this->settings['enabled'] == 'yes') {
+            echo '<div><a href="' . esc_url(wc_get_checkout_url()) . '?' . $this->pluginDisplayName . '_preselected=true" class="checkout-button button" style="font-size: 1.2em; padding-top: 0.4em; padding-bottom: 0.4em; background-color: #' . $this->currentConfig->getButtonColor() . '; color: #FFF;">Check out with ' . $this->pluginDisplayName . '</a></div>';
+        }
+    }
+
+    /**
+     * @param $columns
+     * @return mixed
+     */
+
+    function humm_add_new_order_admin_list_column($columns)
+    {
+        $columns['Humm_Payment'] = 'Humm_Payment';
+        return $columns;
+    }
+
+    /**
+     * @param $column
+     */
+    function humm_add_new_order_admin_list_column_content($column)
+    {
+        global $post;
+        ?>
+        <style>
+            mark.building::after {
+                content: '\e011';
+                color: #CCC;
+
+                font-family: WooCommerce;
+                speak: none;
+                font-weight: 400;
+                font-variant: normal;
+                text-transform: none;
+                line-height: 1;
+                -webkit-font-smoothing: antialiased;
+                margin: 0;
+                text-indent: 0;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                text-align: center;
+            }
+        </style>
+        <?
+        if ('Humm_Payment' === $column) {
+            $order = wc_get_order($post->ID);
+            $orderNote = $this->get_private_order_notes($order->get_id());
+            if ($order->get_data()['payment_method'] == $this->pluginFileName) {
+                $showNote = ' <mark class="order-status status-cancelled"><span>' .$orderNote. '</span></mark>';
+                echo $showNote;
+            }
+        }
+    }
+
+    /**
+     * @param $orderId
+     * @return array
+     */
+    function get_private_order_notes($orderId)
+    {
+        global $wpdb;
+        $tablePerfixed = $wpdb->prefix . 'comments';
+        $results = $wpdb->get_results("
+        SELECT *
+        FROM $tablePerfixed
+        WHERE  `comment_post_ID` = $orderId
+        AND  `comment_type` LIKE  'order_note'
+    ");
+
+        $orderNote = '';
+        foreach ($results as $note) {
+            $orderNote = $orderNote.$note->comment_content;
+//            $note->comment_date.
+//            $orderNote[] = array(
+////                'note_date' => $note->comment_date,
+//                'note_content' => $note->comment_content,
+//            );
+        }
+        return $orderNote;
+    }
+
+    /**
+     * display_min_max_notice
+     */
+
+    function display_min_max_notice()
+    {
+        $minimum = $this->getMinPrice();
+        $maximum = $this->getMaxPrice();
+
+        if ($minimum != 0 && WC()->cart->total < $minimum) {
+            if (is_checkout()) {
+                wc_print_notice(
+                    sprintf("You must have an order with a minimum of %s to use %s. Your current order total is %s.",
+                        wc_price($minimum),
+                        $this->pluginDisplayName,
+                        wc_price(WC()->cart->total)
+                    ), 'notice'
+                );
+            }
+        } elseif ($maximum != 0 && WC()->cart->total > $maximum) {
+            if (is_checkout()) {
+                wc_print_notice(
+                    sprintf("You must have an order with a maximum of %s to use %s. Your current order total is %s.",
+                        wc_price($maximum),
+                        $this->pluginDisplayName,
+                        wc_price(WC()->cart->total)
+                    ), 'notice'
+                );
+            }
+        }
+    }
+
+    /**
+     * @return int
+     */
+
+    protected function getMinPrice()
+    {
+        $field = sprintf('%s_minimum', $this->pluginFileName);
+
+        return isset($this->settings[$field]) ? $this->settings[$field] : 0;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getMaxPrice()
+    {
+        $field = sprintf('%s_maximum', $this->pluginFileName);
+
+        return isset($this->settings[$field]) ? $this->settings[$field] : 0;
+    }
+
+    /**
+     * @param $available_gateways
+     * @return mixed
+     */
+
+    function display_min_max_filter($available_gateways)
+    {
+        $minimum = $this->getMinPrice();
+        $maximum = $this->getMaxPrice();
+        if (($minimum != 0 && WC()->cart->total < $minimum) || ($maximum != 0 && WC()->cart->total > $maximum)) {
+            if (isset($available_gateways[$this->pluginFileName])) {
+                unset($available_gateways[$this->pluginFileName]);
+            }
+        }
+
+        return $available_gateways;
+    }
+
+    /**
+     * @param $available_gateways
+     * @return mixed
+     */
+
+    function preselect_flexi($available_gateways)
+    {
+        if (isset($_GET[$this->pluginDisplayName . "_preselected"])) {
+            $this->flexi_payment_preselected = $_GET[$this->pluginDisplayName . "_preselected"];
+        }
+
+        if (!empty($available_gateways)) {
+            if ($this->flexi_payment_preselected == "true") {
+                foreach ($available_gateways as $gateway) {
+                    if (strtolower($gateway->id) == $this->pluginFileName) {
+                        WC()->session->set('chosen_payment_method', $gateway->id);
+                    }
+                }
+            }
+        }
+
+        return $available_gateways;
+    }
+
     /**
      * @return array
      */
@@ -632,6 +688,48 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     }
 
     /**
+     * returns the gateway URL
+     *
+     * @param $countryCode
+     *
+     * @return string
+     */
+    private function getGatewayUrl($countryCode = '')
+    {
+        //if no countryCode passed in
+        if ($this->is_null_or_empty($countryCode)) {
+            if (isset($this->settings['country'])) {
+                $countryCode = $this->settings['country'];
+            } else {
+                $countryCode = 'AU';
+            }
+        }
+
+        $environment = ($this->isTesting() == 'no') ? "live" : "sandbox";
+        $url = $this->currentConfig->getUrlAddress($countryCode)[$environment . 'URL'];
+
+        return $url;
+    }
+
+    /**
+     * @param $str
+     *
+     * @return bool
+     */
+    private function is_null_or_empty($str)
+    {
+        return is_null($str) || $str == '';
+    }
+
+    /**
+     * @return string
+     */
+    public function isTesting()
+    {
+        return isset($this->settings['use_test']) ? $this->settings['use_test'] : 'no';
+    }
+
+    /**
      * @param WC_Order $order
      *
      * @return bool
@@ -671,27 +769,149 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     }
 
     /**
-     * returns the gateway URL
-     *
-     * @param $countryCode
-     *
-     * @return string
+     * @param $message
      */
-    private function getGatewayUrl($countryCode = '')
+
+    private function logValidationError($message)
     {
-        //if no countryCode passed in
-        if ($this->is_null_or_empty($countryCode)) {
-            if (isset($this->settings['country'])) {
-                $countryCode = $this->settings['country'];
-            } else {
-                $countryCode = 'AU';
-            }
+        wc_add_notice(__('Payment error: ', 'woothemes') . $message, 'error');
+    }
+
+    /**
+     * Ensure the customer is being billed from and is shipping to, Australia.
+     *
+     * @param WC_Order $order
+     *
+     * @return bool
+     */
+    private function checkCustomerLocation($order)
+    {
+        // The following get shipping and billing countries, and filters null or empty values
+        // Then we check to see if there is just a single unique value that is equal to AU, otherwise we
+        // display an error message.
+
+        $countries = array($order->get_billing_country(), $order->get_shipping_country());
+        $set_addresses = array_filter($countries);
+        $countryCode = $this->getCountryCode();
+        $countryName = $this->getCountryName();
+
+//            valid address is either:
+//                1. only have billing country or only ship country, or both have same country, and that country is the supported country in flexi setting;
+//                2. have no country at all in both billing and shipping address
+        $valid_addresses = ((count(array_unique($set_addresses)) === 1 && end($set_addresses) === $countryCode) || count($set_addresses) === 0);
+
+        if (!$valid_addresses) {
+            $errorMessage = "&nbsp;Orders from outside " . $countryName . " are not supported by " . $this->pluginDisplayName . ". Please select a different payment option.";
+            $order->cancel_order($errorMessage);
+            $this->logValidationError($errorMessage);
+
+            return false;
         }
 
-        $environment = ($this->isTesting() == 'no') ? "live" : "sandbox";
-        $url = $this->currentConfig->getUrlAddress($countryCode)[$environment . 'URL'];
+        return true;
+    }
 
-        return $url;
+    /**
+     * @return string
+     */
+    private function getCountryCode()
+    {
+        return $this->settings['country'];
+    }
+
+    /**
+     * @return string
+     */
+    private function getCountryName()
+    {
+        return $this->currentConfig->countries[$this->getCountryCode()]['name'];
+    }
+
+    /**
+     * Ensure the order amount is >= $20
+     * Also ensure order is <= max_purchase
+     *
+     * @param WC_Order $order
+     *
+     * @return true
+     */
+    private function checkOrderAmount($order)
+    {
+        if ($this->currentConfig->getDisplayName() == 'humm') {
+            return true;
+        }
+        $total = $order->get_total();
+        $min = $this->getMinPurchase();
+        if ($total < $min) {
+            $errorMessage = "&nbsp;Orders under " . $this->getCurrencyCode() . $this->getCurrencySymbol() . $min . " are not supported by " . $this->pluginDisplayName . ". Please select a different payment option.";
+            $order->cancel_order($errorMessage);
+            $this->logValidationError($errorMessage);
+
+            return false;
+        }
+
+        $max = $this->getMaxPurchase();
+        if ($total > $max) {
+            $errorMessage = "&nbsp;Orders over " . $this->getCurrencyCode() . $this->getCurrencySymbol() . $max . " are not supported by " . $this->pluginDisplayName . ". Please select a different payment option.";
+            $order->cancel_order($errorMessage);
+            $this->logValidationError($errorMessage);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return mixed
+     */
+
+    private function getMinPurchase()
+    {
+        return $this->currentConfig->countries[$this->getCountryCode()]['min_purchase'];
+    }
+
+    /**
+     * @return string
+     */
+    private function getCurrencyCode()
+    {
+        return $this->currentConfig->countries[$this->getCountryCode()]['currency_code'];
+    }
+
+    /**
+     * @return string
+     */
+    private function getCurrencySymbol()
+    {
+        return $this->currentConfig->countries[$this->getCountryCode()]['currency_symbol'];
+    }
+
+    /**
+     * @return int
+     */
+    private function getMaxPurchase()
+    {
+        return $this->currentConfig->countries[$this->getCountryCode()]['max_purchase'];
+    }
+
+    /**
+     * @param $query
+     * @param $api_key
+     * @return mixed
+     */
+    function flexi_sign($query, $api_key)
+    {
+        $clear_text = '';
+        ksort($query);
+        foreach ($query as $key => $value) {
+            if (substr($key, 0, 2) === "x_" && $key !== "x_signature") {
+                $clear_text .= $key . $value;
+            }
+        }
+        $hash = hash_hmac("sha256", $clear_text, $api_key);
+
+        return str_replace('-', '', $hash);
     }
 
     /**
@@ -836,6 +1056,19 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     }
 
     /**
+     * Log a message using the 2.7 logging infrastructure
+     *
+     * @param string $message Message log
+     * @param string $level WC_Log_Levels
+     */
+    public function log($message, $level = WC_Log_Levels::DEBUG)
+    {
+        if ($this->logger != null && $this->settings["enable_logging"]) {
+            $this->logger->log($level, $message, $this->logContext);
+        }
+    }
+
+    /**
      * @param $original_message
      * @return array|string
      */
@@ -875,170 +1108,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         }
 
         return $title;
-    }
-
-    /**
-     * Ensure the customer is being billed from and is shipping to, Australia.
-     *
-     * @param WC_Order $order
-     *
-     * @return bool
-     */
-    private function checkCustomerLocation($order)
-    {
-        // The following get shipping and billing countries, and filters null or empty values
-        // Then we check to see if there is just a single unique value that is equal to AU, otherwise we
-        // display an error message.
-
-        $countries = array($order->get_billing_country(), $order->get_shipping_country());
-        $set_addresses = array_filter($countries);
-        $countryCode = $this->getCountryCode();
-        $countryName = $this->getCountryName();
-
-//            valid address is either:
-//                1. only have billing country or only ship country, or both have same country, and that country is the supported country in flexi setting;
-//                2. have no country at all in both billing and shipping address
-        $valid_addresses = ((count(array_unique($set_addresses)) === 1 && end($set_addresses) === $countryCode) || count($set_addresses) === 0);
-
-        if (!$valid_addresses) {
-            $errorMessage = "&nbsp;Orders from outside " . $countryName . " are not supported by " . $this->pluginDisplayName . ". Please select a different payment option.";
-            $order->cancel_order($errorMessage);
-            $this->logValidationError($errorMessage);
-
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Ensure the order amount is >= $20
-     * Also ensure order is <= max_purchase
-     *
-     * @param WC_Order $order
-     *
-     * @return true
-     */
-    private function checkOrderAmount($order)
-    {
-        if ($this->currentConfig->getDisplayName() == 'humm') {
-            return true;
-        }
-        $total = $order->get_total();
-        $min = $this->getMinPurchase();
-        if ($total < $min) {
-            $errorMessage = "&nbsp;Orders under " . $this->getCurrencyCode() . $this->getCurrencySymbol() . $min . " are not supported by " . $this->pluginDisplayName . ". Please select a different payment option.";
-            $order->cancel_order($errorMessage);
-            $this->logValidationError($errorMessage);
-
-            return false;
-        }
-
-        $max = $this->getMaxPurchase();
-        if ($total > $max) {
-            $errorMessage = "&nbsp;Orders over " . $this->getCurrencyCode() . $this->getCurrencySymbol() . $max . " are not supported by " . $this->pluginDisplayName . ". Please select a different payment option.";
-            $order->cancel_order($errorMessage);
-            $this->logValidationError($errorMessage);
-
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param $message
-     */
-
-    private function logValidationError($message)
-    {
-        wc_add_notice(__('Payment error: ', 'woothemes') . $message, 'error');
-    }
-
-    /**
-     * @return string
-     */
-    public function isTesting()
-    {
-        return isset($this->settings['use_test']) ? $this->settings['use_test'] : 'no';
-    }
-
-    /**
-     * @return string
-     */
-    private function getCountryCode()
-    {
-        return $this->settings['country'];
-    }
-
-    /**
-     * @return string
-     */
-    private function getCountryName()
-    {
-        return $this->currentConfig->countries[$this->getCountryCode()]['name'];
-    }
-
-    /**
-     * @return string
-     */
-    private function getCurrencyCode()
-    {
-        return $this->currentConfig->countries[$this->getCountryCode()]['currency_code'];
-    }
-
-    /**
-     * @return string
-     */
-    private function getCurrencySymbol()
-    {
-        return $this->currentConfig->countries[$this->getCountryCode()]['currency_symbol'];
-    }
-
-    /**
-     * @return int
-     */
-    private function getMaxPurchase()
-    {
-        return $this->currentConfig->countries[$this->getCountryCode()]['max_purchase'];
-    }
-
-    /**
-     * @return mixed
-     */
-
-    private function getMinPurchase()
-    {
-        return $this->currentConfig->countries[$this->getCountryCode()]['min_purchase'];
-    }
-
-    /**
-     * @param $str
-     *
-     * @return bool
-     */
-    private function is_null_or_empty($str)
-    {
-        return is_null($str) || $str == '';
-    }
-
-    /**
-     * @param $query
-     * @param $api_key
-     * @return mixed
-     */
-    function flexi_sign($query, $api_key)
-    {
-        $clear_text = '';
-        ksort($query);
-        foreach ($query as $key => $value) {
-            if (substr($key, 0, 2) === "x_" && $key !== "x_signature") {
-                $clear_text .= $key . $value;
-            }
-        }
-        $hash = hash_hmac("sha256", $clear_text, $api_key);
-
-        return str_replace('-', '', $hash);
     }
 
     /**
@@ -1135,4 +1204,14 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
 
         return false;
     }
+
+    /**
+     * Load javascript for Wordpress admin
+     */
+    abstract protected function admin_scripts();
+
+    /**
+     * Load JavaScript for the checkout page
+     */
+    abstract protected function flexi_enqueue_script();
 }
