@@ -100,9 +100,6 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
                 $displayPrice = wc_get_price_to_display($product);
             }
 
-            if (is_cart()) {
-                $displayPrice = "110";
-            }
             // Script URL
             $script .= 'src="https://widgets.' . $country_domain . '/content/scripts/';
             $script .= $name === 'humm' ? 'price-info' : 'payments';

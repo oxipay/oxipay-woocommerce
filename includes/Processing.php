@@ -72,7 +72,6 @@ function oxipay_generate_processing_form($query)
         } else {
             $value = htmlspecialchars($v, ENT_QUOTES);
         }
-
         echo sprintf('<input id="%s" name="%s" value="%s" type="hidden" />', $item, $item, $value);
     }
 
