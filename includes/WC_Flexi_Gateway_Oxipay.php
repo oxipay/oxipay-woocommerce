@@ -83,8 +83,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
             'process_admin_options'
         ));
         add_action('storefront_content_top', array($this, 'add_top_banner_widget'));
-        add_action('woocommerce_cart_totals_after_order_total', array($this, 'add_price_widget'));
-        add_action('woocommerce_cart_totals_after_order_total', array($this, 'add_price_widget_anchor'));
         add_action('woocommerce_after_single_product', array($this, 'add_price_widget'));
         add_action('woocommerce_single_product_summary', array($this, 'add_price_widget_anchor'));
         add_filter('woocommerce_thankyou_order_id', array($this, 'payment_finalisation'));
@@ -434,9 +432,9 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
                 color: #777;
                 background: #e5e5e5;
                 border-radius: 4px;
-                border-bottom: 1px solid rgba(0,0,0,.05);
+                border-bottom: 1px solid rgba(0, 0, 0, .05);
                 margin: -.25em 0;
-                cursor: inherit!important;
+                cursor: inherit !important;
                 max-width: 100%;
             }
         </style>
@@ -627,6 +625,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
      */
     function process_payment($order_id)
     {
+        global $woocommerce;
         $order = new WC_Order($order_id);
         $gatewayUrl = $this->getGatewayUrl();
 
@@ -649,7 +648,9 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
             'x_currency' => $this->getCurrencyCode(),
             'x_url_callback' => $callbackURL,
             'x_url_complete' => $callbackURL,
-            'x_url_cancel' => $order->get_cancel_order_url_raw(),
+//            'x_url_cancel' => $order->get_cancel_order_url_raw(),
+//          'x_url_cancel' => $this->wc_get_checkout_url()
+            'x_url_cancel' => $order->get_checkout_payment_url(),
             'x_test' => 'false',
             'x_shop_country' => $this->getCountryCode(),
             'x_shop_name' => $this->settings['shop_name'],
@@ -678,6 +679,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
 
         $signature = $this->flexi_sign($transaction_details, $this->settings[$this->pluginFileName . '_api_key']);
         $transaction_details['x_signature'] = $signature;
+        $this->log(json_encode($transaction_details));
 
         $encodedFields = array(
             'x_url_callback',
@@ -690,6 +692,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
             $transaction_details[$i] = base64_encode($transaction_details[$i]);
         }
 
+        $this->log(sprintf("send-data%s",json_encode($transaction_details)));
         // use RFC 3986 so that we can decode it correctly in js
         $qs = http_build_query($transaction_details, null, '&', PHP_QUERY_RFC3986);
 
@@ -1016,6 +1019,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         if ($sig_exists && $sig_match) {
             $this->log(sprintf('Finalising orderId: %s, (isAsyncCallback=%s)', $order_id, $isAsyncCallback));
             // Get the status of the order and handle accordingly
+            $this->log(sprintf('params%s'),json_encode($params));
             $flexi_result_note = '';
             switch ($params['x_result']) {
                 case "completed":
@@ -1029,7 +1033,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
                     }
                     $msg = 'complete';
                     break;
-
                 case "failed":
                     $flexi_result_note = __('Payment declined using ' . $this->pluginDisplayName . '. Gateway Reference #' . $params['x_gateway_reference'], 'woocommerce');
                     $order->add_order_note($flexi_result_note);
@@ -1037,7 +1040,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
                     $msg = 'failed';
                     WC()->session->set('flexi_result', 'failed');
                     break;
-
                 case "error":
                     $flexi_result_note = __('Payment error using ' . $this->pluginDisplayName . '. Gateway Reference #' . $params['x_gateway_reference'], 'woocommerce');
                     $order->add_order_note($flexi_result_note);

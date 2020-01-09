@@ -40,22 +40,21 @@
         , hwaccel: true // Whether to use hardware acceleration
         , position: 'absolute' // Element positioning
     };
-
     var target = document.getElementById('spinner');
     var spinner = new Spinner(opts).spin(target);
 </script>
 
 <?php
-parse_str( $_SERVER['QUERY_STRING'], $query );
+parse_str($_SERVER['QUERY_STRING'], $query);
 
-function oxipay_generate_processing_form( $query ) {
-    if ( ! isset( $query["gateway_url"] ) ) {
-        error_log( 'gateway_url is not specified' );
+function oxipay_generate_processing_form($query)
+{
+    if (!isset($query["gateway_url"])) {
+        error_log('gateway_url is not specified');
         return;
     }
-
-    $url = base64_decode( $query["gateway_url"] );
-    $url = htmlspecialchars( $url, ENT_QUOTES );
+    $url = base64_decode($query["gateway_url"]);
+    $url = htmlspecialchars($url, ENT_QUOTES);
 
     echo "<form id='oxipayload' method='post' action='$url'>";
 
@@ -65,24 +64,23 @@ function oxipay_generate_processing_form( $query ) {
         'gateway_url',
         'x_url_cancel'
     );
-
-    foreach ( $query as $i => $v ) {
-        $item  = htmlspecialchars( $i, ENT_QUOTES );
+    foreach ($query as $i => $v) {
+        $item = htmlspecialchars($i, ENT_QUOTES);
         $value = null;
-        if ( in_array( $item, $encodedFields ) ) {
-            $value = htmlspecialchars( base64_decode( $v ), ENT_QUOTES );
+        if (in_array($item, $encodedFields)) {
+            $value = htmlspecialchars(base64_decode($v), ENT_QUOTES);
         } else {
-            $value = htmlspecialchars( $v, ENT_QUOTES );
+            $value = htmlspecialchars($v, ENT_QUOTES);
         }
 
-        echo sprintf( '<input id="%s" name="%s" value="%s" type="hidden" />', $item, $item, $value );
+        echo sprintf('<input id="%s" name="%s" value="%s" type="hidden" />', $item, $item, $value);
     }
 
     echo "</form>";
     echo "<script>document.getElementById('oxipayload').submit();</script>";
 }
 
-oxipay_generate_processing_form( $query );
+oxipay_generate_processing_form($query);
 ?>
 
 </body>
