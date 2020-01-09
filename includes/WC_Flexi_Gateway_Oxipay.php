@@ -648,8 +648,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
             'x_currency' => $this->getCurrencyCode(),
             'x_url_callback' => $callbackURL,
             'x_url_complete' => $callbackURL,
-//            'x_url_cancel' => $order->get_cancel_order_url_raw(),
-//          'x_url_cancel' => $this->wc_get_checkout_url()
             'x_url_cancel' => $order->get_checkout_payment_url(),
             'x_test' => 'false',
             'x_shop_country' => $this->getCountryCode(),
