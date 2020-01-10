@@ -986,6 +986,13 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         $order = wc_get_order($order_id);
         $cart = WC()->cart;
         $msg = "";
+        if ($order->get_data()['payment_method'] !== $this->pluginFileName) {
+            // we don't care about it because it's not an flexi order
+            // log in debug level
+            WC()->session->set('flexi_result_note', '');
+            $this->log(sprintf('No action required. orderId: %s is not a %s order, (isAsyncCallback=%s)', $order_id, $this->pluginDisplayName, $isAsyncCallback));
+            return $order_id;
+        }
 
         $isAsyncCallback = $_SERVER['REQUEST_METHOD'] === "POST" ? true : false;
 
@@ -1010,16 +1017,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         // we need order information in order to complete the order
         if (empty($order)) {
             $this->log(sprintf('unable to get order information for orderId: %s, (isAsyncCallback=%s)', $order_id, $isAsyncCallback));
-
-            return $order_id;
-        }
-
-        // make sure we have an flexi order
-        // OIR-3
-        if ($order->get_data()['payment_method'] !== $this->pluginFileName) {
-            // we don't care about it because it's not an flexi order
-            // log in debug level
-            $this->log(sprintf('No action required. orderId: %s is not a %s order, (isAsyncCallback=%s)', $order_id, $this->pluginDisplayName, $isAsyncCallback));
 
             return $order_id;
         }
@@ -1105,8 +1102,10 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
 
     function thankyou_page_message($original_message)
     {
-        if (!empty(WC()->session->get('flexi_result_note'))) {
-            return WC()->session->get('flexi_result_note');
+        if (WC()->session->get('chosen_payment_method') == $this->pluginFileName) {
+            if (!empty(WC()->session->get('flexi_result_note'))) {
+                return WC()->session->get('flexi_result_note');
+            }
         }
         return $original_message;
     }
