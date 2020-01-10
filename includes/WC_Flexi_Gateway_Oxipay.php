@@ -439,6 +439,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
                 background: #e68821;
                 color: white;
             }
+
             mark.payment-status {
                 display: -webkit-inline-flex;
                 display: inline-flex;
@@ -457,11 +458,9 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
             $order = wc_get_order($post->ID);
             $orderNote = $this->get_humm_order_notes($order->get_id());
             if ($order->get_data()['payment_method'] == $this->pluginFileName) {
-                $showNote = ' <mark class="humm-status"><span>' .$orderNote[0] . '</span></mark>';
+                $showNote = ' <mark class="humm-status"><span>' . $orderNote[0] . '</span></mark>';
                 echo $showNote;
-            }
-            else
-            {
+            } else {
                 $showNote = ' <mark class="payment-status"><span>' . $order->get_data()['payment_method'] . '</span></mark>';
                 echo $showNote;
             }
@@ -644,7 +643,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
      */
     function process_payment($order_id)
     {
-        global $woocommerce;
         $order = new WC_Order($order_id);
         $gatewayUrl = $this->getGatewayUrl();
 
@@ -709,7 +707,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
             $transaction_details[$i] = base64_encode($transaction_details[$i]);
         }
 
-        $this->log(sprintf("send-data%s",json_encode($transaction_details)));
+        $this->log(sprintf("send-data%s", json_encode($transaction_details)));
         // use RFC 3986 so that we can decode it correctly in js
         $qs = http_build_query($transaction_details, null, '&', PHP_QUERY_RFC3986);
 
@@ -1033,7 +1031,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         if ($sig_exists && $sig_match) {
             $this->log(sprintf('Finalising orderId: %s, (isAsyncCallback=%s)', $order_id, $isAsyncCallback));
             // Get the status of the order and handle accordingly
-            $this->log(sprintf('params%s'),json_encode($params));
+            $this->log(sprintf('params%s'), json_encode($params));
             $flexi_result_note = '';
             switch ($params['x_result']) {
                 case "completed":

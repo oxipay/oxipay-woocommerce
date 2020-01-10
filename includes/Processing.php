@@ -17,7 +17,7 @@
     </div>
 </div>
 
-<script>
+<script type="application/javascript">
     var opts = {
         lines: 50 // The number of lines to draw
         , length: -5 // The length of each line
