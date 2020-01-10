@@ -33,6 +33,7 @@ function woocommerce_oxipay_init()
 {
     require_once('includes/WC_Oxipay_Gateway.php');
 }
+
 /**
  * @param $methods
  * @return array

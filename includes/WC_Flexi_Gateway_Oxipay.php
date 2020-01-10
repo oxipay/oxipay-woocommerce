@@ -92,8 +92,8 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         add_filter('woocommerce_available_payment_gateways', array($this, 'display_min_max_filter'));
         add_filter('woocommerce_available_payment_gateways', array($this, 'preselect_flexi'));
         add_filter('woocommerce_thankyou_order_received_text', array($this, 'thankyou_page_message'));
-        add_filter('manage_edit-shop_order_columns', array($this, 'humm_add_new_order_admin_list_column'));
-        add_action('manage_shop_order_posts_custom_column', array($this, 'humm_add_new_order_admin_list_column_content'));
+        add_filter('manage_edit-shop_order_columns', array($this, 'humm_order_payment_note_column'));
+        add_action('manage_shop_order_posts_custom_column', array($this, 'humm_order_payment_note_column_content'));
 
         $preselect_button_order = $this->settings["preselect_button_order"] ? $this->settings["preselect_button_order"] : '20';
         add_action('woocommerce_proceed_to_checkout', array(
@@ -410,7 +410,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
      * @return mixed
      */
 
-    function humm_add_new_order_admin_list_column($columns)
+    function humm_order_payment_note_column($columns)
     {
         $columns['Payment_Info'] = 'Payment_Info';
         return $columns;
@@ -419,7 +419,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     /**
      * @param $column
      */
-    function humm_add_new_order_admin_list_column_content($column)
+    function humm_order_payment_note_column_content($column)
     {
         global $post;
         ?>
