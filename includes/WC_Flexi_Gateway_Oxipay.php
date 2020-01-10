@@ -428,14 +428,15 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
             mark.humm-status {
                 display: -webkit-inline-flex;
                 display: inline-flex;
+                text-align: center;
                 font-size: 14px;
                 line-height: 2.5em;
                 border-radius: 4px;
-                border-bottom: 1px solid rgba(0, 0, 0, .05);
-                margin: -.25em 0;
+                border-bottom: 1px solid rgba(0, 0, 0, .08);
+                margin: 0.5em 0.5em;
                 cursor: inherit !important;
                 max-width: 100%;
-                background: #eacc12;
+                background: #e68821;
                 color: white;
             }
             mark.payment-status {
