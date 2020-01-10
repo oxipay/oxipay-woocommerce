@@ -412,7 +412,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
 
     function humm_add_new_order_admin_list_column($columns)
     {
-        $columns['Humm_Payment'] = 'Humm_Payment';
+        $columns['Payment_Info'] = 'Payment_Info';
         return $columns;
     }
 
@@ -429,6 +429,18 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
                 display: -webkit-inline-flex;
                 display: inline-flex;
                 line-height: 2.5em;
+                border-radius: 4px;
+                border-bottom: 1px solid rgba(0, 0, 0, .05);
+                margin: -.25em 0;
+                cursor: inherit !important;
+                max-width: 100%;
+                background: #c6e1c6;
+                color: #5b841b;
+            }
+            mark.payment-status {
+                display: -webkit-inline-flex;
+                display: inline-flex;
+                line-height: 2.5em;
                 color: #777;
                 background: #e5e5e5;
                 border-radius: 4px;
@@ -439,11 +451,16 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
             }
         </style>
         <?
-        if ('Humm_Payment' === $column) {
+        if ('Payment_Info' === $column) {
             $order = wc_get_order($post->ID);
             $orderNote = $this->get_private_order_notes($order->get_id());
             if ($order->get_data()['payment_method'] == $this->pluginFileName) {
                 $showNote = ' <mark class="humm-status"><span>' . $orderNote . '</span></mark>';
+                echo $showNote;
+            }
+            else
+            {
+                $showNote = ' <mark class="payment-status"><span>' . $order->get_data()['payment_method'] . '</span></mark>';
                 echo $showNote;
             }
         }
@@ -451,7 +468,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
 
     /**
      * @param $orderId
-     * @return array
+     * @return string
      */
     function get_private_order_notes($orderId)
     {
