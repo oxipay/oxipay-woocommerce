@@ -428,14 +428,15 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
             mark.humm-status {
                 display: -webkit-inline-flex;
                 display: inline-flex;
+                font-size: 14px;
                 line-height: 2.5em;
                 border-radius: 4px;
                 border-bottom: 1px solid rgba(0, 0, 0, .05);
                 margin: -.25em 0;
                 cursor: inherit !important;
                 max-width: 100%;
-                background: #c6e1c6;
-                color: #5b841b;
+                background: #eacc12;
+                color: white;
             }
             mark.payment-status {
                 display: -webkit-inline-flex;
@@ -453,7 +454,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         <?
         if ('Payment_Info' === $column) {
             $order = wc_get_order($post->ID);
-            $orderNote = $this->get_private_order_notes($order->get_id());
+            $orderNote = $this->get_humm_order_notes($order->get_id());
             if ($order->get_data()['payment_method'] == $this->pluginFileName) {
                 $showNote = ' <mark class="humm-status"><span>' . $orderNote . '</span></mark>';
                 echo $showNote;
@@ -470,7 +471,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
      * @param $orderId
      * @return string
      */
-    function get_private_order_notes($orderId)
+    function get_humm_order_notes($orderId)
     {
         global $wpdb;
         $tablePerfixed = $wpdb->prefix . 'comments';
