@@ -9,8 +9,6 @@ defined('ABSPATH') || exit;
  */
 abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
 {
-    //current version of the plugin- used to run upgrade tasks on update
-
     /**
      * @var mixed
      */
@@ -54,7 +52,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         $this->pluginDisplayName = $config->getDisplayName();
         $this->pluginFileName = strtolower($config->getPluginFileName());
 
-        // where available we can use logging to assist with debugging
         if (function_exists('wc_get_logger')) {
             $this->logger = wc_get_logger();
             $this->logContext = array('source' => $this->pluginDisplayName);
@@ -73,9 +70,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         }
 
         add_action('admin_enqueue_scripts', array($this, 'admin_scripts'));
-
-        // when we are on the checkout page we want to provide
-        // the checkout process through a modal dialog box
         if (!is_admin()) {
             add_action('wp_enqueue_scripts', array($this, 'flexi_enqueue_script'));
         }
@@ -109,7 +103,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
      */
     function init_form_fields()
     {
-        //Build options for the country select field from the config
         $countryOptions = array('' => __('Please select...', 'woocommerce'));
 
         foreach ($this->currentConfig->countries as $countryCode => $country) {
@@ -130,6 +123,10 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
                 'default' => 'yes',
                 'description' => 'Disable ' . $this->pluginDisplayName . ' services, your customers will not be able to use our easy installment plans.',
                 'desc_tip' => true
+            ),
+            'PaymentGateway_settings' => array(
+                'title' => __('PaymentGateway Settings', 'woocommerce'),
+                'type' => 'title',
             ),
             'country' => array(
                 'title' => __($this->pluginDisplayName . ' Region', 'woocommerce'),
@@ -818,18 +815,12 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
      */
     private function checkCustomerLocation($order)
     {
-        // The following get shipping and billing countries, and filters null or empty values
-        // Then we check to see if there is just a single unique value that is equal to AU, otherwise we
-        // display an error message.
 
         $countries = array($order->get_billing_country(), $order->get_shipping_country());
         $set_addresses = array_filter($countries);
         $countryCode = $this->getCountryCode();
         $countryName = $this->getCountryName();
 
-//            valid address is either:
-//                1. only have billing country or only ship country, or both have same country, and that country is the supported country in flexi setting;
-//                2. have no country at all in both billing and shipping address
         $valid_addresses = ((count(array_unique($set_addresses)) === 1 && end($set_addresses) === $countryCode) || count($set_addresses) === 0);
 
         if (!$valid_addresses) {
@@ -944,6 +935,19 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         $hash = hash_hmac("sha256", $clear_text, $api_key);
 
         return str_replace('-', '', $hash);
+    }
+
+    /**
+     * Log a message using the 2.7 logging infrastructure
+     *
+     * @param string $message Message log
+     * @param string $level WC_Log_Levels
+     */
+    public function log($message, $level = WC_Log_Levels::DEBUG)
+    {
+        if ($this->logger != null && $this->settings["enable_logging"]) {
+            $this->logger->log($level, $message, $this->logContext);
+        }
     }
 
     /**
@@ -1084,19 +1088,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     }
 
     /**
-     * Log a message using the 2.7 logging infrastructure
-     *
-     * @param string $message Message log
-     * @param string $level WC_Log_Levels
-     */
-    public function log($message, $level = WC_Log_Levels::DEBUG)
-    {
-        if ($this->logger != null && $this->settings["enable_logging"]) {
-            $this->logger->log($level, $message, $this->logContext);
-        }
-    }
-
-    /**
      * @param $original_message
      * @return array|string
      */
@@ -1123,9 +1114,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     {
         global $wp_query;
 
-        //copying woocommerce logic from wc_page_endpoint_title() in wc-page-functions.php
         if (!is_null($wp_query) && !is_admin() && is_main_query() && in_the_loop() && is_page() && is_wc_endpoint_url()) {
-            //make sure we are on the Order Received page and have the payment result available
             $endpoint = WC()->query->get_current_endpoint();
             if ($endpoint == 'order-received' && !empty($_GET['x_result'])) {
                 //look at the x_result query var. Ideally we'd load the order and look at the status, but this has not been updated when this filter runs
@@ -1133,7 +1122,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
                     $title = 'Payment Failed';
                 }
             }
-            //copying woocommerce code- the filter only needs to run once
             remove_filter('the_title', array($this, 'order_received_title'), 11);
         }
 

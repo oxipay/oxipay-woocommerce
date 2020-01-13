@@ -92,7 +92,6 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
             $maximum = $this->getMaxPrice();
             $name = $this->currentConfig->getDisplayName();
             $advanced = isset($this->settings['price_widget_advanced']) && $this->settings['price_widget_advanced'] === 'yes';
-            // data-max
             $script = '<script ';
             if ($maximum > 0)
                 $script .= 'data-max="' . $maximum . '" ';
@@ -100,9 +99,8 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
                 $displayPrice = wc_get_price_to_display($product);
             }
 
-            // Script URL
             $script .= 'src="https://widgets.' . $country_domain . '/content/scripts/';
-            $script .= $name === 'humm' ? 'price-info' : 'payments';
+            $script .= $name === 'Humm' ? 'price-info' : 'payments';
             $script .= '.js?';
             //  Widget type - Dynamic or Static
             if ($advanced && isset($this->settings['price_widget_dynamic_enabled']) && $this->settings['price_widget_dynamic_enabled'] === 'yes') {
@@ -117,7 +115,6 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
                 $script .= 'productPrice=' . $displayPrice;
             }
 
-            // Widget location in page
             $script .= '&element=';
             if ($advanced && isset($this->settings['price_widget_element_selector']) && $this->settings['price_widget_element_selector'] !== '') {
                 $script .= urlencode($this->settings['price_widget_element_selector']);
@@ -125,8 +122,7 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
                 $script .= '%23' . $name . '-price-info-anchor';
             }
 
-            // Merchant type
-            if ($name === 'humm') {
+            if ($name === 'Humm') {
                 $merchant_type = "&" . $this->settings['merchant_type'];
                 if ($merchant_type !== '&both')
                     $script .= $merchant_type;
@@ -158,7 +154,7 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
             } else {
                 $country_domain = (isset($this->settings['country']) && $this->settings['country'] == 'NZ') ? 'co.nz' : 'com.au';
                 if ($country_domain == "com.au" && $this->settings['enabled'] == 'yes') {
-                    if ($this->currentConfig->getDisplayName() == 'humm') {
+                    if ($this->currentConfig->getDisplayName() == 'Humm') {
                         echo '<script id="humm-top-banner-script" src="https://widgets.shophumm.' . $country_domain . '/content/scripts/top-banner.js?element=header"></script>';
                     } else {
                         echo '<script id="oxipay-top-banner-script" src="https://widgets.oxipay.' . $country_domain . '/content/scripts/top-banner.js?element=header"></script>';
@@ -192,7 +188,7 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
 
         // if humm, always set 'use_modal' to 'no'
         if ($whitelist['use_modal'] == 'yes') {
-            if ($this->currentConfig->getDisplayName() == 'humm') {
+            if ($this->currentConfig->getDisplayName() == 'Humm') {
                 $whitelist['use_modal'] = 'no';
             }
         }
