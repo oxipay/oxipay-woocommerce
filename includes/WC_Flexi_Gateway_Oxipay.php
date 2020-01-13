@@ -4,6 +4,8 @@ defined('ABSPATH') || exit;
 
 /**
  * Class WC_Flexi_Gateway_Oxipay
+ * @author roger.bi@flexigroup.com.au
+ * @copyright Flexigroup
  */
 abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
 {

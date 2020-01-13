@@ -10,7 +10,7 @@ defined('ABSPATH') || exit;
 class Oxipay_Config
 {
     /**
-     * constant
+     * @constant
      */
     const COUNTRY_AUSTRALIA = 'AU';
     const COUNTRY_NEW_ZEALAND = 'NZ';

@@ -84,7 +84,6 @@ function get_oxipay_settings($query)
         $settings = $oxipay->get_settings();
         wp_send_json($settings);
     }
-
     return;
 }
 

@@ -1,5 +1,7 @@
 /* globals jQuery */
-/* globals countryUrls */
+/**
+ * @copyright Flexigroup
+ */
 (function ($) {
     'use strict';
 
