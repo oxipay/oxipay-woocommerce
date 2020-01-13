@@ -713,7 +713,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
 
         return array(
             'result' => 'success',
-            'redirect' => plugins_url("../templates/Template_ProcessForm.php?$qs", __FILE__)
+            'redirect' => plugins_url("../templates/Template_Process_Form.php?$qs", __FILE__)
         );
     }
 
