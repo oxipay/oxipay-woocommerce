@@ -11,8 +11,8 @@ class Oxipay_Config {
     const DISPLAY_NAME_AFTER = 'humm';
     const PLUGIN_FILE_NAME = 'oxipay';
     const LAUNCH_TIME_URL = 'https://humm-variables.s3-ap-southeast-2.amazonaws.com/nz-launch-time.txt';
-    const LAUNCH_TIME_DEFAULT = "2019-02-23 13:30:00 UTC";
-    const LAUNCH_TIME_CHECK_ENDS = "2020-05-23 13:30:00 UTC";
+    const LAUNCH_TIME_DEFAULT = "2020-04-30 14:30:00 UTC";
+    const LAUNCH_TIME_CHECK_ENDS = "2020-07-30 14:30:00 UTC";
     const BUTTON_COLOR = array( "Oxipay" => "E68821", "humm" => "FF6C00" );
 
     public $countries = array(
