@@ -47,6 +47,9 @@
 <?php
 parse_str($_SERVER['QUERY_STRING'], $query);
 
+/**
+ * @param $query
+ */
 function oxipay_generate_processing_form($query)
 {
     if (!isset($query["gateway_url"])) {
@@ -83,6 +86,9 @@ function oxipay_generate_processing_form($query)
 oxipay_generate_processing_form($query);
 ?>
 <script type="text/javascript">
+    /**
+     * formSubmit
+     */
     function formSubmit() {
         if ((typeof document.forms.processForm.x_signature == undefined) && (document.forms.processForm.x_signature.value == undefined)) {
             console.log("delay ... for submit");

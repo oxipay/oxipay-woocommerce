@@ -1,11 +1,23 @@
 <?php
 
+/**
+ * Class WC_HummpaymentTestMain
+ */
 class WC_HummpaymentTestMain extends WP_UnitTestCase
 {
-
+    /**
+     * @var object
+     */
     public $payment_gateway;
 
+    /**
+     * @var string
+     */
     public $WC_Session;
+
+    /**
+     * setup
+     */
 
     public function setup()
     {
@@ -15,6 +27,10 @@ class WC_HummpaymentTestMain extends WP_UnitTestCase
 
         self::set_session();
     }
+
+    /**
+     * set_session
+     */
 
     public function set_session()
     {

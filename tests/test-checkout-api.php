@@ -1,8 +1,12 @@
 <?php
-
-
+/**
+ * Class CheckoutApiTest
+ */
 class CheckoutApiTest extends WC_HummpaymentTestMain
 {
+    /**
+     * @return array
+     */
     public function exception_provider()
     {
         return array(
@@ -10,6 +14,9 @@ class CheckoutApiTest extends WC_HummpaymentTestMain
         );
     }
 
+    /**
+     * createOrder
+     */
     private function createOrder(){        
         global $woocommerce;
 
