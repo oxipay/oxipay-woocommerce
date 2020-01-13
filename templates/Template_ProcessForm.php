@@ -69,6 +69,7 @@ function oxipay_generate_processing_form($query)
             $value = null;
             if (in_array($item, $encodedFields)) {
                 $value = htmlspecialchars(base64_decode($v), ENT_QUOTES);
+
             } else {
                 $value = htmlspecialchars($v, ENT_QUOTES);
             }
@@ -82,7 +83,7 @@ oxipay_generate_processing_form($query);
 ?>
 <script type="text/javascript">
     function formSubmit() {
-        if (document.forms.processForm.x_signature.value == undefined) {
+        if ((typeof document.forms.processForm.x_signature == undefined) && (document.forms.processForm.x_signature.value == undefined)) {
             console.log("delay ... for submit");
             setTimeout(function () {
                 document.getElementById('oxipayload').submit();
