@@ -79,6 +79,7 @@ function oxipay_generate_processing_form($query)
     </form>
     <?php
 }
+
 oxipay_generate_processing_form($query);
 ?>
 <script type="text/javascript">
@@ -87,7 +88,7 @@ oxipay_generate_processing_form($query);
             console.log("delay ... for submit");
             setTimeout(function () {
                 document.getElementById('oxipayload').submit();
-            },500);
+            }, 500);
         }
         else {
             console.log(document.forms.processForm.version_info.value);
