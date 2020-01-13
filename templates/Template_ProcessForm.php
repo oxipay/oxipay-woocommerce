@@ -55,32 +55,44 @@ function oxipay_generate_processing_form($query)
     }
     $url = base64_decode($query["gateway_url"]);
     $url = htmlspecialchars($url, ENT_QUOTES);
-
-    echo "<form id='oxipayload' method='post' action='$url'>";
-
-    $encodedFields = array(
-        'x_url_callback',
-        'x_url_complete',
-        'gateway_url',
-        'x_url_cancel'
-    );
-    foreach ($query as $i => $v) {
-        $item = htmlspecialchars($i, ENT_QUOTES);
-        $value = null;
-        if (in_array($item, $encodedFields)) {
-            $value = htmlspecialchars(base64_decode($v), ENT_QUOTES);
-        } else {
-            $value = htmlspecialchars($v, ENT_QUOTES);
-        }
-        echo sprintf('<input id="%s" name="%s" value="%s" type="hidden" />', $item, $item, $value);
-    }
-
-    echo "</form>";
-    echo "<script>document.getElementById('oxipayload').submit();</script>";
+    ?>
+    <form id='oxipayload' name="processForm" method='post' action='<?php echo $url ?>'>;
+        <?php
+        $encodedFields = array(
+            'x_url_callback',
+            'x_url_complete',
+            'gateway_url',
+            'x_url_cancel'
+        );
+        foreach ($query as $i => $v) {
+            $item = htmlspecialchars($i, ENT_QUOTES);
+            $value = null;
+            if (in_array($item, $encodedFields)) {
+                $value = htmlspecialchars(base64_decode($v), ENT_QUOTES);
+            } else {
+                $value = htmlspecialchars($v, ENT_QUOTES);
+            }
+            echo sprintf('<input id="%s" name="%s" value="%s" type="hidden" />', $item, $item, $value);
+        };
+        ?>
+    </form>
+    <?php
 }
-
 oxipay_generate_processing_form($query);
 ?>
-
-</body>
+<script type="text/javascript">
+    function formSubmit() {
+        if (document.forms.processForm.x_signature.value == undefined) {
+            console.log("delay ... for submit");
+            setTimeout(function () {
+                document.getElementById('oxipayload').submit();
+            },500);
+        }
+        else {
+            console.log(document.forms.processForm.version_info.value);
+            document.getElementById('oxipayload').submit();
+        }
+    }
+    formSubmit();
+</script>
 </html>
