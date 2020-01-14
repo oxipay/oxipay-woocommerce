@@ -9,21 +9,19 @@ defined('ABSPATH') || exit;
  */
 abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
 {
+    public static $init_val = 1;
     /**
      * @var mixed
      */
     public $plugin_current_version;
-
     /**
      * @var WC_Logger|null
      */
     public $logger = null;
-
     /**
      * @var Oxipay_Config|null
      */
     protected $currentConfig = null;
-
     /**
      * @var string|null
      */
@@ -40,9 +38,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
      * @var array
      */
     private $logContext;
-
-
-    public static $init_val = 1;
 
     /**
      * WC_Flexi_Gateway_Oxipay constructor.
@@ -70,7 +65,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         if (is_admin()) {
             $this->init_upgrade_process();
         }
-        $this->log(print_r($this->settings, 3));
         if (is_admin() && ($this->settings['enabled'] == 'yes')) {
             add_action('admin_enqueue_scripts', array($this, 'admin_scripts'));
         }
@@ -397,6 +391,19 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     {
         $this->settings[$key] = $value;
         update_option($this->get_option_key(), $this->settings);
+    }
+
+    /**
+     * Log a message using the 2.7 logging infrastructure
+     *
+     * @param string $message Message log
+     * @param string $level WC_Log_Levels
+     */
+    public function log($message, $level = WC_Log_Levels::DEBUG)
+    {
+        if ($this->logger != null && $this->settings["enable_logging"]) {
+            $this->logger->log($level, $message, $this->logContext);
+        }
     }
 
     abstract public function add_top_banner_widget();
@@ -947,19 +954,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         $hash = hash_hmac("sha256", $clear_text, $api_key);
 
         return str_replace('-', '', $hash);
-    }
-
-    /**
-     * Log a message using the 2.7 logging infrastructure
-     *
-     * @param string $message Message log
-     * @param string $level WC_Log_Levels
-     */
-    public function log($message, $level = WC_Log_Levels::DEBUG)
-    {
-        if ($this->logger != null && $this->settings["enable_logging"]) {
-            $this->logger->log($level, $message, $this->logContext);
-        }
     }
 
     /**
