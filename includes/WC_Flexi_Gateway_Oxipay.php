@@ -128,6 +128,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
                 'title' => __('General Settings', 'woocommerce'),
                 'type' => 'title',
                 'css' => WC_HUMM_ASSETS.'css/oxipay-config.css',
+                'class' =>'humm',
                 'description' =>
                     '<div class="wc-humm-instructions"><p>
                      <a target="_blank" href="https://docs.shophumm.com.au/ecommerce/woocommerce/">' . __ ( 'How To Setup', 'woo-payment-gateway' ) . '</a>' .
@@ -963,8 +964,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     function admin_options()
     { ?>
         <h2><?php _e($this->pluginDisplayName, 'woocommerce'); ?> Payment Gateway</h2>
-
-        <p>For help setting this plugin up please contact our integration team.</p>
 
         <table class="form-table">
             <?php $this->generate_settings_html(); ?>

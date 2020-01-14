@@ -77,8 +77,10 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
      */
     function admin_scripts()
     {
-        wp_register_script('oxipay_admin', plugins_url('/assets/js/admin.js', __FILE__), array('jquery'), '0.4.5');
+        wp_enqueue_style('oxipay_css', plugins_url('../assets/css/oxipay.css', __FILE__));
+        wp_register_script('oxipay_admin', plugins_url('../assets/js/admin.js', __FILE__), array('jquery'), '0.4.5');
         wp_enqueue_script('oxipay_admin');
+
     }
 
     /**
