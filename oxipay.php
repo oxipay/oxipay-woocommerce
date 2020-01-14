@@ -20,7 +20,7 @@ include_once(ABSPATH . 'wp-admin/includes/plugin.php');
 if (!is_plugin_active('woocommerce/woocommerce.php')) {
     return;
 }
-define ( 'WC_HUMM_ASSETS', plugin_dir_url ( __FILE__ ) . 'assets/' );
+define('WC_HUMM_ASSETS', plugin_dir_url(__FILE__) . 'assets/');
 require_once('includes/Oxipay_config.php');
 
 add_action('plugins_loaded', 'woocommerce_oxipay_init', 0);

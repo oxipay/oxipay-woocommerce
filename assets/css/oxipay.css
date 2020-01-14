@@ -68,6 +68,7 @@ p {
 
 a {
     text-decoration: none;
+    font-size: 15px;
     color: #e68821;
 }
 
@@ -82,7 +83,9 @@ a {
     color: white;
     margin-bottom: 30px;
 }
-.wc-settings-sub-title humm {
-    background: #0cff3f;
-    font-size:1rem ;
+.humm-general{
+    font-size:1.2rem !important;
+}
+.form-table {
+    background: lightgrey;
 }
