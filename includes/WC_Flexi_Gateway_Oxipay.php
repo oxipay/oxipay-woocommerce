@@ -41,13 +41,16 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
      */
     private $logContext;
 
+
+    public static $init_val = 1;
+
     /**
-     * Can the order be refunded?
-     * @param Oxipay_Config $config
+     * WC_Flexi_Gateway_Oxipay constructor.
+     * @param $config
      */
     function __construct($config)
     {
-
+        self::$init_val++;
         $this->currentConfig = $config;
         $this->pluginDisplayName = $config->getDisplayName();
         $this->pluginFileName = strtolower($config->getPluginFileName());
@@ -60,7 +63,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         $this->id = $this->pluginFileName;
         $this->has_fields = false;
         $this->method_title = __($this->pluginDisplayName, 'woocommerce');
-
         $this->plugin_current_version = $config->getPluginVersion();
 
         $this->init_form_fields();
@@ -68,12 +70,14 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         if (is_admin()) {
             $this->init_upgrade_process();
         }
+        $this->log(print_r($this->settings, 3));
+        if (is_admin() && ($this->settings['enabled'] == 'yes')) {
+            add_action('admin_enqueue_scripts', array($this, 'admin_scripts'));
+        }
 
-        add_action('admin_enqueue_scripts', array($this, 'admin_scripts'));
         if (!is_admin()) {
             add_action('wp_enqueue_scripts', array($this, 'flexi_enqueue_script'));
         }
-
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, array(
             $this,
             'process_admin_options'
@@ -127,13 +131,13 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
             'General Settings' => array(
                 'title' => __('General Settings', 'woocommerce'),
                 'type' => 'title',
-                'css' => WC_HUMM_ASSETS.'css/oxipay-config.css',
-                'class' =>'humm',
+                'css' => WC_HUMM_ASSETS . 'css/oxipay-config.css',
+                'class' => 'humm-general',
                 'description' =>
                     '<div class="wc-humm-instructions"><p>
-                     <a target="_blank" href="https://docs.shophumm.com.au/ecommerce/woocommerce/">' . __ ( 'How To Setup', 'woo-payment-gateway' ) . '</a>' .
+                     <a target="_blank" href="https://docs.shophumm.com.au/ecommerce/woocommerce/">' . __('How To Setup', 'woo-payment-gateway') . '</a>' .
                     '<p><a target="_blank" href="https://www.shophumm.com.au/">'
-                    . __ ( 'Register account', 'woo-payment-gateway' ) .
+                    . __('Register account', 'woo-payment-gateway') .
                     '</a>' . '</p></div>'
             ),
             'country' => array(
