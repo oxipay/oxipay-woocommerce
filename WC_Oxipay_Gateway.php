@@ -36,7 +36,7 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
         if ( ! $show_times ) {
             update_option( 'humm_admin_notice_update_show_times', 1 );
         }
-        if ( $show_times < 3 && $this->settings['country'] == 'AU' ) {
+        if ( $show_times < 3 && $this->settings['country'] == 'NZ' ) {
             update_option( 'humm_admin_notice_update_show_times', $show_times + 1 );
             printf( '<div class="notice notice-info is-dismissible"><p><strong>humm</strong> <img alt="humm logo" src="https://widgets.shophumm.com.au/content/images/logo-orange.svg" height="16px" /> is the new Oxipay!</p></div>' );
         }
