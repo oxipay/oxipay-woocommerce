@@ -125,6 +125,6 @@ class Oxipay_Config
 
     public function getPluginVersion()
     {
-        return get_plugin_data(plugin_dir_path(__FILE__) . 'includes/' . Oxipay_Config::PLUGIN_FILE_NAME . '.php', false, false)['Version'];
+        return get_plugin_data(plugin_dir_path(__FILE__) .'../'. Oxipay_Config::PLUGIN_FILE_NAME . '.php', false, false)['Version'];
     }
 }

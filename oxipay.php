@@ -3,12 +3,20 @@
  * Plugin Name: Humm / Oxipay Payment Gateway
  * Plugin URI: https://www.shophumm.com.au
  * Description: In Australia - <a href="https://www.shophumm.com.au"><strong>humm</strong></a>, In New Zealand - <a href="https://www.oxipay.com.au">Oxipay</a>.
- * Version: plugin_version_placeholder
- * Author: FlexiGroup
- * Author URI: https://www.shophumm.com.au
- * @package WordPress
- * @author FlexiGroup
- * @since 0.4.8
+ * Version:           2.0.0
+ * Author:            flexigroup
+ * Author URI:
+ * License:           GPL-2.0+
+ * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+ * Github URI:
+ * WC requires at least:
+ * WC tested up to:
+ * @version  2.0.0
+ * @package  flexigroup
+ * @author   flexigroup
+ * package WordPress
+ * author FlexiGroup
+ * since 0.4.8
  */
 
 if (!defined('ABSPATH')) {
@@ -97,7 +105,8 @@ function oxipay_settings_link($links)
 
     return array_merge($settings_link, $links);
 }
-
+define ( 'WC_HUMM_PATH', plugin_dir_path ( __FILE__ ) );
+define ( 'WC_HUMM_PLUGIN_NAME', plugin_basename ( __FILE__ ) );
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'oxipay_settings_link');
 add_filter('woocommerce_payment_gateways', 'add_oxipay_payment_gateway');
 add_filter('query_vars', 'add_oxipay_query_vars_filter');
