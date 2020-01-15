@@ -97,20 +97,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     }
 
     /**
-     * @return string
-     */
-    public function plugin_path() {
-        return WC_HUMM_PATH;
-    }
-
-    /**
-     * @return string
-     */
-    public function template_path() {
-        return trailingslashit ( 'oxipay' );
-    }
-
-    /**
      * WC override to display the administration property page
      */
     function init_form_fields()
@@ -405,19 +391,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     {
         $this->settings[$key] = $value;
         update_option($this->get_option_key(), $this->settings);
-    }
-
-    /**
-     * Log a message using the 2.7 logging infrastructure
-     *
-     * @param string $message Message log
-     * @param string $level WC_Log_Levels
-     */
-    public function log($message, $level = WC_Log_Levels::DEBUG)
-    {
-        if ($this->logger != null && $this->settings["enable_logging"]) {
-            $this->logger->log($level, $message, $this->logContext);
-        }
     }
 
     abstract public function add_top_banner_widget();
@@ -735,18 +708,15 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
             'x_url_cancel'
         );
 
-        $templateOutput = $this->wc_humm_get_template("Template_Process_Form_Cache.php",$transaction_details);
 
-//        foreach ($encodedFields as $i) {
-//            $transaction_details[$i] = base64_encode($transaction_details[$i]);
-//        }
-
-        $this->log(sprintf("template--%s", json_encode($templateOutput)));
+        foreach ($encodedFields as $i) {
+            $transaction_details[$i] = base64_encode($transaction_details[$i]);
+        }
         // use RFC 3986 so that we can decode it correctly in js
         $qs = http_build_query($transaction_details, null, '&', PHP_QUERY_RFC3986);
         return array(
-//            'result' => 'success',
-//            'redirect' => plugins_url("../templates/Template_Process_Form.php?$qs", __FILE__)
+            'result' => 'success',
+            'redirect' => plugins_url("../templates/Template_Process_Form.php?$qs", __FILE__)
         );
     }
 
@@ -969,6 +939,19 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         $hash = hash_hmac("sha256", $clear_text, $api_key);
 
         return str_replace('-', '', $hash);
+    }
+
+    /**
+     * Log a message using the 2.7 logging infrastructure
+     *
+     * @param string $message Message log
+     * @param string $level WC_Log_Levels
+     */
+    public function log($message, $level = WC_Log_Levels::DEBUG)
+    {
+        if ($this->logger != null && $this->settings["enable_logging"]) {
+            $this->logger->log($level, $message, $this->logContext);
+        }
     }
 
     /**
@@ -1242,14 +1225,30 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         return false;
     }
 
-
     /**
      * @param $template_name
      * @param $args
      * @return string
      */
-    function wc_humm_get_template($template_name,$args) {
-        return wc_get_template_html($template_name, $args, $this->template_path (), $this->plugin_path () . 'templates/' );
+    function wc_humm_get_template($template_name, $args)
+    {
+        return wc_get_template_html($template_name, $args, $this->template_path(), $this->plugin_path() . 'templates/');
+    }
+
+    /**
+     * @return string
+     */
+    public function template_path()
+    {
+        return trailingslashit('oxipay');
+    }
+
+    /**
+     * @return string
+     */
+    public function plugin_path()
+    {
+        return WC_HUMM_PATH;
     }
 
     /**
