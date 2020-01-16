@@ -36,9 +36,9 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
         if ( ! $show_times ) {
             update_option( 'humm_admin_notice_update_show_times', 1 );
         }
-        if ( $show_times < 3 && $this->settings['country'] == 'AU' ) {
+        if ( $show_times < 3 && $this->settings['country'] == 'NZ' ) {
             update_option( 'humm_admin_notice_update_show_times', $show_times + 1 );
-            printf( '<div class="notice notice-info is-dismissible"><p><strong>humm</strong> <img alt="humm logo" src="https://widgets.shophumm.com.au/content/images/logo-orange.svg" height="16px" /> is the new Oxipay!</p></div>' );
+            printf( '<div class="notice notice-info is-dismissible"><p><strong>humm</strong> <img alt="humm logo" src="https://widgets.shophumm.co.nz/content/images/logo-orange.svg" height="16px" /> is the new Oxipay!</p></div>' );
         }
     }
 
@@ -68,16 +68,21 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
         // do we really need a global here?
         global $product;
         if ( $this->settings['enabled'] == 'yes' && isset( $this->settings['price_widget'] ) && $this->settings['price_widget'] == 'yes' ) {
-            $country_domain = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? 'oxipay.co.nz' : 'shophumm.com.au';
-            $maximum = $this->getMaxPrice();
-            $name = $this->currentConfig->getDisplayName();
+            $product_name = $this->currentConfig->getDisplayName();
+            if ( $product_name == "humm" ) {
+                $product_name = "shophumm";
+            }
+            $country_domain = ( isset( $this->settings['country'] ) && $this->settings['country'] == 'NZ' ) ? $product_name . '.co.nz' : $product_name . '.com.au';
+            $maximum        = $this->getMaxPrice();
+            $name           = $this->currentConfig->getDisplayName();
 
             $advanced = isset( $this->settings['price_widget_advanced'] ) && $this->settings['price_widget_advanced'] === 'yes';
 
             // data-max
             $script = '<script ';
-            if ($maximum > 0)
+            if ( $maximum > 0 ) {
                 $script .= 'data-max="' . $maximum . '" ';
+            }
 
             // Script URL
             $script .= 'src="https://widgets.' . $country_domain . '/content/scripts/';
@@ -108,8 +113,9 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay {
             // Merchant type
             if ( $name === 'humm' ) {
                 $merchant_type = "&" . $this->settings['merchant_type'];
-                if ( $merchant_type !== '&both' )
+                if ( $merchant_type !== '&both' ) {
                     $script .= $merchant_type;
+                }
             }
 
             $script .= '"></script>';
