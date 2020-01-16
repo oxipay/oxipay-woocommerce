@@ -86,9 +86,10 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         add_filter('woocommerce_available_payment_gateways', array($this, 'display_min_max_filter'));
         add_filter('woocommerce_available_payment_gateways', array($this, 'preselect_flexi'));
         add_filter('woocommerce_thankyou_order_received_text', array($this, 'thankyou_page_message'));
-        add_filter('manage_edit-shop_order_columns', array($this, 'humm_order_payment_note_column'));
-        add_action('manage_shop_order_posts_custom_column', array($this, 'humm_order_payment_note_column_content'));
-
+        if ($this->settings['enabled'] == 'yes') {
+            add_filter('manage_edit-shop_order_columns', array($this, 'humm_order_payment_note_column'));
+            add_action('manage_shop_order_posts_custom_column', array($this, 'humm_order_payment_note_column_content'));
+        }
         $preselect_button_order = $this->settings["preselect_button_order"] ? $this->settings["preselect_button_order"] : '20';
         add_action('woocommerce_proceed_to_checkout', array(
             $this,
@@ -101,6 +102,9 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
      */
     function init_form_fields()
     {
+        if (is_admin() && ($this->settings['enabled'] == 'yes')) {
+            add_action('admin_enqueue_scripts', array($this, 'admin_scripts'));
+        }
         $countryOptions = array('' => __('Please select...', 'woocommerce'));
 
         foreach ($this->currentConfig->countries as $countryCode => $country) {
@@ -127,12 +131,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
                 'type' => 'title',
                 'css' => WC_HUMM_ASSETS . 'css/oxipay-config.css',
                 'class' => 'humm-general',
-                'description' =>
-                    '<div class="wc-humm-instructions"><p>
-                     <a target="_blank" href="https://docs.shophumm.com.au/ecommerce/woocommerce/">' . __('How To Setup', 'woo-payment-gateway') . '</a>' .
-                    '<p><a target="_blank" href="https://www.shophumm.com.au/">'
-                    . __('Register account', 'woo-payment-gateway') .
-                    '</a>' . '</p></div>'
             ),
             'country' => array(
                 'title' => __($this->pluginDisplayName . ' Region', 'woocommerce'),
@@ -328,6 +326,9 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
      */
     private function upgrade($currentDbVersion)
     {
+        if (is_admin() && ($this->settings['enabled'] == 'yes')) {
+            add_action('admin_enqueue_scripts', array($this, 'admin_scripts'));
+        }
         if (version_compare($currentDbVersion, '1.2.0') < 0) {
             if (!isset($this->settings['use_modal'])) {
                 // default to the redirect for existing merchants
@@ -650,7 +651,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     {
         $order = new WC_Order($order_id);
         $gatewayUrl = $this->getGatewayUrl();
-
         $isValid = true;
         $isValid = $isValid && $this->verifyConfiguration($order);
         $isValid = $isValid && $this->checkCustomerLocation($order);
@@ -700,7 +700,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         $signature = $this->flexi_sign($transaction_details, $this->settings[$this->pluginFileName . '_api_key']);
         $transaction_details['x_signature'] = $signature;
         $this->log(json_encode($transaction_details));
-
         $encodedFields = array(
             'x_url_callback',
             'x_url_complete',
@@ -959,8 +958,19 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
      */
     function admin_options()
     { ?>
-        <h2><?php _e($this->pluginDisplayName, 'woocommerce'); ?> Payment Gateway</h2>
+        <div class="humm-header">
+            <div class="humm-payment-logo"></div>
+            <div class="humm-payment-byline">Little things. Big things. Interest freeee!<br/>Humm Payment</div>
+        </div>
+        <div id="humm_simplepath">
+            <div id="simplepath_unsupported">
+               <p> <a href="https://docs.shophumm.com.au/ecommerce/woocommerce/" target="_blank"> Humm Woocommerce Documentation </a></p>
+            </div>
+        </div>
 
+        <div id="humm_simplepath_back">
+            <p>If you don't have a humm merchant account you may join <a href="https://www.shophumm.com.au/sell-with-humm" target="_blank">here</a></p>
+        </div>
         <table class="form-table">
             <?php $this->generate_settings_html(); ?>
         </table>

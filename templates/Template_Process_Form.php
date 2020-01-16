@@ -101,6 +101,7 @@ oxipay_generate_processing_form($query);
             document.getElementById('oxipayload').submit();
         }
     }
+
     formSubmit();
 </script>
 </html>
