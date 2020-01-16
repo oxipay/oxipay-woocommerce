@@ -88,3 +88,27 @@ a {
 .form-table {
     background: lightgrey;
 }
+.humm-payment-logo
+ {
+    float:left;
+    display:inline-block;
+    vertical-align: middle;
+    margin: 1px 40px 10px 5px;
+    width: 137px;
+    height:100px;
+    background-repeat: no-repeat, no-repeat, no-repeat;
+    background-image: url(../images/bird-humm.svg);
+}
+.humm-header {
+    display: table;
+}
+.section-config.with-button.humm-payment-section .config-heading { font-weight: normal; }
+.complex.humm-payment-section .button-container { float:right; }
+.humm-payment-byline
+  {
+    display: table-cell;
+    vertical-align: middle;
+}
+.simplepath-wrapper-set.active .admin__collapsible-block
+  { display:none; }
+.humm-payment-section.section-config.active > .admin__collapsible-block + input + fieldset { margin-left: 40px; }
