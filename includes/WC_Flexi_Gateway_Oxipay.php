@@ -174,7 +174,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
                 'description' => __('The ' . $this->pluginDisplayName . ' logs are available at the <a href="' . admin_url('admin.php?page=wc-status&tab=logs') . '">WooCommerce status page</a>', 'woocommerce')
             ),
             'display_settings' => array(
-                'title' => __('Display Settings', 'woocommerce'),
+                'title' => __('Banners and Widgets', 'woocommerce'),
                 'type' => 'title',
             ),
             'price_widget' => array(
@@ -956,27 +956,8 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
      * Renders plugin configuration markup
      */
     function admin_options()
-    { ?>
-        <div class="humm-header">
-            <div class="humm-payment-logo"></div>
-            <div class="humm-payment-byline">Little things. Big things. Interest freeee!<br/>Humm Payment</div>
-        </div>
-        <div id="humm_simplepath">
-            <div id="simplepath_unsupported">
-               <p> <a href="https://docs.shophumm.com.au/ecommerce/woocommerce/" target="_blank"> Humm Woocommerce Documentation </a></p>
-            </div>
-        </div>
-
-        <div id="humm_simplepath_back">
-            <p>If you don't have a humm merchant           account you may join <a href="https://www.shophumm.com.au/sell-with-humm" target="_blank">here</a></p>
-        </div>
-        <div id="humm-container">
-           <table class="form-table">
-            <?php $this->generate_settings_html(); ?>
-           </table>
-        <p>Plugin Version: <?php echo $this->plugin_current_version; ?></p>
-        </div>
-        <?php
+    {
+        include plugin_dir_path(dirname(__FILE__)) . 'includes/view/backend/admin_options.php';
 
         $countryUrls = array();
         foreach ($this->currentConfig->countries as $countryCode => $country) {
