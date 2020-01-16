@@ -430,7 +430,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         global $post;
         ?>
         <style>
-
             mark.humm-status {
                 display: -webkit-inline-flex;
                 display: inline-flex;
@@ -969,12 +968,14 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         </div>
 
         <div id="humm_simplepath_back">
-            <p>If you don't have a humm merchant account you may join <a href="https://www.shophumm.com.au/sell-with-humm" target="_blank">here</a></p>
+            <p>If you don't have a humm merchant           account you may join <a href="https://www.shophumm.com.au/sell-with-humm" target="_blank">here</a></p>
         </div>
-        <table class="form-table">
+        <div id="humm-container">
+           <table class="form-table">
             <?php $this->generate_settings_html(); ?>
-        </table>
+           </table>
         <p>Plugin Version: <?php echo $this->plugin_current_version; ?></p>
+        </div>
         <?php
 
         $countryUrls = array();

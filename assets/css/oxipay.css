@@ -66,11 +66,6 @@ p {
     margin: 10px;
 }
 
-a {
-    text-decoration: none;
-    color: #e68821;
-}
-
 .btn {
     display: inline-block;
     font-weight: normal;
@@ -85,9 +80,13 @@ a {
 .humm-general{
     font-size:1.2rem !important;
 }
-.form-table {
-    background: lightgrey;
+#humm-container .form-table{
+    background: lightgrey !important;
 }
+#humm-container .form-table th {
+    padding-left: 8px;
+}
+
 .humm-payment-logo
  {
     float:left;
