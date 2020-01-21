@@ -85,6 +85,10 @@ html {
     font-weight: 300;
 }
 
+#humm-container {
+    font-weight: normal;
+}
+
 .humm-payment-logo
  {
     float:left;
