@@ -1,0 +1,65 @@
+Woocommerce Version
+
+
+
+Modules and Update functions
+
+
+1. Rebuild admin console to best UI compared to the other PSP
+
+2. Build banners and widgets in different pages based on the current banners&widgets of plugin
+
+3. Add payment status in the admin console to ensure all of transactions process correctly
+
+4. Add separated style file to better manage Humm plugin style
+
+5. Rearchitecture cancel payment module
+
+6. Rebuild API call
+
+7. Remove unnecessary hardcoded
+
+8. Add plugin templates
+
+9. Add view template
+
+10. Filenames & Variables
+
+11. Some unit tests
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
