@@ -22,6 +22,10 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
     const PLUGIN_NO_MERCHANT_ID_SET_LOG_MSG = 'Transaction attempted with no Merchant ID key. Please check oxipay plugin configuration, and provide an Merchant ID.';
     const PLUGIN_NO_REGION_LOG_MSG = 'Transaction attempted with no Oxipay region set. Please check oxipay plugin configuration, and provide an Oxipay region.';
     public static $littleBigFlag = 0;
+    public static $big_small_flag = array(
+        "big" => '&BigThings',
+        "little" => '&LittleThings'
+    );
     public $shop_details;
 
     /**
@@ -155,6 +159,25 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
 
             $script .= '"></script>';
             return $script;
+        }
+    }
+
+    /**
+     * add_price_widget_cart
+     */
+    function add_price_widget_cart()
+    {
+        global $woocommerce;
+        $ec_identity = 'small';
+        if ($this->settings['enabled'] == 'yes' && isset($this->settings['price_widget']) && $this->settings['price_widget'] == 'yes') {
+            $threshold_price = $this->getThreshold();
+            if (is_cart()) {
+                $cart_total = $woocommerce->cart->total;
+                $ec_pattern = sprintf("%s%s%s%s", '<script src =" https://widgets.shophumm.com.au/content/scripts/price-info.js?productPrice=', $cart_total, 'pattern', '"></script>');
+                if (floatval($cart_total) >= floatval($threshold_price))
+                    $ec_identity = 'big';
+                echo str_replace('pattern', self::$big_small_flag[$ec_identity], $ec_pattern);
+            }
         }
     }
 
