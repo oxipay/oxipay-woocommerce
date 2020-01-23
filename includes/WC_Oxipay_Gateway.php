@@ -21,7 +21,7 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
     const PLUGIN_NO_API_KEY_LOG_MSG = 'Transaction attempted with no API key set. Please check oxipay plugin configuration, and provide an API Key';
     const PLUGIN_NO_MERCHANT_ID_SET_LOG_MSG = 'Transaction attempted with no Merchant ID key. Please check oxipay plugin configuration, and provide an Merchant ID.';
     const PLUGIN_NO_REGION_LOG_MSG = 'Transaction attempted with no Oxipay region set. Please check oxipay plugin configuration, and provide an Oxipay region.';
-
+    public static $littleBigFlag = 0;
     public $shop_details;
 
     /**
@@ -88,11 +88,23 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
      */
     function add_price_widget()
     {
+        echo $this->get_widget_script();
+    }
+
+    /**
+     * @return string
+     */
+
+    function get_widget_script()
+    {
         global $product;
+        $threshold = array("little" => "&LittleThings", "big" => "&BigThings");
+        $thresholdPrice = $this->getThreshold();
         if ($this->settings['enabled'] == 'yes' && isset($this->settings['price_widget']) && $this->settings['price_widget'] == 'yes') {
             $country_domain = (isset($this->settings['country']) && $this->settings['country'] == 'NZ') ? 'oxipay.co.nz' : 'shophumm.com.au';
             $maximum = $this->getMaxPrice();
             $name = $this->currentConfig->getDisplayName();
+            $thresholdPrice = $this->getThreshold();
             $advanced = isset($this->settings['price_widget_advanced']) && $this->settings['price_widget_advanced'] === 'yes';
             $script = '<script ';
             if ($maximum > 0)
@@ -104,24 +116,35 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
             $script .= 'src="https://widgets.' . $country_domain . '/content/scripts/';
             $script .= $name === 'Humm' ? 'price-info' : 'payments';
             $script .= '.js?';
-            //  Widget type - Dynamic or Static
             if ($advanced && isset($this->settings['price_widget_dynamic_enabled']) && $this->settings['price_widget_dynamic_enabled'] === 'yes') {
                 if (isset($this->settings['price_widget_price_selector'])) {
                     $selector = $this->settings['price_widget_price_selector'];
                 } else {
                     $selector = '.price .woocommerce-Price-amount.amount';
                 }
-
                 $script .= 'price-selector=' . urlencode($selector);
             } else {
                 $script .= 'productPrice=' . $displayPrice;
             }
 
+            $bigThing = '';
+
+            if (floatval($displayPrice) <= floatval($thresholdPrice)) {
+                $script .= $threshold['little'];
+            } else {
+                self::$littleBigFlag = true;
+                $bigThing = work;
+                $script = '<div id="BigThing"></div>' . $script;
+                $script .= $threshold['big'];
+            }
             $script .= '&element=';
             if ($advanced && isset($this->settings['price_widget_element_selector']) && $this->settings['price_widget_element_selector'] !== '') {
                 $script .= urlencode($this->settings['price_widget_element_selector']);
             } else {
-                $script .= '%23' . $name . '-price-info-anchor';
+                if ($bigThing)
+                    $script .= '%23' . 'BigThing';
+                else
+                    $script .= '%23' . $name . '-price-info-anchor';
             }
 
             if ($name === 'Humm') {
@@ -131,17 +154,27 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
             }
 
             $script .= '"></script>';
-            echo $script;
+            return $script;
         }
     }
 
     /**
      * add_price_widget_anchor()
      */
-
     function add_price_widget_anchor()
     {
+        global $product;
         echo '<div id="' . $this->currentConfig->getDisplayName() . '-price-info-anchor"></div>';
+        if ($this->settings['enabled'] == 'yes' && isset($this->settings['price_widget']) && $this->settings['price_widget'] == 'yes') {
+            $thresholdPrice = $this->getThreshold();
+            if (is_product()) {
+                $displayPrice = wc_get_price_to_display($product);
+            }
+            if (floatval($displayPrice) >= floatval($thresholdPrice)) {
+                $ec = '<div id="testBig"></div>' . '<script src =' . '" https://widgets.shophumm.com.au/content/scripts/price-info.js?productPrice=' . "<?php echo $displayPrice ?>" . '&BigThings&element=%23testBig' . '"></script>';
+                echo $ec;
+            }
+        }
     }
 
     /**

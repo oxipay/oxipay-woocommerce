@@ -281,7 +281,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
                 'id' => $this->pluginFileName . '_minimum',
                 'title' => __('Minimum Order Total', 'woocommerce'),
                 'type' => 'text',
-                'default' => '0',
+                'default' => '20',
                 'description' => 'Minimum order total to use ' . $this->pluginDisplayName . '. Empty for unlimited',
                 'desc_tip' => true,
             ),
@@ -292,7 +292,15 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
                 'default' => '0',
                 'description' => 'Maximum order total to use ' . $this->pluginDisplayName . '. Empty for unlimited',
                 'desc_tip' => true,
-            )
+            ),
+            $this->pluginFileName . '_thresholdAmount' => array(
+                'id' => $this->pluginFileName . '_thresholdAmount',
+                'title' => __('Little Things Threshold Amount', 'woocommerce'),
+                'type' => 'text',
+                'default' => '2000',
+                'description' => 'Little Things Threshold Amount to use ' . $this->pluginDisplayName . '. Empty for unlimited',
+                'desc_tip' => true,
+            ),
         );
     }
 
@@ -338,11 +346,15 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
             }
             $minField = sprintf('%s_minimum', $this->pluginFileName);
             $maxField = sprintf('%s_maximum', $this->pluginFileName);
+            $thresholdField = sprintf('%s_thresholdAmount', $this->pluginFileName);
             if (!isset($this->settings[$minField])) {
                 $this->updateSetting('use_modal', $this->settings[$minField]);
             }
             if (!isset($this->settings[$maxField])) {
                 $this->updateSetting('use_modal', $this->settings[$maxField]);
+            }
+            if (!isset($this->settings[$thresholdField])) {
+                $this->updateSetting('use_modal', $this->settings[$thresholdField]);
             }
         } elseif (version_compare($currentDbVersion, '1.3.5') < 0) {
             if (!isset($this->settings['preselect_button_enabled'])) {
@@ -958,7 +970,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     function admin_options()
     {
         include plugin_dir_path(dirname(__FILE__)) . 'includes/view/backend/admin_options.php';
-
         $countryUrls = array();
         foreach ($this->currentConfig->countries as $countryCode => $country) {
             $countryUrls[$countryCode] = array('gateway' => $this->getGatewayUrl($countryCode));
@@ -1241,6 +1252,15 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     public function plugin_path()
     {
         return WC_HUMM_PATH;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getThreshold()
+    {
+        $thresholdAmount = sprintf('%s_thresholdAmount', $this->pluginFileName);
+        return isset($this->settings[$thresholdAmount]) ? $this->settings[$thresholdAmount] : 0;
     }
 
     /**
