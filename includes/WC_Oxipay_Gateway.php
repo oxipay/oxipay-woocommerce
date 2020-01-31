@@ -213,7 +213,9 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
                 $country_domain = (isset($this->settings['country']) && $this->settings['country'] == 'NZ') ? 'co.nz' : 'com.au';
                 if ($country_domain == "com.au" && $this->settings['enabled'] == 'yes') {
                     if ($this->currentConfig->getDisplayName() == 'Humm') {
+                        echo '<div style="margin-bottom: 20px">';
                         echo '<script id="humm-top-banner-script" src="https://widgets.shophumm.' . $country_domain . '/content/scripts/top-banner.js?element=header"></script>';
+                        echo '</div>';
                     } else {
                         echo '<script id="oxipay-top-banner-script" src="https://widgets.oxipay.' . $country_domain . '/content/scripts/top-banner.js?element=header"></script>';
                     }

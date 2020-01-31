@@ -89,6 +89,9 @@ html {
     font-weight: normal;
 }
 
+.humm-margin-below {
+    margin-bottom: 10px;
+}
 .humm-payment-logo
  {
     float:left;
