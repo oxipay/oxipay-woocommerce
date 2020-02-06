@@ -846,15 +846,15 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         $countryCode = $this->getCountryCode();
         $countryName = $this->getCountryName();
 
-        $valid_addresses = ((count(array_unique($set_addresses)) === 1 && end($set_addresses) === $countryCode) || count($set_addresses) === 0);
-
-        if (!$valid_addresses) {
-            $errorMessage = "&nbsp;Orders from outside " . $countryName . " are not supported by " . $this->pluginDisplayName . ". Please select a different payment option.";
-            $order->cancel_order($errorMessage);
-            $this->logValidationError($errorMessage);
-
-            return false;
-        }
+//        $valid_addresses = ((count(array_unique($set_addresses)) === 1 && end($set_addresses) === $countryCode) || count($set_addresses) === 0);
+//
+//        if (!$valid_addresses) {
+//            $errorMessage = "&nbsp;Orders from outside " . $countryName . " are not supported by " . $this->pluginDisplayName . ". Please select a different payment option.";
+//            $order->cancel_order($errorMessage);
+//            $this->logValidationError($errorMessage);
+//
+//            return false;
+//        }
 
         return true;
     }
