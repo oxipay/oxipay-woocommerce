@@ -78,7 +78,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         ));
         add_action('storefront_content_top', array($this, 'add_top_banner_widget'));
         add_action('woocommerce_after_single_product', array($this, 'add_price_widget'));
-        add_action('woocommerce_proceed_to_checkout',array($this,'add_price_widget_cart'));
+        add_action('woocommerce_proceed_to_checkout', array($this, 'add_price_widget_cart'));
         add_action('woocommerce_single_product_summary', array($this, 'add_price_widget_anchor'));
         add_filter('woocommerce_thankyou_order_id', array($this, 'payment_finalisation'));
         add_filter('the_title', array($this, 'order_received_title'), 11);
@@ -278,6 +278,14 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
                 'default' => __('', 'woocommerce'),
                 'desc_tip' => true,
             ),
+            'force_humm' => array(
+                'title' => __('Force humm', 'woocommerce'),
+                'type' => 'checkbox',
+                'label' => __('Force display and checkout with <strong>humm</strong>, not waiting for automatic switch over (NZ only)', 'woocommerce'),
+                'default' => 'yes',
+                'description' => __('You will switch to <strong>humm</strong> if this is set to \'yes\'. Otherwise you will be automatically switched over on the official <strong>humm</strong> launch date', 'woocommerce'),
+                'desc_tip' => true
+            ),
             $this->pluginFileName . '_minimum' => array(
                 'id' => $this->pluginFileName . '_minimum',
                 'title' => __('Minimum Order Total', 'woocommerce'),
@@ -410,6 +418,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     abstract public function add_top_banner_widget();
 
     abstract public function add_price_widget();
+
     abstract public function add_price_widget_cart();
 
     abstract public function add_price_widget_anchor();
@@ -749,9 +758,9 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
                 $countryCode = 'AU';
             }
         }
-
         $environment = ($this->isTesting() == 'no') ? "live" : "sandbox";
         $url = $this->currentConfig->getUrlAddress($countryCode)[$environment . 'URL'];
+//        $this->log(json_encode($this->currentConfig->getUrlAddress($countryCode)));
 
         return $url;
     }

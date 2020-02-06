@@ -12,7 +12,7 @@
         <div class="card-block card-heading">
             <h4>Redirecting</h4>
         </div>
-        <p>Please wait while we redirect you ...</p>
+        <p>Please wait while we redirect you ...</p>        
         <div id="spinner"></div>
     </div>
 </div>
