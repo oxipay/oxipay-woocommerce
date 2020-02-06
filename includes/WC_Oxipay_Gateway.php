@@ -1,5 +1,5 @@
+g
 <?php
-
 defined('ABSPATH') || exit;
 
 if (!class_exists('WC_Flexi_Gateway_Oxipay')) {
