@@ -103,9 +103,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
      */
     function init_form_fields()
     {
-        if (is_admin() && ($this->settings['enabled'] == 'yes')) {
-            add_action('admin_enqueue_scripts', array($this, 'admin_scripts'));
-        }
+
         $countryOptions = array('' => __('Please select...', 'woocommerce'));
 
         foreach ($this->currentConfig->countries as $countryCode => $country) {
@@ -1052,8 +1050,9 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
 
         if ($sig_exists && $sig_match) {
             $this->log(sprintf('Finalising orderId: %s, (isAsyncCallback=%s)', $order_id, $isAsyncCallback));
-            // Get the status of the order and handle accordingly
-            $this->log(sprintf('params%s'), json_encode($params));
+            if (!empty($params)) {
+                $this->log(json_encode($params));
+            }
             $flexi_result_note = '';
             switch ($params['x_result']) {
                 case "completed":

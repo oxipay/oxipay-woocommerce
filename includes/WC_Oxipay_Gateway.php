@@ -138,7 +138,6 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
                 $script .= $threshold['little'];
             } else {
                 self::$littleBigFlag = true;
-                $bigThing = work;
                 $script = '<div id="BigThing"></div>' . $script;
                 $script .= $threshold['big'];
             }
@@ -169,7 +168,7 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
     function add_price_widget_cart()
     {
         global $woocommerce;
-        $ec_identity = 'small';
+        $ec_identity = 'little';
         if ($this->settings['enabled'] == 'yes' && isset($this->settings['price_widget']) && $this->settings['price_widget'] == 'yes') {
             $threshold_price = $this->getThreshold();
             if (is_cart()) {
