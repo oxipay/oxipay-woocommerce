@@ -1238,7 +1238,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
 
         return false;
     }
-
     /**
      * @param $template_name
      * @param $args

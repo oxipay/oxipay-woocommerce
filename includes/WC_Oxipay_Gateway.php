@@ -104,9 +104,11 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
         $threshold = array("little" => "&LittleThings", "big" => "&BigThings");
         $thresholdPrice = $this->getThreshold();
         if ($this->settings['enabled'] == 'yes' && isset($this->settings['price_widget']) && $this->settings['price_widget'] == 'yes') {
-            $country_domain = (isset($this->settings['country']) && $this->settings['country'] == 'NZ') ? 'oxipay.co.nz' : 'shophumm.com.au';
+//          $country_domain = (isset($this->settings['country']) && $this->settings['country'] == 'NZ') ? 'oxipay.co.nz' : 'shophumm.com.au';
+            $country_domain = 'shophumm.com.au';
             $maximum = $this->getMaxPrice();
-            $name = $this->currentConfig->getDisplayName();
+//          $name = $this->currentConfig->getDisplayName();
+            $name = 'Humm';
             $thresholdPrice = $this->getThreshold();
             $advanced = isset($this->settings['price_widget_advanced']) && $this->settings['price_widget_advanced'] === 'yes';
             $script = '<script ';
@@ -186,7 +188,8 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
     function add_price_widget_anchor()
     {
         global $product;
-        echo '<div id="' . $this->currentConfig->getDisplayName() . '-price-info-anchor"></div>';
+//      echo '<div id="' . $this->currentConfig->getDisplayName() . '-price-info-anchor"></div>';
+        echo '<div id="Humm-price-info-anchor"></div>';
         if ($this->settings['enabled'] == 'yes' && isset($this->settings['price_widget']) && $this->settings['price_widget'] == 'yes') {
             $thresholdPrice = $this->getThreshold();
             if (is_product()) {
@@ -206,19 +209,13 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
     function add_top_banner_widget()
     {
         if (isset($this->settings['top_banner_widget']) && $this->settings['top_banner_widget'] == 'yes') {
+            $country_domain = "com.au";
             if ((isset($this->settings['top_banner_widget_homepage_only']) && $this->settings['top_banner_widget_homepage_only'] == 'yes') && !is_front_page()) {
                 return;
             } else {
-                $country_domain = (isset($this->settings['country']) && $this->settings['country'] == 'NZ') ? 'co.nz' : 'com.au';
-                if ($country_domain == "com.au" && $this->settings['enabled'] == 'yes') {
-                    if ($this->currentConfig->getDisplayName() == 'Humm') {
-                        echo '<div style="margin-bottom: 20px">';
-                        echo '<script id="humm-top-banner-script" src="https://widgets.shophumm.' . $country_domain . '/content/scripts/top-banner.js?element=header"></script>';
-                        echo '</div>';
-                    } else {
-                        echo '<script id="oxipay-top-banner-script" src="https://widgets.oxipay.' . $country_domain . '/content/scripts/top-banner.js?element=header"></script>';
-                    }
-                }
+                echo '<div style="margin-bottom: 20px">';
+                echo '<script id="humm-top-banner-script" src="https://widgets.shophumm.' . $country_domain . '/content/scripts/top-banner.js?element=header"></script>';
+                echo '</div>';
             }
         }
     }
