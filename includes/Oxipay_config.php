@@ -128,7 +128,7 @@ class Oxipay_Config
     {
         $launch_time_string = get_option('oxipay_nz_launch_time_string');
         $launch_time_update_time = get_option('oxipay_nz_launch_time_updated');
-        $this->getLogger()->log('info',$launch_time_string . '|' . $launch_time_update_time);
+        $this->getLogger()->log('info', $launch_time_string . '|' . $launch_time_update_time);
 
         if (time() - strtotime(self::NZ_LAUNCH_TIME_CHECK_ENDS) > 0) {
             // if after LAUNCH_TIME_CHECK_ENDS time, and launch_time is still empty, set it to default launch time, and done.
@@ -136,12 +136,12 @@ class Oxipay_Config
                 $launch_time_string = self::NZ_LAUNCH_TIME_DEFAULT;
                 update_option('oxipay_nz_launch_time_string', $launch_time_string);
             }
-
             return $launch_time_string;
         }
         $country = get_option('woocommerce_oxipay_settings')['country'];
-        if ($country == 'NZ' && (empty($launch_time_string) || empty($launch_time_update_time) || (time() - $launch_time_update_time >= 3600))) {
+        if ($country == 'NZ' && (empty($launch_time_string) || empty($launch_time_update_time) || (time() - $launch_time_update_time >= 1440))) {
             $remote_launch_time_string = wp_remote_get(self::NZ_LAUNCH_TIME_URL)['body'];
+            $this->getLogger()->log('info','remote-launch'.strtotime($remote_launch_time_string));
             if (!empty($remote_launch_time_string)) {
                 $launch_time_string = $remote_launch_time_string;
                 update_option('oxipay_nz_launch_time_string', $launch_time_string);
@@ -163,7 +163,6 @@ class Oxipay_Config
     public function isAfter()
     {
         $force_humm = get_option('woocommerce_oxipay_settings')['force_humm'];
-
         return $force_humm == 'yes' ? true : (time() - strtotime($this->getLaunchDateString()) >= 0);
 
     }
