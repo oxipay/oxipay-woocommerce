@@ -483,8 +483,9 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         if ('Payment_Info' === $column) {
             $order = wc_get_order($post->ID);
             $orderNote = $this->get_humm_order_notes($order->get_id());
+
             if ($order->get_data()['payment_method'] == $this->pluginFileName) {
-                $showNote = ' <mark class="humm-status"><span>' . $orderNote[0] . '</span></mark>';
+                $showNote = ' <mark class="humm-status"><span>' . (isset($orderNote[0])? $orderNote[0]:' ').'</span></mark>';
                 echo $showNote;
             } else {
                 $showNote = ' <mark class="payment-status"><span>' . $order->get_data()['payment_method'] . '</span></mark>';
