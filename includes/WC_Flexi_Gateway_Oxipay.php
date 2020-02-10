@@ -1251,7 +1251,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     /**
      * @return string
      */
-    public function template_path()
+    function template_path()
     {
         return trailingslashit('oxipay');
     }
@@ -1259,7 +1259,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     /**
      * @return string
      */
-    public function plugin_path()
+    function plugin_path()
     {
         return WC_HUMM_PATH;
     }
@@ -1267,7 +1267,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     /**
      * @return int
      */
-    protected function getThreshold()
+    function getThreshold()
     {
         $thresholdAmount = sprintf('%s_thresholdAmount', $this->pluginFileName);
         return isset($this->settings[$thresholdAmount]) ? $this->settings[$thresholdAmount] : 0;
