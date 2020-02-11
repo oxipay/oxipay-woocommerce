@@ -485,7 +485,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
             $orderNote = $this->get_humm_order_notes($order->get_id());
 
             if ($order->get_data()['payment_method'] == $this->pluginFileName) {
-                $showNote = ' <mark class="humm-status"><span>' . (isset($orderNote[0])? $orderNote[0]:' ').'</span></mark>';
+                $showNote = ' <mark class="humm-status"><span>' . (isset($orderNote[0]) ? $orderNote[0] : ' ') . '</span></mark>';
                 echo $showNote;
             } else {
                 $showNote = ' <mark class="payment-status"><span>' . $order->get_data()['payment_method'] . '</span></mark>';
@@ -1238,6 +1238,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
 
         return false;
     }
+
     /**
      * @param $template_name
      * @param $args
@@ -1276,10 +1277,10 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     /**
      * Load javascript for Wordpress admin
      */
-    abstract protected function admin_scripts();
+//    abstract function admin_scripts();
 
     /**
      * Load JavaScript for the checkout page
      */
-    abstract protected function flexi_enqueue_script();
+//    abstract function flexi_enqueue_script();
 }
