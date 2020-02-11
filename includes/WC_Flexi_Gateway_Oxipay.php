@@ -1277,10 +1277,10 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     /**
      * Load javascript for Wordpress admin
      */
-//    abstract function admin_scripts();
+    abstract public function admin_scripts();
 
     /**
      * Load JavaScript for the checkout page
      */
-//    abstract function flexi_enqueue_script();
+    abstract public function flexi_enqueue_script();
 }
