@@ -1006,6 +1006,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         $order = wc_get_order($order_id);
         $cart = WC()->cart;
         $msg = "";
+        $isAsyncCallback = $_SERVER['REQUEST_METHOD'] === "POST" ? true : false;
         if ($order->get_data()['payment_method'] !== $this->pluginFileName) {
             // we don't care about it because it's not an flexi order
             // log in debug level
@@ -1013,8 +1014,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
             $this->log(sprintf('No action required. orderId: %s is not a %s order, (isAsyncCallback=%s)', $order_id, $this->pluginDisplayName, $isAsyncCallback));
             return $order_id;
         }
-
-        $isAsyncCallback = $_SERVER['REQUEST_METHOD'] === "POST" ? true : false;
 
         if ($isAsyncCallback) {
             $params = $_POST;
