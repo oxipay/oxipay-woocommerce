@@ -223,19 +223,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
                 'description' => __('Position the "checkout with ' . $this->pluginDisplayName . ' button" in Cart page if there are multiple checkout buttons. Default is 20. Smaller number moves the button ahead and larger number moves it lower in the list of checkout buttons.', 'woocommerce'),
                 'desc_tip' => true
             ),
-            'au_settings' => array(
-                'title' => __('', 'woocommerce'),
-                'type' => 'title',
-            ),
-            'merchant_type' => array(
-                'title' => __('Humm Merchant Type', 'woocommerce'),
-                'type' => 'select',
-                'class' => 'wc-enhanced-select',
-                'description' => 'Select the option that matches your retailer agreement.',
-                'options' => $merchantTypes,
-                'desc_tip' => true,
-                'custom_attributes' => array('required' => 'required'),
-            ),
             'top_banner_widget' => array(
                 'title' => __('Humm Top Banner Widget', 'woocommerce'),
                 'label' => __('Enable the ' . $this->pluginDisplayName . ' Top Banner Widget', 'woocommerce'),
@@ -253,6 +240,19 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
                 'show_if_checked' => 'yes',
                 'description' => 'When the top banner enabled, it shows in homepage only (if checked), or shows in every page (if unchecked)',
                 'autoload' => false,
+            ),
+            'au_settings' => array(
+                'title' => __('', 'woocommerce'),
+                'type' => 'title',
+            ),
+            'merchant_type' => array(
+                'title' => __('Humm Merchant Type', 'woocommerce'),
+                'type' => 'select',
+                'class' => 'wc-enhanced-select',
+                'description' => 'Select the option that matches your retailer agreement.',
+                'options' => $merchantTypes,
+                'desc_tip' => true,
+                'custom_attributes' => array('required' => 'required'),
             ),
             'nz_settings' => array(
                 'title' => __('', 'woocommerce'),
