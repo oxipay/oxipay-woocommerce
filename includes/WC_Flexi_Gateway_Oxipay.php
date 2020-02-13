@@ -427,10 +427,14 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
 
     function flexi_checkout_button()
     {
-        if ($this->settings["preselect_button_enabled"] == "yes" && $this->settings['enabled'] == 'yes') {
 
-            echo '<div><a href="' . esc_url(wc_get_checkout_url()) . '?' . $this->pluginDisplayName . '_preselected=true" class="checkout-button button" style="font-size: 1.2em; padding-top: 0.4em; padding-bottom: 0.4em; background-color: #' .
-                $this->currentConfig->getButtonColor() . '; color: #FFF;">Check out with ' . $this->pluginDisplayName . '</a></div>';
+        $minimum = $this->getMinPrice();
+        $maximum = $this->getMaxPrice();
+        if (($minimum != 0 && WC()->cart->total > $minimum) && ($maximum != 0 && WC()->cart->total < $maximum)) {
+            if ($this->settings["preselect_button_enabled"] == "yes" && $this->settings['enabled'] == 'yes') {
+                echo '<div><a href="' . esc_url(wc_get_checkout_url()) . '?' . $this->pluginDisplayName . '_preselected=true" class="checkout-button button" style="font-size: 1.2em; padding-top: 0.4em; padding-bottom: 0.4em; background-color: #' .
+                    $this->currentConfig->getButtonColor() . '; color: #FFF;">Check out with ' . $this->pluginDisplayName . '</a></div>';
+            }
         }
     }
 
@@ -557,7 +561,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     protected function getMinPrice()
     {
         $field = sprintf('%s_minimum', $this->pluginFileName);
-
         return isset($this->settings[$field]) ? $this->settings[$field] : 0;
     }
 
@@ -585,7 +588,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
                 unset($available_gateways[$this->pluginFileName]);
             }
         }
-
         return $available_gateways;
     }
 
@@ -761,7 +763,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         }
         $environment = ($this->isTesting() == 'no') ? "live" : "sandbox";
         $url = $this->currentConfig->getUrlAddress($countryCode)[$environment . 'URL'];
-//        $this->log(json_encode($this->currentConfig->getUrlAddress($countryCode)));
+//      $this->log(json_encode($this->currentConfig->getUrlAddress($countryCode)));
 
         return $url;
     }
