@@ -73,7 +73,10 @@ class Oxipay_Config
      */
     public function getButtonColor()
     {
-        return self::BUTTON_COLOR[$this->getDisplayName()];
+        if ($this->isAfter()) {
+            return self::BUTTON_COLOR["Humm"];
+        } else
+            return self::BUTTON_COLOR[$this->getDisplayName()];
     }
 
     /**
@@ -90,9 +93,10 @@ class Oxipay_Config
                 $country = substr($wc_country, 0, 2);
             }
         }
-        if ($country == 'AU') {
+        if (($country == 'AU') || ($this->isAfter())) {
             $name = self::DISPLAY_NAME_AFTER;
         }
+
 
         return $name;
     }
@@ -141,7 +145,7 @@ class Oxipay_Config
         $country = get_option('woocommerce_oxipay_settings')['country'];
         if ($country == 'NZ' && (empty($launch_time_string) || empty($launch_time_update_time) || (time() - $launch_time_update_time >= 1440))) {
             $remote_launch_time_string = wp_remote_get(self::NZ_LAUNCH_TIME_URL)['body'];
-            $this->getLogger()->log('info','remote-launch'.strtotime($remote_launch_time_string));
+            $this->getLogger()->log('info', 'remote-launch' . strtotime($remote_launch_time_string));
             if (!empty($remote_launch_time_string)) {
                 $launch_time_string = $remote_launch_time_string;
                 update_option('oxipay_nz_launch_time_string', $launch_time_string);
