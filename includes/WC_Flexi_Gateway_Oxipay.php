@@ -648,8 +648,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     {
         $country_domain = (isset($this->settings['country']) && $this->settings['country'] == 'NZ') ? 'co.nz' : 'com.au';
         $checkout_total = (WC()->cart) ? WC()->cart->get_totals()['total'] : "0";
-
-        if ($this->currentConfig->getDisplayName() == 'humm') {
+        if (($this->currentConfig->getDisplayName() == 'Humm')|| ( $this->currentConfig->getDisplayName() == 'Oxipay' )){
             $widget_type = 'price-info';
             $merchant_type = "&" . $this->settings['merchant_type'];
             if ($merchant_type == '&both') {
@@ -763,8 +762,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         }
         $environment = ($this->isTesting() == 'no') ? "live" : "sandbox";
         $url = $this->currentConfig->getUrlAddress($countryCode)[$environment . 'URL'];
-//      $this->log(json_encode($this->currentConfig->getUrlAddress($countryCode)));
-
         return $url;
     }
 
@@ -848,16 +845,6 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
         $set_addresses = array_filter($countries);
         $countryCode = $this->getCountryCode();
         $countryName = $this->getCountryName();
-
-//        $valid_addresses = ((count(array_unique($set_addresses)) === 1 && end($set_addresses) === $countryCode) || count($set_addresses) === 0);
-//
-//        if (!$valid_addresses) {
-//            $errorMessage = "&nbsp;Orders from outside " . $countryName . " are not supported by " . $this->pluginDisplayName . ". Please select a different payment option.";
-//            $order->cancel_order($errorMessage);
-//            $this->logValidationError($errorMessage);
-//
-//            return false;
-//        }
 
         return true;
     }
