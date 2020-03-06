@@ -906,7 +906,8 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
 
     private function getMinPurchase()
     {
-        return $this->currentConfig->countries[$this->getCountryCode()]['min_purchase'];
+//      return $this->currentConfig->countries[$this->getCountryCode()]['min_purchase'];
+        return $this->getMinPrice();
     }
 
     /**
@@ -930,7 +931,8 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
      */
     private function getMaxPurchase()
     {
-        return $this->currentConfig->countries[$this->getCountryCode()]['max_purchase'];
+//        return $this->currentConfig->countries[$this->getCountryCode()]['max_purchase'];
+        return $this->getMaxPrice();
     }
 
     /**
