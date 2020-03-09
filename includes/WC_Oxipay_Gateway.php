@@ -187,7 +187,6 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
     function add_price_widget_anchor()
     {
         global $product;
-//      echo '<div id="' . $this->currentConfig->getDisplayName() . '-price-info-anchor"></div>';
         echo '<div id="Humm-price-info-anchor"></div>';
         if ($this->settings['enabled'] == 'yes' && isset($this->settings['price_widget']) && $this->settings['price_widget'] == 'yes') {
             $thresholdPrice = $this->getThreshold();
@@ -208,12 +207,12 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
     function add_top_banner_widget()
     {
         if (isset($this->settings['top_banner_widget']) && $this->settings['top_banner_widget'] == 'yes') {
-            $country_domain = "com.au";
+            $country_domain = $this->settings['country'] == 'au'? 'com.au':'co.nz';
             if ((isset($this->settings['top_banner_widget_homepage_only']) && $this->settings['top_banner_widget_homepage_only'] == 'yes') && !is_front_page()) {
                 return;
             } else {
                 echo '<div style="margin-bottom: 20px">';
-                echo '<script id="humm-top-banner-script" src="https://widgets.shophumm.' . $country_domain . '/content/scripts/top-banner.js?element=header"></script>';
+                echo '<script id="humm-top-banner-script" src="https://widgets.shophumm.' . $country_domain . '/content/scripts/more-info-small-slices.js"></script>';
                 echo '</div>';
             }
         }
