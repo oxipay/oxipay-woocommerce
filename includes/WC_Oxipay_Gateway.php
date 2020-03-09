@@ -171,12 +171,28 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
         $ec_identity = 'little';
         if ($this->settings['enabled'] == 'yes' && isset($this->settings['price_widget']) && $this->settings['price_widget'] == 'yes') {
             $threshold_price = $this->getThreshold();
+            $cart_total = $woocommerce->cart->total;
             if (is_cart()) {
-                $cart_total = $woocommerce->cart->total;
-                $ec_pattern = sprintf("%s%s%s%s", '<script src =" https://widgets.shophumm.com.au/content/scripts/price-info.js?productPrice=', $cart_total, 'pattern', '"></script>');
-                if (floatval($cart_total) >= floatval($threshold_price))
-                    $ec_identity = 'big';
-                echo str_replace('pattern', self::$big_small_flag[$ec_identity], $ec_pattern);
+                if ($this->settings['country'] == 'AU') {
+                    $ec_pattern = sprintf("%s%s%s%s", '<script src =" https://widgets.shophumm.com.au/content/scripts/price-info.js?productPrice=', $cart_total, 'pattern', '"></script>');
+                    if (floatval($cart_total) >= floatval($threshold_price))
+                        $ec_identity = 'big';
+                    echo str_replace('pattern', self::$big_small_flag[$ec_identity], $ec_pattern);
+                }
+                else if ( $this->settings['country'] == 'NZ') {
+                    if (floatval($cart_total) <= floatval($threshold_price)) {
+                        $ec_pattern = sprintf("%s%s%s%s", '<script src= "https://widgets.shophumm.co.nz/content/scripts/price-info.js?productPrice=', $cart_total, '&LittleThings&little=F5', '"></script>');
+                        $ec_pattern = $ec_pattern . sprintf("%s%s%s%s", '<script src= "https://widgets.shophumm.co.nz/content/scripts/price-info.js?productPrice=', $cart_total, '&LittleThings&little=w10', '"></script>');
+                    }
+                    else {
+                        $ec_pattern = sprintf("%s%s%s%s", '<script src= "https://widgets.shophumm.co.nz/content/scripts/price-info.js?productPrice=', $cart_total, '&big=M6', '"></script>');
+                        $ec_pattern = $ec_pattern . sprintf("%s%s%s%s", '<script src= "https://widgets.shophumm.co.nz/content/scripts/price-info.js?productPrice=', $cart_total, '&big=M9', '"></script>');
+                        $ec_pattern = $ec_pattern . sprintf("%s%s%s%s", '<script src= "https://widgets.shophumm.co.nz/content/scripts/price-info.js?productPrice=', $cart_total, '&big=M12', '"></script>');
+                        $ec_pattern = $ec_pattern . sprintf("%s%s%s%s", '<script src= "https://widgets.shophumm.co.nz/content/scripts/price-info.js?productPrice=', $cart_total, '&big=M18', '"></script>');
+                        $ec_pattern = $ec_pattern . sprintf("%s%s%s%s", '<script src= "https://widgets.shophumm.co.nz/content/scripts/price-info.js?productPrice=', $cart_total, '&big=M24', '"></script>');
+                    }
+                    echo $ec_pattern;
+                }
             }
         }
     }
@@ -207,7 +223,7 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
     function add_top_banner_widget()
     {
         if (isset($this->settings['top_banner_widget']) && $this->settings['top_banner_widget'] == 'yes') {
-            $country_domain = $this->settings['country'] == 'au'? 'com.au':'co.nz';
+            $country_domain = $this->settings['country'] == 'AU'? 'com.au':'co.nz';
             if ((isset($this->settings['top_banner_widget_homepage_only']) && $this->settings['top_banner_widget_homepage_only'] == 'yes') && !is_front_page()) {
                 return;
             } else {
