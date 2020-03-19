@@ -145,17 +145,10 @@ class Oxipay_Config
         $country = get_option('woocommerce_oxipay_settings')['country'];
         if ($country == 'NZ' && (empty($launch_time_string) || empty($launch_time_update_time) || (time() - $launch_time_update_time >= 1440))) {
             $remote_launch_time_string = wp_remote_get(self::NZ_LAUNCH_TIME_URL)['body'];
-            $this->getLogger()->log('info', 'remote-launch' . strtotime($remote_launch_time_string));
-            if (!empty($remote_launch_time_string)) {
-                $launch_time_string = $remote_launch_time_string;
+            $launch_time_string = $remote_launch_time_string > self::NZ_LAUNCH_TIME_DEFAULT ? $remote_launch_time_string:self::NZ_LAUNCH_TIME_DEFAULT;
+            $this->getLogger()->log('info', 'remote-launch' . $remote_launch_time_string.$launch_time_string);
                 update_option('oxipay_nz_launch_time_string', $launch_time_string);
                 update_option('oxipay_nz_launch_time_updated', time());
-            } elseif (empty($launch_time_string) || (empty($launch_time_update_time) && $launch_time_string != self::NZ_LAUNCH_TIME_DEFAULT)) {
-                // this is when $launch_time_string never set (first time run of the plugin), or local const LAUNCH_TIME_DEFAULT changes and and never update from remote.
-                // Mainly for development, for changing const LAUNCH_TIME_DEFAULT to take effect.
-                $launch_time_string = self::NZ_LAUNCH_TIME_DEFAULT;
-                update_option('oxipay_nz_launch_time_string', $launch_time_string);
-            }
         }
 
         return $launch_time_string;

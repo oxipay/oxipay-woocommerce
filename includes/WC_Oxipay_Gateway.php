@@ -115,10 +115,6 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
                 }
                 else {
                     $ec_pattern = sprintf("%s%s%s%s", '<script src= "https://widgets.shophumm.co.nz/content/scripts/price-info.js?productPrice=', $displayPrice, '&big=M6&element=%23Humm-price-info-anchor', '"></script>');
-                    $ec_pattern = $ec_pattern . sprintf("%s%s%s%s", '<script src= "https://widgets.shophumm.co.nz/content/scripts/price-info.js?productPrice=', $displayPrice, '&big=M9&element=%23Humm-price-info-anchor', '"></script>');
-                    $ec_pattern = $ec_pattern . sprintf("%s%s%s%s", '<script src= "https://widgets.shophumm.co.nz/content/scripts/price-info.js?productPrice=', $displayPrice, '&big=M12&element=%23Humm-price-info-anchor', '"></script>');
-                    $ec_pattern = $ec_pattern . sprintf("%s%s%s%s", '<script src= "https://widgets.shophumm.co.nz/content/scripts/price-info.js?productPrice=', $displayPrice, '&big=M18&element=%23Humm-price-info-anchor', '"></script>');
-                    $ec_pattern = $ec_pattern . sprintf("%s%s%s%s", '<script src= "https://widgets.shophumm.co.nz/content/scripts/price-info.js?productPrice=', $displayPrice, '&big=M24&element=%23Humm-price-info-anchor', '"></script>');
                 }
                 return $ec_pattern;
             }
@@ -203,10 +199,6 @@ class WC_Oxipay_Gateway extends WC_Flexi_Gateway_Oxipay
                     }
                     else {
                         $ec_pattern = sprintf("%s%s%s%s", '<script src= "https://widgets.shophumm.co.nz/content/scripts/price-info.js?productPrice=', $cart_total, '&big=M6', '"></script>');
-                        $ec_pattern = $ec_pattern . sprintf("%s%s%s%s", '<script src= "https://widgets.shophumm.co.nz/content/scripts/price-info.js?productPrice=', $cart_total, '&big=M9', '"></script>');
-                        $ec_pattern = $ec_pattern . sprintf("%s%s%s%s", '<script src= "https://widgets.shophumm.co.nz/content/scripts/price-info.js?productPrice=', $cart_total, '&big=M12', '"></script>');
-                        $ec_pattern = $ec_pattern . sprintf("%s%s%s%s", '<script src= "https://widgets.shophumm.co.nz/content/scripts/price-info.js?productPrice=', $cart_total, '&big=M18', '"></script>');
-                        $ec_pattern = $ec_pattern . sprintf("%s%s%s%s", '<script src= "https://widgets.shophumm.co.nz/content/scripts/price-info.js?productPrice=', $cart_total, '&big=M24', '"></script>');
                     }
                     echo $ec_pattern;
                 }
