@@ -9,6 +9,8 @@ Please config web server php.ini file: parameters of “short_open_tag = on” t
 
 
 
+
+
 Modules and Update functions 
 
 1. Rebuild admin console to the best UI compared to the other PSP
