@@ -1,8 +1,12 @@
 Installations:
 
-Repository:  https://github.com/oxipay/oxipay-woocommerce/tree/review  tag: V2.0 
+Repository:  https://github.com/oxipay/oxipay-woocommerce/tree/review  tag: V2.0
 
-Please config web server php.ini file: parameters of “short_open_tag = on” to ensure plugin  work 
+
+By default PHP 7+ does not supports php short_open_tag so
+
+Please config web server php.ini file: parameters of “short_open_tag = on” to ensure plugin  completely work if some errors happen
+
 
 
 Modules and Update functions 

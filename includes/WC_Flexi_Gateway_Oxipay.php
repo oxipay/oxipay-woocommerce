@@ -485,7 +485,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
                 max-width: 100%;
             }
         </style>
-        <?
+        <?php
         if ('Payment_Info' === $column) {
             $order = wc_get_order($post->ID);
             $orderNote = $this->get_humm_order_notes($order->get_id());
