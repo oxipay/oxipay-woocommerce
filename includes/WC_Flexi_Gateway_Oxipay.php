@@ -571,7 +571,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
     {
         $field = sprintf('%s_maximum', $this->pluginFileName);
 
-        return isset($this->settings[$field]) ? $this->settings[$field] : 0;
+        return isset($this->settings[$field]) && (intval($this->settings[$field]) <> 0) ? $this->settings[$field] : 1000000;
     }
 
     /**
@@ -892,7 +892,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
 
         $max = $this->getMaxPurchase();
         if ($total > $max) {
-            $errorMessage = "&nbsp;Orders over " . $this->getCurrencyCode() . $this->getCurrencySymbol() . $max . " are not supported by " . $this->pluginDisplayName . ". Please select a different payment option.";
+            $errorMessage = "&nbsp;Orders over " . $this->getCurrencyCode() . $this->getCurrencySymbol() . $max . " are not supported by " . $this->pluginDisplayName . ". Please select a different payment option!";
             $order->cancel_order($errorMessage);
             $this->logValidationError($errorMessage);
 
@@ -933,7 +933,7 @@ abstract class WC_Flexi_Gateway_Oxipay extends WC_Payment_Gateway
      */
     private function getMaxPurchase()
     {
-//        return $this->currentConfig->countries[$this->getCountryCode()]['max_purchase'];
+//      return $this->currentConfig->countries[$this->getCountryCode()]['max_purchase'];
         return $this->getMaxPrice();
     }
 
