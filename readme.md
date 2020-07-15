@@ -11,10 +11,10 @@ or
 https://github.com/oxipay/oxipay-woocommerce/tree/version2
 
 
-tag: V2.0
+Repository tag: V2.0
 
 
-By default PHP 7+ does not supports php short_open_tag so
+By default PHP 7+ does not support php short_open_tag so
 
 optional: Please config web server php.ini file: parameters of “short_open_tag = on” to ensure plugin completely work if some errors happen during installation
 
